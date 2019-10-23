@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- color -->
+  <dimen name="color_argb_seeker_marginSides">4dp</dimen>
+  <dimen name="color_argb_label_marginTop">12dp</dimen>
+
+</resources>

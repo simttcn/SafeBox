@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="default_sorting">1</integer>
+
+
+
+    <!-- ========================== Material dialog ========================== -->
+    <!-- bottomsheets   -->
+    <integer name="md_grid_width">4</integer>
+
+    <!-- color   -->
+    <integer name="color_grid_column_count">4</integer>
+
+
+</resources>
