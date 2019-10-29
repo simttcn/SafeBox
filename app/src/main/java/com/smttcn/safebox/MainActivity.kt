@@ -9,6 +9,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.smttcn.commons.extensions.PerformAppAuthentication
+import com.smttcn.commons.extensions.PerformNewAppPassword
 import com.smttcn.commons.extensions.toast
 import com.smttcn.materialdialogs.MaterialDialog
 import com.smttcn.materialdialogs.input.input
@@ -47,17 +49,12 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         isAuthenticated = false
-        MaterialDialog(this).show {
-            title(R.string.enter_password)
-            input(
-                hint = getString(R.string.enter_your_password),
-                inputType = InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
-            ) { _, text ->
-                toast("Input: $text")
-                isAuthenticated = true
-            }
-            negativeButton(android.R.string.cancel) { finish()}
-            positiveButton(android.R.string.ok)
+        PerformNewAppPassword(this) {
+        //PerformAppAuthentication {
+            if (it)
+                toast("Authentication OKAY!")
+            else
+                toast("Authentication FAILED!")
         }
 
         // Todo:

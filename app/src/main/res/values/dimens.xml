@@ -81,4 +81,8 @@
     <dimen name="file_chooser_item_icon_margin_end">12dp</dimen>
     <dimen name="file_chooser_list_padding_bottom">16dp</dimen>
 
+    <!-- Custom view example -->
+    <dimen name="customTitle">14sp</dimen>
+    <dimen name="customEntry">16sp</dimen>
+
 </resources>

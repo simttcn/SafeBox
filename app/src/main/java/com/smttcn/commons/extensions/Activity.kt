@@ -2,35 +2,28 @@ package com.smttcn.commons.extensions
 
 import android.app.Activity
 import android.content.*
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
-import android.graphics.drawable.ColorDrawable
-import android.media.RingtoneManager
 import android.net.Uri
-import android.os.TransactionTooLargeException
-import android.provider.DocumentsContract
-import android.provider.MediaStore
-import android.text.Html
+import android.text.InputType
+import android.text.method.PasswordTransformationMethod
 import android.view.View
-import android.view.ViewGroup
-import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
-import androidx.documentfile.provider.DocumentFile
 import com.smttcn.safebox.R
 import com.smttcn.commons.activities.BaseSimpleActivity
+import com.smttcn.commons.crypto.Hashing
 //import com.smttcn.commons.dialogs.*
 import com.smttcn.commons.helpers.*
-import com.smttcn.commons.models.*
+import com.smttcn.materialdialogs.MaterialDialog
+import com.smttcn.materialdialogs.ModalDialog
+import com.smttcn.materialdialogs.customview.customView
+import com.smttcn.materialdialogs.customview.getCustomView
+import com.smttcn.materialdialogs.input.input
+import com.smttcn.materialdialogs.lifecycle.lifecycleOwner
 //import kotlinx.android.synthetic.main.dialog_title.view.*
 import java.io.*
-import java.util.*
-import kotlin.collections.HashMap
 
 fun AppCompatActivity.updateActionBarTitle(text: String, color: Int = baseConfig.primaryColor) {
     supportActionBar?.title = HtmlCompat.fromHtml("<font color='${color.getContrastColor().toHex()}'>$text</font>", HtmlCompat.FROM_HTML_MODE_LEGACY)
@@ -130,3 +123,74 @@ fun Activity.hideKeyboard(view: View) {
 }
 
 fun BaseSimpleActivity.getFileInputStreamSync(path: String) = FileInputStream(File(path))
+
+fun Activity.PerformAppAuthentication(callback: (success: Boolean) -> Unit) {
+    MaterialDialog(this).show {
+        title(R.string.enter_password)
+        input(
+            hint = getString(R.string.enter_your_password),
+            inputType = InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
+        ) { _, text ->
+            //toast("Input: $text")
+
+            // todo: check entered password here
+            // return result
+            callback(true)
+        }
+        negativeButton(android.R.string.cancel) { finish()}
+        positiveButton(android.R.string.ok)
+    }
+}
+
+fun Activity.PerformNewAppPassword(parent: AppCompatActivity, callback: (success: Boolean) -> Unit) {
+
+    val dialog = MaterialDialog(this, ModalDialog).show {
+        title(R.string.new_password)
+        customView(R.layout.view_password_new, scrollable = true, horizontalPadding = true)
+        positiveButton(android.R.string.ok) { dialog ->
+            // Pull the password out of the custom view when the positive button is pressed
+            val passwordNewInput: EditText = dialog.getCustomView().findViewById(R.id.new_password)
+            val passwordConfirmInput: EditText = dialog.getCustomView().findViewById(R.id.confirm_password)
+            toast("Password input: ${passwordNewInput.text}")
+
+            val hasher = Hashing()
+            val hashed_pwd = hasher.HashWithSalt(passwordNewInput.text.toString())
+            toast("Password hash: ${hashed_pwd}")
+
+            // todo: check entered password here (temp)
+            val checked = hasher.CheckHashWithSalt(passwordNewInput.text.toString(), hashed_pwd)
+            // return result
+            callback(checked)
+        }
+        negativeButton(android.R.string.cancel)
+        lifecycleOwner(parent)
+    }
+
+    // Setup custom view content
+    val customView = dialog.getCustomView()
+    val passwordNewInput: EditText = customView.findViewById(R.id.new_password)
+    passwordNewInput.inputType = InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
+    passwordNewInput.transformationMethod =  PasswordTransformationMethod.getInstance()
+    val passwordConfirmInput: EditText = customView.findViewById(R.id.confirm_password)
+    passwordConfirmInput.inputType = InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
+    passwordConfirmInput.transformationMethod =  PasswordTransformationMethod.getInstance()
+
+}
+
+fun Activity.PerformChangeAppPassword(callback: (success: Boolean) -> Unit) {
+    MaterialDialog(this).show {
+        title(R.string.enter_password)
+        input(
+            hint = getString(R.string.enter_your_password),
+            inputType = InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
+        ) { _, text ->
+            //toast("Input: $text")
+
+            // check entered password here
+            // return result
+            callback(true)
+        }
+        negativeButton(android.R.string.cancel) { finish()}
+        positiveButton(android.R.string.ok)
+    }
+}
