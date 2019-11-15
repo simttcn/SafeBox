@@ -6,6 +6,18 @@ import com.smttcn.safebox.R
 import com.smttcn.commons.extensions.getSharedPrefs
 import java.text.SimpleDateFormat
 import java.util.*
+import android.R.id.edit
+import android.content.SharedPreferences.Editor
+import com.smttcn.commons.extensions.toByteArrayEx
+import org.json.JSONObject
+
+
+
+
+
+
+
+
 
 open class BaseConfig(val context: Context) {
     protected val prefs = context.getSharedPrefs()
@@ -24,7 +36,37 @@ open class BaseConfig(val context: Context) {
 
     var appPasswordHash: String
         get() = prefs.getString(APP_PASSWORD_HASH, "")!!
-        set(appPasswordHash) = prefs.edit().putString(APP_PASSWORD_HASH, appPasswordHash).apply()
+        set(passwordHash) = prefs.edit().putString(APP_PASSWORD_HASH, passwordHash).apply()
+
+//    var appPasswordHashEncrypted: HashMap<String, ByteArray>
+//        get() {
+//            val outputMap = HashMap<String, ByteArray>()
+//            try {
+//                val jsonString = prefs.getString(APP_PASSWORD_HASH, "")!!
+//                val jsonObject = JSONObject(jsonString)
+//                val keysItr = jsonObject.keys()
+//                while (keysItr.hasNext()) {
+//                    val key = keysItr.next()
+//                    val value = jsonObject.getString(key)
+//                    outputMap[key] = value.toByteArrayEx()
+//                }
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
+//
+//            return outputMap
+//        }
+//        set(appPasswordHashMap) {
+//            val inputMap : HashMap<Any?, Any?> = HashMap<Any?, Any?>(appPasswordHashMap)
+//
+//            appPasswordHashMap.forEach(){
+//              inputMap[it.key] = Arrays.toString(it.value)
+//            }
+//
+//            val jsonObject = JSONObject(inputMap)
+//            val jsonString = jsonObject.toString()
+//            prefs.edit().putString(APP_PASSWORD_HASH, jsonString).apply()
+//        }
 
     var sorting: Int
         get() = prefs.getInt(SORT_ORDER, context.resources.getInteger(R.integer.default_sorting))

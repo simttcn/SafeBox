@@ -16,6 +16,18 @@ import java.text.Normalizer
 import java.util.*
 import java.util.regex.Pattern
 
+fun String.toByteArrayEx() : ByteArray {
+    if (this != null) {
+        val split = this.substring(1, this.length - 1).split(", ")
+        val array = ByteArray(split.size)
+        for (i in split.indices) {
+            array[i] = java.lang.Byte.parseByte(split[i])
+        }
+        return array
+    }
+    return ByteArray(0)
+}
+
 fun String.getFilenameFromPath() = substring(lastIndexOf("/") + 1)
 
 fun String.getFilenameExtension() = substring(lastIndexOf(".") + 1)

@@ -16,7 +16,7 @@ internal class Hashing {
     private val memoryCost: Int = 16
     private val parallelization: Int = 16
 
-    fun HashWithSalt(originalPassword: String) : String {
+    fun hashWithSalt(originalPassword: String) : String {
 
         if (originalPassword.isEmpty()) {
             return ""
@@ -27,7 +27,17 @@ internal class Hashing {
         return generatedSecuredPasswordHash
     }
 
-    fun CheckHashWithSalt(originalPassword: String, hashedPassword: String) : Boolean {
+    fun hashWithSaltWithVerification(originalPassword: String) : String? {
+
+        val hashedPassword = hashWithSalt(originalPassword)
+
+        if (checkHashWithSalt(originalPassword, hashedPassword))
+            return hashedPassword
+        else
+            return null
+    }
+
+    fun checkHashWithSalt(originalPassword: String, hashedPassword: String) : Boolean {
 
         return SCryptUtil.check(originalPassword, hashedPassword, keyLength)
 

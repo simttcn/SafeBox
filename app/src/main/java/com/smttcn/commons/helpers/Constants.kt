@@ -13,6 +13,7 @@ const val APP_ICON_IDS = "app_icon_ids"
 const val APP_ID = "app_id"
 const val APP_LAUNCHER_NAME = "app_launcher_name"
 const val APP_PASSWORD_HASH = "app_password_hash"
+const val APP_PASSWORD_HASH_ENCRYPTED = "app_password_hash_encrypted"
 const val KEY_STORE = "AndroidKeyStore"
 const val KEY_STORE_ALIAS = "smttcn_safebox_key_00"
 const val KEY_LENGTH = 256

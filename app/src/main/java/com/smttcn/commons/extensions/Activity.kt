@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import com.smttcn.safebox.R
 import com.smttcn.commons.activities.BaseSimpleActivity
+import com.smttcn.commons.crypto.Encryption
 import com.smttcn.commons.crypto.Hashing
 //import com.smttcn.commons.dialogs.*
 import com.smttcn.commons.helpers.*
@@ -124,25 +125,24 @@ fun Activity.hideKeyboard(view: View) {
 
 fun BaseSimpleActivity.getFileInputStreamSync(path: String) = FileInputStream(File(path))
 
-fun Activity.PerformAppAuthentication(callback: (success: Boolean) -> Unit) {
+fun Activity.performAppAuthentication(callback: (success: Boolean) -> Unit) {
     MaterialDialog(this).show {
         title(R.string.enter_password)
         input(
             hint = getString(R.string.enter_your_password),
             inputType = InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
         ) { _, text ->
-            //toast("Input: $text")
 
-            // todo: check entered password here
-            // return result
-            callback(true)
+            val authenticator: Authenticator = Authenticator(context)
+            authenticator.authenticateAppPassword(text.toString(), callback)
         }
+
         negativeButton(android.R.string.cancel) { finish()}
         positiveButton(android.R.string.ok)
     }
 }
 
-fun Activity.PerformNewAppPassword(parent: AppCompatActivity, callback: (success: Boolean) -> Unit) {
+fun Activity.performNewAppPassword(parent: AppCompatActivity, callback: (success: Boolean) -> Unit) {
 
     val dialog = MaterialDialog(this, ModalDialog).show {
         title(R.string.new_password)
@@ -151,16 +151,10 @@ fun Activity.PerformNewAppPassword(parent: AppCompatActivity, callback: (success
             // Pull the password out of the custom view when the positive button is pressed
             val passwordNewInput: EditText = dialog.getCustomView().findViewById(R.id.new_password)
             val passwordConfirmInput: EditText = dialog.getCustomView().findViewById(R.id.confirm_password)
-            toast("Password input: ${passwordNewInput.text}")
 
-            val hasher = Hashing()
-            val hashed_pwd = hasher.HashWithSalt(passwordNewInput.text.toString())
-            toast("Password hash: ${hashed_pwd}")
+            val authenticator: Authenticator = Authenticator(context)
+            authenticator.newAppPassword(passwordNewInput.text.toString(), callback)
 
-            // todo: check entered password here (temp)
-            val checked = hasher.CheckHashWithSalt(passwordNewInput.text.toString(), hashed_pwd)
-            // return result
-            callback(checked)
         }
         negativeButton(android.R.string.cancel)
         lifecycleOwner(parent)
@@ -177,7 +171,7 @@ fun Activity.PerformNewAppPassword(parent: AppCompatActivity, callback: (success
 
 }
 
-fun Activity.PerformChangeAppPassword(callback: (success: Boolean) -> Unit) {
+fun Activity.performChangeAppPassword(callback: (success: Boolean) -> Unit) {
     MaterialDialog(this).show {
         title(R.string.enter_password)
         input(
@@ -193,4 +187,8 @@ fun Activity.PerformChangeAppPassword(callback: (success: Boolean) -> Unit) {
         negativeButton(android.R.string.cancel) { finish()}
         positiveButton(android.R.string.ok)
     }
+}
+
+fun Activity.isSimilarByteArray(data1: ByteArray, data2: ByteArray) : Boolean {
+    return data1.toString(Charsets.UTF_8).equals(data2.toString(Charsets.UTF_8))
 }
