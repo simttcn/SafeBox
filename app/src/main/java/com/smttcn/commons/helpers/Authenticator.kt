@@ -11,6 +11,13 @@ internal class Authenticator(appContext: Context) {
 
     val baseConfig: BaseConfig = BaseConfig.newInstance(appContext)
 
+    public fun isAppPasswordHashExist(): Boolean {
+        if (baseConfig.appPasswordHash.length > 20)
+            return true
+        else
+            return false
+    }
+
     public fun authenticateAppPassword(password: String, callback: (success: Boolean) -> Unit) {
         val hashed_password = baseConfig.appPasswordHash
 
@@ -32,11 +39,11 @@ internal class Authenticator(appContext: Context) {
     public fun newAppPassword(password: String, callback: (success: Boolean) -> Unit) {
         // hash the password
         val hasher = Hashing()
-        val hashed_pwd = hasher.hashWithSaltWithVerification(password)
+        val hashedPasswordWithSalt = hasher.hashWithSaltWithVerification(password)
         // verify the password before saving the hash
-        if (hashed_pwd != null)
+        if (hashedPasswordWithSalt != null)
         {
-            baseConfig.appPasswordHash = hashed_pwd
+            baseConfig.appPasswordHash = hashedPasswordWithSalt
             callback(true)
         } else {
             callback(false)

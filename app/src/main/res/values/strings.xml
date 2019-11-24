@@ -18,9 +18,9 @@
     <string name="change_password">Change Password</string>
     <string name="enter_password">Enter Password</string>
     <string name="enter_your_password">enter password</string>
-    <string name="enter_your_old_password">enter old password</string>
-    <string name="enter_your_new_password">enter new password</string>
-    <string name="confirm_your_new_password">confirm new password</string>
+    <string name="enter_existing_password">enter existing password</string>
+    <string name="enter_new_password">enter new password</string>
+    <string name="confirm_new_password">confirm new password</string>
     <string name="reset">Reset</string>
     <string name="signin">Sign In</string>
     <string name="cancel">Cancel</string>

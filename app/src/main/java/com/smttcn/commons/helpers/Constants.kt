@@ -27,6 +27,11 @@ const val KEY_CRYPTOR_TRANSFORMATION = "AES/GCM/NoPadding"
 const val KEY_TEXT_SALT = "salt"
 const val KEY_TEXT_IV = "iv"
 const val KEY_TEXT_ENCRYPTED = "encrypted"
+
+// activity for result request code
+const val REQUEST_CODE_NEW_PASSWORD = 100
+
+// date and time
 const val USE_24_HOUR_FORMAT = "use_24_hour_format"
 const val SUNDAY_FIRST = "sunday_first"
 const val DATE_FORMAT = "date_format"

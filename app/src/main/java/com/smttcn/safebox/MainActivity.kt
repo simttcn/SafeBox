@@ -21,13 +21,13 @@ import timber.log.Timber
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        var isAuthenticated = false;
+        fun isAuthenticated(): Boolean {
+            return MyApplication().globalAppAuthenticated.equals("yes")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        isAuthenticated = false
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
@@ -54,34 +54,24 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        isAuthenticated = false
 
-        //performCreatePassword()
-        performAuthentication()
+        if (!isAuthenticated()) {
+            performAuthentication()
+        }
     }
 
     fun performAuthentication() {
-        performAppAuthentication {
-            if (it) {
-                isAuthenticated = true
-                toast("Authentication OKAY!")
-            } else {
-                isAuthenticated = false
-                toast("Authentication FAILED!")
-            }
-        }
-    }
+        // Todo: call LoginActivity to perform authentication here
 
-    fun performCreatePassword() {
-        performNewAppPassword(this) {
-            if (it) {
-                isAuthenticated = true
-                toast("Authentication OKAY!")
-            } else {
-                isAuthenticated = false
-                toast("Authentication FAILED!")
-            }
-        }
+//        performAppAuthentication {
+//            if (it) {
+//                isAuthenticated = true
+//                toast("Authentication OKAY!")
+//            } else {
+//                isAuthenticated = false
+//                toast("Authentication FAILED!")
+//            }
+//        }
     }
 
 }

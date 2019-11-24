@@ -27,6 +27,7 @@ abstract class BaseSimpleActivity : AppCompatActivity() {
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null
     var isAskingPermissions = false
     var checkedDocumentPath = ""
+    var appAuthenticated = false
 
     private val GENERIC_PERM_HANDLER = 100
 

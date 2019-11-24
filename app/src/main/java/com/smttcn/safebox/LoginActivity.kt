@@ -1,7 +1,8 @@
 package com.smttcn.safebox
 
 import android.app.Activity
-import android.content.Context
+import android.app.Application
+import android.content.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -21,6 +22,9 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.app.ComponentActivity.ExtraData
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.view.inputmethod.InputMethodManager
+import com.smttcn.commons.helpers.Authenticator
+import com.smttcn.commons.helpers.BaseConfig
+import com.smttcn.commons.helpers.REQUEST_CODE_NEW_PASSWORD
 
 
 class LoginActivity : AppCompatActivity() {
@@ -28,46 +32,60 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val authenticator = Authenticator(this)
+        if (!authenticator.isAppPasswordHashExist()) redirectToNewPasswordActivity()
+
         setContentView(R.layout.activity_login)
 
         val Password = findViewById<EditText>(R.id.password)
         val LoginButton = findViewById<Button>(R.id.login)
-        //val Loading = findViewById<ProgressBar>(R.id.loading)
 
-        Password.apply {
-            afterTextChanged {
-                if (Password.text.toString().length > 5) {
-                    LoginButton.isEnabled = true
-                } else {
-                    LoginButton.isEnabled = false
-                }
+        Password.addTextChangedListener(object: TextWatcher {
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                LoginButton.isEnabled = s.toString().length > 5
             }
 
-            LoginButton.setOnClickListener {
-                //Loading.visibility = View.VISIBLE
+        })
 
-                // togo: perform authenticaiton here
-                //loginViewModel.login(username.text.toString(), password.text.toString())
-            }
+        LoginButton.setOnClickListener {
+            //Loading.visibility = View.VISIBLE
+
+            // togo: perform authenticaiton here
+            //loginViewModel.login(username.text.toString(), password.text.toString())
         }
+    }
+
+    private fun redirectToNewPasswordActivity() {
+        val intent = Intent(this, PasswordActivity::class.java)
+        startActivityForResult(intent, REQUEST_CODE_NEW_PASSWORD)
+    }
+
+    private fun initialize() {
+
+        val baseConfig: BaseConfig = BaseConfig.newInstance(this)
+
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
-}
 
-/**
- * Extension function to simplify setting an afterTextChanged action to EditText components.
- */
-fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
-    this.addTextChangedListener(object : TextWatcher {
-        override fun afterTextChanged(editable: Editable?) {
-            afterTextChanged.invoke(editable.toString())
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        // Check which request we're responding to
+        if (requestCode == REQUEST_CODE_NEW_PASSWORD) {
+            // Make sure the request was successful
+            if (resultCode == Activity.RESULT_OK) {
+                // The user set a password, so will return to this activity for user to login
+            } else {
+                // password not set, so quit the app
+                finishAndRemoveTask()
+            }
         }
-
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-    })
+    }
 }

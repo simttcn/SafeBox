@@ -1,4 +1,7 @@
 package com.smttcn.safebox
 
-class MyApplication {
+import android.app.Application
+
+class MyApplication : Application() {
+    var globalAppAuthenticated: String = "no"
 }

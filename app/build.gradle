@@ -38,10 +38,16 @@ android {
 
     signingConfigs {
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            keyAlias "keyAliasSafeBox"
+            keyPassword "kdeLJFm392Ec2AA2"
+            storePassword "DM6skJXncZ9P2Ld8"
+            storeFile file('../keystore.jks')
+        }
+        debug {
+            keyAlias "keyAliasSafeBox"
+            keyPassword "kdeLJFm392Ec2AA2"
+            storePassword "DM6skJXncZ9P2Ld8"
+            storeFile file('../keystore.jks')
         }
     }
 
