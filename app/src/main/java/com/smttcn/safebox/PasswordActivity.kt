@@ -22,8 +22,10 @@ import androidx.core.app.ComponentActivity.ExtraData
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.view.inputmethod.InputMethodManager
 import android.transition.Visibility
+import com.smttcn.commons.extensions.showKeyboard
 import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.BaseConfig
+import com.smttcn.materialdialogs.MaterialDialog
 
 
 class PasswordActivity : AppCompatActivity() {
@@ -78,7 +80,7 @@ class PasswordActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                toEnableConfirmButton(s.toString(), ConfirmPassword.text.toString())
+                toEnableConfirmButton(NewPassword.text.toString(), s.toString())
             }
 
         })
@@ -87,10 +89,9 @@ class PasswordActivity : AppCompatActivity() {
             if (isPasswordValid(NewPassword.text.toString(), ConfirmPassword.text.toString())){
 
                 if (toCreateNewPasswordHash) {
-                    // todo: create new password hash
                     val authenticator: Authenticator = Authenticator(this)
                     authenticator.newAppPassword(NewPassword.text.toString()){
-                        if (it == true){
+                        if (it){
                             // new password hash created successfully
                             setResult(Activity.RESULT_OK)
                             finish()
@@ -107,6 +108,8 @@ class PasswordActivity : AppCompatActivity() {
                 }
             }
         }
+
+        showKeyboard(NewPassword)
     }
 
     private fun toEnableConfirmButton(newPassword: String, confirmPassword: String) {
@@ -122,7 +125,4 @@ class PasswordActivity : AppCompatActivity() {
     }
 
 
-    private fun showLoginFailed(@StringRes errorString: Int) {
-        Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
-    }
 }

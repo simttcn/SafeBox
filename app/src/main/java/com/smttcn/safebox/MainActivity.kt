@@ -1,8 +1,10 @@
 package com.smttcn.safebox
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.widget.EditText
+import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -10,19 +12,21 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.smttcn.commons.crypto.KeyStoreUtil
-import com.smttcn.commons.extensions.performAppAuthentication
-import com.smttcn.commons.extensions.performNewAppPassword
 import com.smttcn.commons.extensions.toast
-import com.smttcn.commons.helpers.KEY_STORE_ALIAS
-import com.smttcn.materialdialogs.MaterialDialog
-import com.smttcn.materialdialogs.input.input
+import com.smttcn.commons.helpers.INTERVAL_BACK_BUTTON_QUIT_IN_MS
+import com.smttcn.commons.helpers.REQUEST_CODE_NEW_PASSWORD
 import timber.log.Timber
+import java.time.LocalDateTime
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
+    var BackButtonPressedOnce = false
+    var LastPressedBackTime = System.currentTimeMillis()
+
     companion object {
         fun isAuthenticated(): Boolean {
-            return MyApplication().globalAppAuthenticated.equals("yes")
+            return MyApplication.globalAppAuthenticated.equals("yes")
         }
     }
 
@@ -60,18 +64,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        val millisecondsSinceLastPressedBack = System.currentTimeMillis() - LastPressedBackTime
+        if (!BackButtonPressedOnce || millisecondsSinceLastPressedBack > INTERVAL_BACK_BUTTON_QUIT_IN_MS) {
+            toast(R.string.press_back_again_to_quit, Toast.LENGTH_LONG)
+            BackButtonPressedOnce = true
+            LastPressedBackTime = System.currentTimeMillis()
+            return
+        } else {
+            finishAndRemoveTask()
+        }
+        super.onBackPressed()
+    }
     fun performAuthentication() {
-        // Todo: call LoginActivity to perform authentication here
-
-//        performAppAuthentication {
-//            if (it) {
-//                isAuthenticated = true
-//                toast("Authentication OKAY!")
-//            } else {
-//                isAuthenticated = false
-//                toast("Authentication FAILED!")
-//            }
-//        }
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finishAffinity()
     }
 
 }

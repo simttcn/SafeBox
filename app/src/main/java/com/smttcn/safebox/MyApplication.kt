@@ -3,5 +3,7 @@ package com.smttcn.safebox
 import android.app.Application
 
 class MyApplication : Application() {
-    var globalAppAuthenticated: String = "no"
+    companion object {
+        var globalAppAuthenticated: String = "no"
+    }
 }

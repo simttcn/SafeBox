@@ -6,16 +6,12 @@ import com.smttcn.commons.extensions.baseConfig
 import com.smttcn.commons.crypto.Encryption
 import com.smttcn.commons.crypto.Hashing
 
-// todo: last
 internal class Authenticator(appContext: Context) {
 
     val baseConfig: BaseConfig = BaseConfig.newInstance(appContext)
 
     public fun isAppPasswordHashExist(): Boolean {
-        if (baseConfig.appPasswordHash.length > 20)
-            return true
-        else
-            return false
+        return baseConfig.appPasswordHash.length > 20
     }
 
     public fun authenticateAppPassword(password: String, callback: (success: Boolean) -> Unit) {

@@ -48,13 +48,6 @@ fun Activity.appLaunched(appId: String) {
 
 }
 
-fun Activity.handleAppPasswordProtection(callback: (success: Boolean) -> Unit) {
-    // Todo:
-//    SecurityDialog(this, baseConfig.appPasswordHash, baseConfig.appProtectionType) { hash, type, success ->
-//        callback(success)
-//    }
-}
-
 //fun Activity.showDonateOrUpgradeDialog() {
 //    if (getCanAppBeUpgraded()) {
 //        UpgradeToProDialog(this)

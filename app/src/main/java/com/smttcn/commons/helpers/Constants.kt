@@ -28,6 +28,8 @@ const val KEY_TEXT_SALT = "salt"
 const val KEY_TEXT_IV = "iv"
 const val KEY_TEXT_ENCRYPTED = "encrypted"
 
+const val INTERVAL_BACK_BUTTON_QUIT_IN_MS = 3000
+
 // activity for result request code
 const val REQUEST_CODE_NEW_PASSWORD = 100
 

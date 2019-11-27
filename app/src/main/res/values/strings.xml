@@ -15,8 +15,11 @@
 
     <!--  UI  -->
     <string name="new_password">New Password</string>
+    <string name="new_password_message">New password successfully created, please proceed to login.</string>
+    <string name="new_password_error_message">Unable to save the password, please launch the app and try again.</string>
     <string name="change_password">Change Password</string>
     <string name="enter_password">Enter Password</string>
+    <string name="enter_password_error">Password incorrect, please try again.</string>
     <string name="enter_your_password">enter password</string>
     <string name="enter_existing_password">enter existing password</string>
     <string name="enter_new_password">enter new password</string>
@@ -25,6 +28,8 @@
     <string name="signin">Sign In</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
+    <string name="error">Error</string>
+    <string name="press_back_again_to_quit">Press back button again to quit this app.</string>
 
     <!-- Dates -->
     <string name="january">January</string>
