@@ -32,6 +32,7 @@ const val INTERVAL_BACK_BUTTON_QUIT_IN_MS = 3000
 
 // activity for result request code
 const val REQUEST_CODE_NEW_PASSWORD = 100
+const val REQUEST_CODE_CHANGE_PASSWORD = 110
 
 // date and time
 const val USE_24_HOUR_FORMAT = "use_24_hour_format"

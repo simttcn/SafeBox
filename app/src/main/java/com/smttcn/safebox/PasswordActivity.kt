@@ -55,16 +55,19 @@ class PasswordActivity : AppCompatActivity() {
         val ConfirmButton = findViewById<Button>(R.id.confirm)
 
         if (!toCreateNewPasswordHash) {
-            val ExistingPassword = findViewById<EditText>(R.id.existing_password)
+            // user want to change the app password
+            val CurrentPassword = findViewById<EditText>(R.id.existing_password)
             val CancelButton = findViewById<Button>(R.id.cancel)
 
             CancelButton.visibility = if (!toCreateNewPasswordHash) View.VISIBLE else View.GONE
-            ExistingPassword.visibility = if (!toCreateNewPasswordHash) View.VISIBLE else View.GONE
+            CurrentPassword.visibility = if (!toCreateNewPasswordHash) View.VISIBLE else View.GONE
 
             CancelButton.setOnClickListener {
                 setResult(Activity.RESULT_CANCELED)
                 finish()
             }
+
+            showKeyboard(CurrentPassword)
         }
 
         NewPassword.addTextChangedListener(object: TextWatcher {
@@ -109,7 +112,9 @@ class PasswordActivity : AppCompatActivity() {
             }
         }
 
-        showKeyboard(NewPassword)
+        if (toCreateNewPasswordHash) {
+            showKeyboard(NewPassword)
+        }
     }
 
     private fun toEnableConfirmButton(newPassword: String, confirmPassword: String) {
