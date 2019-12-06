@@ -22,6 +22,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.BaseConfig
+import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.commons.helpers.REQUEST_CODE_NEW_PASSWORD
 import com.smttcn.materialdialogs.MaterialDialog
 import com.smttcn.materialdialogs.callbacks.onDismiss
@@ -29,14 +30,21 @@ import com.smttcn.materialdialogs.callbacks.onDismiss
 
 class LoginActivity : AppCompatActivity() {
 
+    private var IsCalledFromMainActivity = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initialize()
+        initialize(savedInstanceState)
         initializeUI()
 
     }
 
-    private fun initialize() {
+    private fun initialize(bundle: Bundle?) {
+
+        // get param from bundle
+        val bundle = intent.extras
+        val param1 = bundle?.getString(INTENT_CALL_FROM_MAINACTIVITY)
+        if (param1.equals("yes")) IsCalledFromMainActivity = true
 
         // redirect to create new password screen if necessary
         val authenticator = Authenticator(this)
@@ -73,9 +81,15 @@ class LoginActivity : AppCompatActivity() {
                         // Login successfully
                         MyApplication.globalAppAuthenticated = "yes"
 
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
-                        finishAffinity()
+                        if (!IsCalledFromMainActivity) {
+                            // not called from MainActivity, so start one
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                            finishAffinity()
+                        } else {
+                            // called from MainActivity, so finish and return
+                            finish()
+                        }
 
 //                        val Message = findViewById<TextView>(R.id.message)
 //                        Message.text = "Good good"

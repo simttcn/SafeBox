@@ -15,6 +15,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.smttcn.commons.crypto.KeyStoreUtil
 import com.smttcn.commons.extensions.toast
+import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.commons.helpers.INTERVAL_BACK_BUTTON_QUIT_IN_MS
 import com.smttcn.commons.helpers.REQUEST_CODE_CHANGE_PASSWORD
 import com.smttcn.commons.helpers.REQUEST_CODE_NEW_PASSWORD
@@ -84,8 +85,9 @@ class MainActivity : AppCompatActivity() {
 
     fun performAuthentication() {
         val intent = Intent(this, LoginActivity::class.java)
+        intent.putExtra(INTENT_CALL_FROM_MAINACTIVITY, "yes")
         startActivity(intent)
-        finishAffinity()
+        //finishAffinity()
     }
 
     fun changePassword(view: View) {
@@ -111,7 +113,7 @@ class MainActivity : AppCompatActivity() {
                     cancelable(false)  // calls setCancelable on the underlying dialog
                     cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
                 }
-            } else {
+            } else if (resultCode == Activity.RESULT_CANCELED){
                 // User cancelled password change
                 MaterialDialog(this).show {
                     title(R.string.change_password)

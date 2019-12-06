@@ -25,7 +25,8 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks {
 
     override fun onActivityStarted(activity: Activity) {
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
-            // Todo: App enters foreground
+            // App enters foreground
+            globalAppAuthenticated = "no"
         }
     }
 
@@ -37,7 +38,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks {
         isActivityChangingConfigurations = activity.isChangingConfigurations();
 
         if (--activityReferences == 0 && !isActivityChangingConfigurations) {
-            // Todo: App enters background
+            // App enters background
             globalAppAuthenticated = "no"
         }
     }

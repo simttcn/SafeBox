@@ -12,26 +12,18 @@ import com.smttcn.safebox.R
 
 class SettingsFragment : Fragment() {
 
-    private lateinit var settingsViewModel: SettingsViewModel
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        settingsViewModel =
-            ViewModelProviders.of(this).get(SettingsViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_settings, container, false)
 
-        val textView: TextView = root.findViewById(R.id.text_notifications)
-        settingsViewModel.text.observe(this, Observer {
-            textView.text = it
-        })
+        val textView: TextView = root.findViewById(R.id.text_settings)
+        textView.text = getString(R.string.navigation_settings)
 
         val changePasswordTextView: TextView = root.findViewById(R.id.text_change_password)
-        settingsViewModel.textChangePassword.observe(this, Observer {
-            changePasswordTextView.text = it
-        })
+        changePasswordTextView.text = getString(R.string.change_password)
 
         return root
     }

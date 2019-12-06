@@ -20,6 +20,7 @@ import android.content.Context.INPUT_METHOD_SERVICE
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.app.ComponentActivity.ExtraData
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.text.TextUtils.isEmpty
 import android.view.inputmethod.InputMethodManager
 import android.transition.Visibility
 import com.smttcn.commons.extensions.showKeyboard
@@ -36,6 +37,12 @@ class PasswordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initialize()
         initializeUI()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        setResult(Activity.RESULT_CANCELED)
+        finish()
     }
 
     private fun initialize() {
@@ -89,10 +96,12 @@ class PasswordActivity : AppCompatActivity() {
         })
 
         ConfirmButton.setOnClickListener {
-            if (isPasswordValid(NewPassword.text.toString(), ConfirmPassword.text.toString())){
+            if (isNewPasswordValid(NewPassword.text.toString(), ConfirmPassword.text.toString())){
+
+                val authenticator: Authenticator = Authenticator(this)
 
                 if (toCreateNewPasswordHash) {
-                    val authenticator: Authenticator = Authenticator(this)
+                    // create new password on first app entry
                     authenticator.newAppPassword(NewPassword.text.toString()){
                         if (it){
                             // new password hash created successfully
@@ -106,7 +115,31 @@ class PasswordActivity : AppCompatActivity() {
                     }
 
                 } else {
-                    // todo: change password
+                    // change password
+                    val CurrentPassword = findViewById<EditText>(R.id.existing_password)
+
+                    if (CurrentPassword.text.toString().length > 5) {
+                        authenticator.authenticateAppPassword(CurrentPassword.text.toString()) {
+                            if (it == true) {
+                                // todo: correct app password
+
+                                setResult(Activity.RESULT_OK)
+                                finish()
+
+                            } else {
+                                // incorrect app password
+                                showChangePasswordDialog(R.string.change_password_error_message) {
+                                    CurrentPassword.selectAll()
+                                    showKeyboard(CurrentPassword)
+                                }
+                            }
+                        }
+                    } else {
+                        showChangePasswordDialog(R.string.change_password_error_message) {
+                            CurrentPassword.selectAll()
+                            showKeyboard(CurrentPassword)
+                        }
+                    }
 
                 }
             }
@@ -117,13 +150,25 @@ class PasswordActivity : AppCompatActivity() {
         }
     }
 
+    private fun showChangePasswordDialog(stringID: Int, callback: () -> Unit){
+        MaterialDialog(this).show {
+            title(R.string.change_password)
+            message(stringID)
+            positiveButton(R.string.ok)
+            cancelable(false)  // calls setCancelable on the underlying dialog
+            cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+        }.positiveButton {
+            callback()
+        }
+    }
+
     private fun toEnableConfirmButton(newPassword: String, confirmPassword: String) {
         val confirmButton = findViewById<Button>(R.id.confirm)
-        confirmButton.isEnabled = isPasswordValid(newPassword, confirmPassword)
+        confirmButton.isEnabled = isNewPasswordValid(newPassword, confirmPassword)
     }
 
 
-    private fun isPasswordValid(newPassword: String, confirmPassword: String) : Boolean {
+    private fun isNewPasswordValid(newPassword: String, confirmPassword: String) : Boolean {
         return (newPassword.length > 5
                 && confirmPassword.length > 5
                 && newPassword.equals(confirmPassword, false))

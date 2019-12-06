@@ -34,6 +34,9 @@ const val INTERVAL_BACK_BUTTON_QUIT_IN_MS = 3000
 const val REQUEST_CODE_NEW_PASSWORD = 100
 const val REQUEST_CODE_CHANGE_PASSWORD = 110
 
+// Intent request string
+const val INTENT_CALL_FROM_MAINACTIVITY = "call_from_mainactivity"
+
 // date and time
 const val USE_24_HOUR_FORMAT = "use_24_hour_format"
 const val SUNDAY_FIRST = "sunday_first"
