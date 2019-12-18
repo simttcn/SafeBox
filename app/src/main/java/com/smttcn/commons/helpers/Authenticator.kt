@@ -33,6 +33,23 @@ internal class Authenticator(appContext: Context) {
     }
 
     public fun newAppPassword(password: String, callback: (success: Boolean) -> Unit) {
+        hashAndSavePassword(password, callback)
+    }
+
+    public fun changeAppPassword(oldPassword: String, newPassword: String, callback: (success: Boolean) -> Unit) {
+        // check the current password again before saving the new hashed oassword
+        authenticateAppPassword(oldPassword) {
+            if (it == true) {
+                // current password matched, so go ahead to hash and save the new password
+                hashAndSavePassword(newPassword, callback)
+            } else {
+                // current password not matched
+                callback(false)
+            }
+        }
+    }
+
+    public fun hashAndSavePassword(password: String, callback: (success: Boolean) -> Unit) {
         // hash the password
         val hasher = Hashing()
         val hashedPasswordWithSalt = hasher.hashWithSaltWithVerification(password)
@@ -47,8 +64,6 @@ internal class Authenticator(appContext: Context) {
 
     }
 
-    public fun changeAppPassword(callback: (success: Boolean) -> Unit) {
-    }
 
     fun isSimilarByteArray(data1: ByteArray, data2: ByteArray) : Boolean {
         return data1.toString(Charsets.UTF_8).equals(data2.toString(Charsets.UTF_8))

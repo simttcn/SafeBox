@@ -2,12 +2,22 @@ package com.smttcn.safebox
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.os.Bundle
 
 class MyApplication : Application(), Application.ActivityLifecycleCallbacks {
 
     companion object {
         var globalAppAuthenticated: String = "no"
+        lateinit var appContext: Context
+
+        fun getContext(): Context {
+            return appContext
+        }
+
+        fun setContext(context: Context): Unit {
+            appContext = context
+        }
     }
 
     var activityReferences: Int = 0

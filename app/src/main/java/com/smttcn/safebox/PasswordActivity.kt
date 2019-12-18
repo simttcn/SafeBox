@@ -121,10 +121,23 @@ class PasswordActivity : AppCompatActivity() {
                     if (CurrentPassword.text.toString().length > 5) {
                         authenticator.authenticateAppPassword(CurrentPassword.text.toString()) {
                             if (it == true) {
-                                // todo: correct app password
+                                // todo: correct app password, so go ahead to change the password
+                                authenticator.changeAppPassword(CurrentPassword.text.toString(),
+                                    NewPassword.text.toString()) {
 
-                                setResult(Activity.RESULT_OK)
-                                finish()
+                                    if (it == true) {
+                                        setResult(Activity.RESULT_OK)
+                                        finish()
+                                    } else {
+                                        showChangePasswordDialog(R.string.change_password_error_occurs_message) {
+                                            CurrentPassword.selectAll()
+                                            showKeyboard(CurrentPassword)
+                                        }
+                                    }
+                                }
+
+
+
 
                             } else {
                                 // incorrect app password

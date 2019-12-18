@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MyApplication.setContext(this)
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
@@ -90,39 +91,30 @@ class MainActivity : AppCompatActivity() {
         //finishAffinity()
     }
 
-    fun changePassword(view: View) {
-        redirectToChangePasswordActivity()
-    }
-
-    private fun redirectToChangePasswordActivity() {
-        val intent = Intent(this, PasswordActivity::class.java)
-        startActivityForResult(intent, REQUEST_CODE_CHANGE_PASSWORD)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        // Check which request we're responding to
-        if (requestCode == REQUEST_CODE_CHANGE_PASSWORD) {
-            // Make sure the request was successful
-            if (resultCode == Activity.RESULT_OK) {
-                // The user changed his/her app password
-                MaterialDialog(this).show {
-                    title(R.string.change_password)
-                    message(R.string.change_password_message)
-                    positiveButton(R.string.ok)
-                    cancelable(false)  // calls setCancelable on the underlying dialog
-                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-                }
-            } else if (resultCode == Activity.RESULT_CANCELED){
-                // User cancelled password change
-                MaterialDialog(this).show {
-                    title(R.string.change_password)
-                    message(R.string.change_password_cancel_message)
-                    positiveButton(R.string.ok)
-                    cancelable(false)  // calls setCancelable on the underlying dialog
-                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-                }
-            }
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        // Check which request we're responding to
+//        if (requestCode == REQUEST_CODE_CHANGE_PASSWORD) {
+//            // Make sure the request was successful
+//            if (resultCode == Activity.RESULT_OK) {
+//                // The user changed his/her app password
+//                MaterialDialog(this).show {
+//                    title(R.string.change_password)
+//                    message(R.string.change_password_message)
+//                    positiveButton(R.string.ok)
+//                    cancelable(false)  // calls setCancelable on the underlying dialog
+//                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+//                }
+//            } else if (resultCode == Activity.RESULT_CANCELED){
+//                // User cancelled password change
+//                MaterialDialog(this).show {
+//                    title(R.string.change_password)
+//                    message(R.string.change_password_cancel_message)
+//                    positiveButton(R.string.ok)
+//                    cancelable(false)  // calls setCancelable on the underlying dialog
+//                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+//                }
+//            }
+//        }
+//    }
 }

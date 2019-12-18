@@ -17,10 +17,10 @@
     <string name="new_password">New Password</string>
     <string name="new_password_message">New password successfully created, please proceed to login.</string>
     <string name="new_password_error_message">Unable to save the password, please launch the app and try again.</string>
-    <string name="change_password">Change Password</string>
     <string name="change_password_message">Your password has been successfully changed.</string>
     <string name="change_password_cancel_message">Password change cancelled.</string>
     <string name="change_password_error_message">You have entered an incorrect current password, please try again.</string>
+    <string name="change_password_error_occurs_message">Error occurs when changing password, please try again.</string>
     <string name="enter_password">Enter Password</string>
     <string name="enter_password_error">Password incorrect, please try again.</string>
     <string name="enter_your_password">enter password</string>
@@ -228,4 +228,24 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="security_header">Security</string>
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Security Preferences -->
+    <string name="change_password">Change Password</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>
