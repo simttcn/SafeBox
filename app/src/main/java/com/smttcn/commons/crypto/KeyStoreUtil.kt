@@ -39,25 +39,26 @@ internal class KeyStoreUtil {
         return keyAliases
     }
 
-    fun init() {
-        val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, KEY_STORE)
-        val keyGenParameterSpec = KeyGenParameterSpec.Builder(
-            KEY_STORE_ALIAS,
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
-            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-            //.setUserAuthenticationRequired(true) // 2 requires lock screen, invalidated if lock screen is disabled
-            //.setUserAuthenticationValidityDurationSeconds(120) // 3 only available x seconds from password authentication. -1 requires finger print - every time
-            .setRandomizedEncryptionRequired(true) // 4 different ciphertext for same plaintext on each call
-            .build()
-        keyGenerator.init(keyGenParameterSpec)
-        keyGenerator.generateKey()
-
+    init {
+        if (!isKeyExist()) {
+            val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, KEY_STORE)
+            val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+                KEY_STORE_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                //.setUserAuthenticationRequired(true) // 2 requires lock screen, invalidated if lock screen is disabled
+                //.setUserAuthenticationValidityDurationSeconds(120) // 3 only available x seconds from password authentication. -1 requires finger print - every time
+                .setRandomizedEncryptionRequired(true) // 4 different ciphertext for same plaintext on each call
+                .build()
+            keyGenerator.init(keyGenParameterSpec)
+            keyGenerator.generateKey()
+        }
     }
 
     fun getKey(alias: String = KEY_STORE_ALIAS) : SecretKey? {
         val keyStore = getKeyStore()
-        val secretKey: SecretKey
+        val secretKey: SecretKey?
 
         try {
             val secretKeyEntry = keyStore.getEntry(alias, null) as KeyStore.SecretKeyEntry

@@ -27,6 +27,7 @@ const val KEY_CRYPTOR_TRANSFORMATION = "AES/GCM/NoPadding"
 const val KEY_TEXT_SALT = "salt"
 const val KEY_TEXT_IV = "iv"
 const val KEY_TEXT_ENCRYPTED = "encrypted"
+const val PATH_DOCUMENT_ROOT = "data/"
 
 const val INTERVAL_BACK_BUTTON_QUIT_IN_MS = 3000
 
@@ -75,9 +76,6 @@ const val SORT_BY_DATE_CREATED = 8
 const val SORT_BY_EXTENSION = 16
 const val SORT_BY_FOLDERNAME = 32
 const val SORT_DESCENDING = 64
-
-// security
-const val WAS_PROTECTION_HANDLED = "was_protection_handled"
 
 // permissions
 const val PERMISSION_READ_STORAGE = 1

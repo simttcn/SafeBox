@@ -20,24 +20,19 @@ import com.smttcn.safebox.R
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import java.io.File
+import java.io.FileInputStream
 import java.util.*
 import java.util.regex.Pattern
 
 abstract class BaseSimpleActivity : AppCompatActivity() {
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null
     var isAskingPermissions = false
-    var checkedDocumentPath = ""
-    var appAuthenticated = false
 
     private val GENERIC_PERM_HANDLER = 100
 
     companion object {
-        var funAfterSAFPermission: ((success: Boolean) -> Unit)? = null
+        //var funAfterSAFPermission: ((success: Boolean) -> Unit)? = null
     }
-
-    abstract fun getAppIconIDs(): ArrayList<Int>
-
-    abstract fun getAppLauncherName(): String
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -65,7 +60,7 @@ abstract class BaseSimpleActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        funAfterSAFPermission = null
+        //funAfterSAFPermission = null
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -78,32 +73,6 @@ abstract class BaseSimpleActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
-    }
-
-//    fun startAboutActivity(appNameId: Int, licenseMask: Int, versionName: String, faqItems: ArrayList<FAQItem>, showFAQBeforeMail: Boolean) {
-//        Intent(applicationContext, AboutActivity::class.java).apply {
-//            putExtra(APP_ICON_IDS, getAppIconIDs())
-//            putExtra(APP_LAUNCHER_NAME, getAppLauncherName())
-//            putExtra(APP_NAME, getString(appNameId))
-//            putExtra(APP_LICENSES, licenseMask)
-//            putExtra(APP_VERSION_NAME, versionName)
-//            putExtra(APP_FAQ, faqItems)
-//            putExtra(SHOW_FAQ_BEFORE_MAIL, showFAQBeforeMail)
-//            startActivity(this)
-//        }
-//    }
-
-    fun handleSAFDialog(path: String, callback: (success: Boolean) -> Unit): Boolean {
-        return if (!packageName.startsWith("com.simtetchuns")) {
-            callback(true)
-            false
-        } else if (isShowingSAFDialog(path)) {
-            funAfterSAFPermission = callback
-            true
-        } else {
-            callback(true)
-            false
-        }
     }
 
     fun handlePermission(permissionId: Int, callback: (granted: Boolean) -> Unit) {
@@ -124,5 +93,7 @@ abstract class BaseSimpleActivity : AppCompatActivity() {
             actionOnPermission?.invoke(grantResults[0] == 0)
         }
     }
+
+    fun getFileInputStreamSync(path: String) = FileInputStream(File(path))
 
 }

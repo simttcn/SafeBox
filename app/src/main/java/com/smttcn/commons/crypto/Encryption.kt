@@ -150,8 +150,8 @@ internal class Encryption {
         return map
     }
 
-    fun keystoreDecrypt(map: HashMap<String, ByteArray>): String {
-        var decrypted: String = ""
+    fun keystoreDecrypt(map: HashMap<String, ByteArray>): ByteArray {
+        lateinit var decrypted: ByteArray
         try {
             //Get the key
             val keyStoreUtil = KeyStoreUtil()
@@ -165,7 +165,7 @@ internal class Encryption {
             val cipher = Cipher.getInstance(KEY_CRYPTOR_TRANSFORMATION)
             val spec = GCMParameterSpec(128, ivBytes)
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
-            decrypted = cipher.doFinal(encryptedBytes).toString(Charsets.UTF_8)
+            decrypted = cipher.doFinal(encryptedBytes)
 
         } catch (e: Throwable) {
             e.printStackTrace()

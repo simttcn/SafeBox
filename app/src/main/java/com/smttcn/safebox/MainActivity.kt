@@ -58,8 +58,8 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        val keyStoreUtil = KeyStoreUtil()
-        if (keyStoreUtil.isKeyExist()) keyStoreUtil.init()
+        //val keyStoreUtil = KeyStoreUtil()
+        //if (!keyStoreUtil.isKeyExist()) keyStoreUtil.init()
 
     }
 
