@@ -69,12 +69,4 @@ open class FileDirItem(var path: String, val name: String = "", var isDirectory:
     fun getDirectChildrenCount(countHiddenItems: Boolean) = File(path).getDirectChildrenCount(countHiddenItems)
 
     fun getParentPath() = path.getParentPath()
-
-    fun getFileDurationSeconds() = path.getFileDurationSeconds()
-
-    fun getResolution(context: Context) = context.getResolution(path)
-
-    fun getVideoResolution(context: Context) = context.getVideoResolution(path)
-
-    fun getImageResolution() = path.getImageResolution()
 }

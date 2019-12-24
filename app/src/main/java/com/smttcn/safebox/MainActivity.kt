@@ -1,34 +1,33 @@
 package com.smttcn.safebox
 
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputType
-import android.view.View
-import android.widget.EditText
+import android.text.method.MovementMethod
+import android.text.method.ScrollingMovementMethod
+import android.util.AttributeSet
 import android.widget.Toast
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.smttcn.commons.crypto.KeyStoreUtil
 import com.smttcn.commons.extensions.toast
 import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.commons.helpers.INTERVAL_BACK_BUTTON_QUIT_IN_MS
-import com.smttcn.commons.helpers.REQUEST_CODE_CHANGE_PASSWORD
-import com.smttcn.commons.helpers.REQUEST_CODE_NEW_PASSWORD
-import com.smttcn.materialdialogs.MaterialDialog
-import com.smttcn.materialdialogs.callbacks.onDismiss
 import timber.log.Timber
-import java.time.LocalDateTime
-import java.util.*
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity() {
 
     var BackButtonPressedOnce = false
     var LastPressedBackTime = System.currentTimeMillis()
+    private lateinit var mainViewModel: MainViewModel
 
     companion object {
         fun isAuthenticated(): Boolean {
@@ -38,29 +37,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MyApplication.setContext(this)
+        setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+        fab.setOnClickListener { view ->
+            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show()
         }
 
-        setContentView(R.layout.activity_main)
-        val navView: BottomNavigationView = findViewById(R.id.nav_view)
-
-        val navController = findNavController(R.id.nav_host_fragment)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_home, R.id.navigation_image, R.id.navigation_settings
-            )
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
-
-        //val keyStoreUtil = KeyStoreUtil()
-        //if (!keyStoreUtil.isKeyExist()) keyStoreUtil.init()
-
+        initApp()
     }
 
     override fun onResume() {
@@ -82,6 +67,34 @@ class MainActivity : AppCompatActivity() {
             finishAndRemoveTask()
         }
         super.onBackPressed()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+
+        if (id == R.id.menu_settings) {
+            startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun initApp() {
+        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+        MyApplication.setContext(this)
+
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        val textView: TextView = findViewById(R.id.text_home)
+        textView.movementMethod = ScrollingMovementMethod()
+        mainViewModel.text.observe(this, Observer {
+            textView.text = it
+        })
     }
 
     fun performAuthentication() {

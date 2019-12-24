@@ -1,5 +1,6 @@
 package com.smttcn.commons.helpers
 
+import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import java.io.File
 import java.nio.file.LinkOption
@@ -29,6 +30,15 @@ class FileManager {
                 return false
             }
         }
+    }
+
+    public fun GetItemsInRootDirectory(): List<File> {
+        return GetItemsInDirectory(documentRoot)
+    }
+
+    public fun GetItemsInDirectory(dir: String): List<File> {
+        val file = File(dir)
+        return file.listFiles().toList()
     }
 
     public fun IsDirectoryExist(dir: String): Boolean {

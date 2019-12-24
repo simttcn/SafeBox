@@ -36,7 +36,8 @@
             android:imeActionLabel="@string/signin"
             android:imeOptions="actionDone"
             android:inputType="textPassword"
-            android:selectAllOnFocus="true"
+            android:selectAllOnFocus="false"
+            android:text="11111"
 
             android:ems="10"
             android:layout_marginTop="10dp"

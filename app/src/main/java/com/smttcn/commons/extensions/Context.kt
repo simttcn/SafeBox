@@ -118,42 +118,6 @@ fun Context.getUriMimeType(path: String, newUri: Uri): String {
     return mimeType
 }
 
-fun Context.getResolution(path: String): Point? {
-    return if (path.isImageFast() || path.isImageSlow()) {
-        path.getImageResolution()
-    } else if (path.isVideoFast() || path.isVideoSlow()) {
-        getVideoResolution(path)
-    } else {
-        null
-    }
-}
-
-fun Context.getVideoResolution(path: String): Point? {
-    var point = try {
-        val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(path)
-        val width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH).toInt()
-        val height = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT).toInt()
-        Point(width, height)
-    } catch (ignored: Exception) {
-        null
-    }
-
-    if (point == null && path.startsWith("content://", true)) {
-        try {
-            val fd = contentResolver.openFileDescriptor(Uri.parse(path), "r")?.fileDescriptor
-            val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(fd)
-            val width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH).toInt()
-            val height = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT).toInt()
-            point = Point(width, height)
-        } catch (ignored: Exception) {
-        }
-    }
-
-    return point
-}
-
 // format day bits to strings like "Mon, Tue, Wed"
 fun Context.getSelectedDaysString(bitMask: Int): String {
     val dayBits = arrayListOf(MONDAY_BIT, TUESDAY_BIT, WEDNESDAY_BIT, THURSDAY_BIT, FRIDAY_BIT, SATURDAY_BIT, SUNDAY_BIT)

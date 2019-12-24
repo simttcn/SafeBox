@@ -80,31 +80,6 @@ fun String.getGenericMimeType(): String {
 
 fun String.getParentPath() = removeSuffix("/${getFilenameFromPath()}")
 
-fun String.getFileDurationSeconds(): Int? {
-    return try {
-        val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(this)
-        val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-        val timeInMs = java.lang.Long.parseLong(time)
-        (timeInMs / 1000).toInt()
-    } catch (e: Exception) {
-        null
-    }
-}
-
-fun String.getImageResolution(): Point? {
-    val options = BitmapFactory.Options()
-    options.inJustDecodeBounds = true
-    BitmapFactory.decodeFile(this, options)
-    val width = options.outWidth
-    val height = options.outHeight
-    return if (width > 0 && height > 0) {
-        Point(options.outWidth, options.outHeight)
-    } else {
-        null
-    }
-}
-
 fun String.substringTo(cnt: Int): String {
     return if (isEmpty()) {
         ""

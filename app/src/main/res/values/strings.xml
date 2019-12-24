@@ -8,10 +8,16 @@
     <string name="use_24_hour_time_format">Use 24-hour time format</string>
     <string name="open_with">Open with</string>
 
+    <!--  Activity Title  -->
+    <string name="title_activity_settings">Settings</string>
+
     <!--  Tab navigation  -->
     <string name="navigation_home">Home</string>
     <string name="navigation_image">Image</string>
     <string name="navigation_settings">Settings</string>
+
+    <!--  Menu  -->
+    <string name="menu_settings">Settings</string>
 
     <!--  UI  -->
     <string name="new_password">New Password</string>
@@ -228,7 +234,6 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
-    <string name="title_activity_settings">Settings</string>
 
     <!-- Preference Titles -->
     <string name="security_header">Security</string>

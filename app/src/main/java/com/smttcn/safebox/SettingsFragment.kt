@@ -1,27 +1,14 @@
-package com.smttcn.safebox.ui.settings
+package com.smttcn.safebox
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import com.smttcn.commons.extensions.toast
 import com.smttcn.commons.helpers.PREFS_KEY
 import com.smttcn.commons.helpers.REQUEST_CODE_CHANGE_PASSWORD
 import com.smttcn.materialdialogs.MaterialDialog
-import com.smttcn.safebox.MainActivity
-import com.smttcn.safebox.MyApplication
-import com.smttcn.safebox.PasswordActivity
-import com.smttcn.safebox.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
