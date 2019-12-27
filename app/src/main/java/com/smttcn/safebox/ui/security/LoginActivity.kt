@@ -1,45 +1,38 @@
-package com.smttcn.safebox
+package com.smttcn.safebox.ui.security
 
 import android.app.Activity
-import android.app.Application
 import android.content.*
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-import android.content.Context.INPUT_METHOD_SERVICE
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.app.ComponentActivity.ExtraData
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.transition.Visibility
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.helpers.Authenticator
-import com.smttcn.commons.helpers.BaseConfig
 import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.commons.helpers.REQUEST_CODE_NEW_PASSWORD
 import com.smttcn.materialdialogs.MaterialDialog
 import com.smttcn.materialdialogs.callbacks.onDismiss
+import com.smttcn.safebox.ui.main.MainActivity
+import com.smttcn.safebox.MyApplication
+import com.smttcn.safebox.R
 
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     private var IsCalledFromMainActivity = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initialize(savedInstanceState)
+        initialize()
         initializeUI()
 
     }
 
-    private fun initialize(bundle: Bundle?) {
+    private fun initialize() {
+
+        isLoginActivity = true
 
         // get param from bundle
         val bundle = intent.extras
@@ -114,8 +107,8 @@ class LoginActivity : AppCompatActivity() {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, resultData)
         // Check which request we're responding to
         if (requestCode == REQUEST_CODE_NEW_PASSWORD) {
             // Make sure the request was successful

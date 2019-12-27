@@ -31,11 +31,13 @@ internal fun File.hasParent(
   filter: FileFilter
 ) = betterParent(writeable, filter) != null
 
+@Suppress("DEPRECATION")
 internal fun File.isExternalStorage() =
   absolutePath == getExternalStorageDirectory().absolutePath
 
 internal fun File.isRoot() = absolutePath == "/"
 
+@Suppress("DEPRECATION")
 internal fun File.betterParent(
   writeable: Boolean,
   filter: FileFilter
@@ -63,8 +65,9 @@ internal fun File.betterParent(
   return parentToUse
 }
 
+@Suppress("DEPRECATION")
 internal fun File.jumpOverEmulated(): File {
-  if (absolutePath == getExternalStorageDirectory().parentFile.absolutePath) {
+  if (absolutePath == getExternalStorageDirectory()?.parentFile?.absolutePath) {
     // Emulated external storage's parent is empty so jump over it
     return getExternalStorageDirectory()
   }

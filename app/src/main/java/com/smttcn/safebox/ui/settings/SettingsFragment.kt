@@ -1,6 +1,7 @@
-package com.smttcn.safebox
+package com.smttcn.safebox.ui.settings
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.preference.Preference
@@ -9,12 +10,22 @@ import androidx.preference.PreferenceManager
 import com.smttcn.commons.helpers.PREFS_KEY
 import com.smttcn.commons.helpers.REQUEST_CODE_CHANGE_PASSWORD
 import com.smttcn.materialdialogs.MaterialDialog
+import com.smttcn.safebox.ui.security.PasswordActivity
+import com.smttcn.safebox.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
+
+    lateinit var myContext: Context
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val prefManager: PreferenceManager = preferenceManager
         prefManager.sharedPreferencesName = PREFS_KEY
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
+    }
+
+    override fun onAttach(context: Context) {
+        myContext = context
+        super.onAttach(context)
     }
 
     override fun onPreferenceTreeClick(preference: Preference?): Boolean {
@@ -25,7 +36,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun showChangePasswordActivity() {
-        val intent = Intent(MyApplication.getContext(), PasswordActivity::class.java)
+        // todo: we need the context from settings activity, no the main activity
+        val intent = Intent(myContext, PasswordActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE_CHANGE_PASSWORD)
     }
 
@@ -36,7 +48,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             // Make sure the request was successful
             if (resultCode == Activity.RESULT_OK) {
                 // The user changed his/her app password
-                MaterialDialog(MyApplication.getContext()).show {
+                // todo: we need the context from settings activity, no the main activity
+                MaterialDialog(myContext).show {
                     title(R.string.change_password)
                     message(R.string.change_password_message)
                     positiveButton(R.string.ok)
@@ -45,7 +58,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
             } else if (resultCode == Activity.RESULT_CANCELED){
                 // User cancelled password change
-                MaterialDialog(MyApplication.getContext()).show {
+                // todo: we need the context from settings activity, no the main activity
+                MaterialDialog(myContext).show {
                     title(R.string.change_password)
                     message(R.string.change_password_cancel_message)
                     positiveButton(R.string.ok)

@@ -38,7 +38,7 @@ fun MaterialDialog.expandBottomSheet(): MaterialDialog {
   check(dialogBehavior is BottomSheet) {
     "This dialog is not a bottom sheet dialog."
   }
-  (dialogBehavior as BottomSheet).bottomSheetBehavior?.let {
+  dialogBehavior.bottomSheetBehavior?.let {
     it.state = STATE_EXPANDED
   }
   return this
@@ -49,7 +49,7 @@ fun MaterialDialog.collapseBottomSheet(): MaterialDialog {
   check(dialogBehavior is BottomSheet) {
     "This dialog is not a bottom sheet dialog."
   }
-  (dialogBehavior as BottomSheet).bottomSheetBehavior?.let {
+  dialogBehavior.bottomSheetBehavior?.let {
     it.state = STATE_COLLAPSED
   }
   return this
@@ -68,7 +68,7 @@ fun MaterialDialog.setPeekHeight(
   }
   assertOneSet("setPeekHeight", literal, res)
 
-  val bottomSheet = (dialogBehavior as BottomSheet)
+  val bottomSheet = dialogBehavior
   val literalOrRes = literal ?: context.resources.getDimensionPixelSize(res!!)
   val destinationPeekHeight = if (bottomSheet.maxPeekHeight > 0) {
     min(bottomSheet.maxPeekHeight, literalOrRes)

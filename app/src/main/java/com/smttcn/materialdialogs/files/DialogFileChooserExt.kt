@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("unused")
 
 package com.smttcn.materialdialogs.files
 
@@ -61,6 +60,7 @@ fun MaterialDialog.selectedFile(): File? {
  *    empty. Defaults to "This folder's empty!".
  * @param selection A callback invoked when a file is selected.
  */
+@Suppress("DEPRECATION")
 @SuppressLint("CheckResult")
 fun MaterialDialog.fileChooser(
   initialDirectory: File = getExternalStorageDirectory(),

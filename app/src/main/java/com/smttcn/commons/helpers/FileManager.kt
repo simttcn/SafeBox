@@ -3,23 +3,21 @@ package com.smttcn.commons.helpers
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import java.io.File
-import java.nio.file.LinkOption
 
 class FileManager {
 
-    lateinit private var _documentRoot: String
+    var mDocumentRoot: String
 
     var documentRoot: String
-        get() { return MyApplication.getContext().filesDir.toString() + "/" + _documentRoot }
-        set(value) {_documentRoot = value}
+        get() { return MyApplication.getContext().filesDir.toString() + "/" + mDocumentRoot }
+        set(value) {mDocumentRoot = value}
 
     init {
-        _documentRoot = PATH_DOCUMENT_ROOT
+        mDocumentRoot = PATH_DOCUMENT_ROOT
         CheckDirectory(documentRoot, true)
     }
 
     fun CheckDirectory(dir: String, toCreate: Boolean = false) : Boolean {
-        var result: Boolean = false
         val f = File(dir)
         if (f.exists() && f.isDirectory()) {
             return true
@@ -32,13 +30,26 @@ class FileManager {
         }
     }
 
-    public fun GetItemsInRootDirectory(): List<File> {
-        return GetItemsInDirectory(documentRoot)
+    public fun GetFileDirItemsInRootDirectory(): List<FileDirItem> {
+        val files = GetFilesInDirectory(documentRoot)
+        var items: MutableList<FileDirItem> = mutableListOf<FileDirItem>()
+        for(file in files) {
+            items.add(FileDirItem(file))
+        }
+
+        return items
     }
 
-    public fun GetItemsInDirectory(dir: String): List<File> {
+    public fun GetFilesInRootDirectory(): List<File> {
+        return GetFilesInDirectory(documentRoot)
+    }
+
+    public fun GetFilesInDirectory(dir: String): List<File> {
         val file = File(dir)
-        return file.listFiles().toList()
+        file.listFiles()?.let {
+            return it.toList()
+        }
+        return emptyList()
     }
 
     public fun IsDirectoryExist(dir: String): Boolean {

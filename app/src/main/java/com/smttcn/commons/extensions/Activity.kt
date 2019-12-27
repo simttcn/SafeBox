@@ -12,7 +12,6 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import com.smttcn.safebox.R
-import com.smttcn.commons.activities.BaseSimpleActivity
 import com.smttcn.commons.crypto.Encryption
 import com.smttcn.commons.crypto.Hashing
 //import com.smttcn.commons.dialogs.*

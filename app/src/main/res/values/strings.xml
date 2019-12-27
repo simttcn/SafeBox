@@ -10,11 +10,8 @@
 
     <!--  Activity Title  -->
     <string name="title_activity_settings">Settings</string>
-
-    <!--  Tab navigation  -->
-    <string name="navigation_home">Home</string>
-    <string name="navigation_image">Image</string>
-    <string name="navigation_settings">Settings</string>
+    <string name="title_activity_password">Password</string>
+    <string name="title_activity_debugconsole">Debug Console</string>
 
     <!--  Menu  -->
     <string name="menu_settings">Settings</string>
@@ -253,4 +250,7 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

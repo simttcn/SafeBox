@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.R.id.edit
 import android.content.SharedPreferences.Editor
+import androidx.core.content.ContextCompat
 import com.smttcn.commons.extensions.toByteArrayEx
 import org.json.JSONObject
 
@@ -92,15 +93,15 @@ open class BaseConfig(val context: Context) {
         set(dateFormat) = prefs.edit().putString(DATE_FORMAT, dateFormat).apply()
 
     var textColor: Int
-        get() = prefs.getInt(TEXT_COLOR, context.resources.getColor(R.color.colorText))
+        get() = prefs.getInt(TEXT_COLOR, ContextCompat.getColor(context, R.color.colorText))
         set(textColor) = prefs.edit().putInt(TEXT_COLOR, textColor).apply()
 
     var backgroundColor: Int
-        get() = prefs.getInt(BACKGROUND_COLOR, context.resources.getColor(R.color.colorBackground))
+        get() = prefs.getInt(BACKGROUND_COLOR, ContextCompat.getColor(context, R.color.colorBackground))
         set(backgroundColor) = prefs.edit().putInt(BACKGROUND_COLOR, backgroundColor).apply()
 
     var primaryColor: Int
-        get() = prefs.getInt(PRIMARY_COLOR, context.resources.getColor(R.color.colorPrimary))
+        get() = prefs.getInt(PRIMARY_COLOR, ContextCompat.getColor(context, R.color.colorPrimary))
         set(primaryColor) = prefs.edit().putInt(PRIMARY_COLOR, primaryColor).apply()
 
     private fun getDefaultDateFormat(): String {

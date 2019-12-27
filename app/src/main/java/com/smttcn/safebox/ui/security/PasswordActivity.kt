@@ -1,42 +1,29 @@
-package com.smttcn.safebox
+package com.smttcn.safebox.ui.security
 
 import android.app.Activity
-import android.content.Context
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.Toast
-import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-import android.content.Context.INPUT_METHOD_SERVICE
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.app.ComponentActivity.ExtraData
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.text.TextUtils.isEmpty
-import android.view.inputmethod.InputMethodManager
-import android.transition.Visibility
+import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.showKeyboard
 import com.smttcn.commons.helpers.Authenticator
-import com.smttcn.commons.helpers.BaseConfig
 import com.smttcn.materialdialogs.MaterialDialog
+import com.smttcn.safebox.ui.main.MainActivity
+import com.smttcn.safebox.R
 
 
-class PasswordActivity : AppCompatActivity() {
+class PasswordActivity : BaseActivity() {
 
     var toCreateNewPasswordHash = false // or other values
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initialize()
-        initializeUI()
+        if (!MainActivity.isAuthenticated()) finish()
+        initActivity()
+        initActivityUI()
     }
 
     override fun onStop() {
@@ -45,7 +32,7 @@ class PasswordActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun initialize() {
+    private fun initActivity() {
 
         //val baseConfig: BaseConfig = BaseConfig.newInstance(this)
         // to determine which type of UI to be shown
@@ -55,7 +42,7 @@ class PasswordActivity : AppCompatActivity() {
         setContentView(R.layout.activity_password)
     }
 
-    private fun initializeUI() {
+    private fun initActivityUI() {
 
         val NewPassword = findViewById<EditText>(R.id.new_password)
         val ConfirmPassword = findViewById<EditText>(R.id.confirm_password)
@@ -121,7 +108,7 @@ class PasswordActivity : AppCompatActivity() {
                     if (CurrentPassword.text.toString().length > 5) {
                         authenticator.authenticateAppPassword(CurrentPassword.text.toString()) {
                             if (it == true) {
-                                // todo: correct app password, so go ahead to change the password
+                                // correct app password, so go ahead to change the password
                                 authenticator.changeAppPassword(CurrentPassword.text.toString(),
                                     NewPassword.text.toString()) {
 

@@ -17,16 +17,10 @@ internal class Authenticator(appContext: Context) {
     public fun authenticateAppPassword(password: String, callback: (success: Boolean) -> Unit) {
         val hashed_password = baseConfig.appPasswordHash
 
-        if (hashed_password != null)
-        {
-            val hasher = Hashing()
+        val hasher = Hashing()
 
-            if (hasher.checkHashWithSalt(password, hashed_password)) {
-                callback(true)
-            } else {
-                callback(false)
-            }
-
+        if (hasher.checkHashWithSalt(password, hashed_password)) {
+            callback(true)
         } else {
             callback(false)
         }

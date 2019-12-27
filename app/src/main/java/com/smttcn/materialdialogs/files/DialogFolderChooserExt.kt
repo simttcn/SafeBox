@@ -53,6 +53,7 @@ fun MaterialDialog.selectedFolder(): File? {
  *    empty. Defaults to "This folder's empty!".
  * @param selection A callback invoked when a folder is selected.
  */
+@Suppress("DEPRECATION")
 @SuppressLint("CheckResult")
 fun MaterialDialog.folderChooser(
   initialDirectory: File = getExternalStorageDirectory(),

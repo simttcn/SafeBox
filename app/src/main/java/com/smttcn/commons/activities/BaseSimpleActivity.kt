@@ -1,33 +1,25 @@
 package com.smttcn.commons.activities
 
-import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Bundle
-import android.provider.DocumentsContract
-import android.view.Menu
-import android.view.MenuItem
-import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.util.Pair
-import com.smttcn.safebox.R
 import com.smttcn.commons.extensions.*
-import com.smttcn.commons.helpers.*
+import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
+import com.smttcn.safebox.ui.security.LoginActivity
+import com.smttcn.safebox.ui.main.MainActivity
 import java.io.File
 import java.io.FileInputStream
-import java.util.*
-import java.util.regex.Pattern
 
-abstract class BaseSimpleActivity : AppCompatActivity() {
+
+
+
+
+abstract class BaseActivity : AppCompatActivity() {
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null
     var isAskingPermissions = false
-
+    var isLoginActivity = false
+    private var sessionDepth = 0
     private val GENERIC_PERM_HANDLER = 100
 
     companion object {
@@ -51,11 +43,28 @@ abstract class BaseSimpleActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        if (!isLoginActivity && !MainActivity.isAuthenticated()) {
+            performAuthentication()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        sessionDepth++
+        if (sessionDepth == 1) {
+            //app came to foreground;
+        }
     }
 
     override fun onStop() {
         super.onStop()
         actionOnPermission = null
+        if (sessionDepth > 0)
+            sessionDepth--;
+        if (sessionDepth == 0) {
+            // app went to background
+        }
     }
 
     override fun onDestroy() {
@@ -63,16 +72,15 @@ abstract class BaseSimpleActivity : AppCompatActivity() {
         //funAfterSAFPermission = null
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
-            else -> return super.onOptionsItemSelected(item)
-        }
-        return true
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
+    }
+
+    fun performAuthentication() {
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.putExtra(INTENT_CALL_FROM_MAINACTIVITY, "yes")
+        startActivity(intent)
+        //finishAffinity()
     }
 
     fun handlePermission(permissionId: Int, callback: (granted: Boolean) -> Unit) {

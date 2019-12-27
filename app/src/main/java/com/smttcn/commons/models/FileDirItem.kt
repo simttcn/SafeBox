@@ -5,10 +5,26 @@ import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import java.io.File
 
-open class FileDirItem(var path: String, val name: String = "", var isDirectory: Boolean = false, var children: Int = 0, var size: Long = 0L, var modified: Long = 0L) :
-        Comparable<FileDirItem> {
+open class FileDirItem(_file: File) : Comparable<FileDirItem> {
+
     companion object {
         var sorting = 0
+    }
+
+    var path: String = ""
+    var name: String = ""
+    var isDirectory: Boolean = false
+    var children: Int = 0
+    var size: Long = 0L
+    var modified: Long = 0L
+
+    init {
+        path = _file.path
+        name = _file.name
+        isDirectory = _file.isDirectory
+        children = 0
+        size = _file.length()
+        modified = _file.lastModified()
     }
 
     override fun toString() = "FileDirItem(path=$path, name=$name, isDirectory=$isDirectory, children=$children, size=$size, modified=$modified)"
