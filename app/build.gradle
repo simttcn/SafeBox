@@ -84,13 +84,35 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.navigation:navigation-fragment:2.0.0'
-    implementation 'androidx.navigation:navigation-ui:2.0.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.0.0'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0' // for androidx.lifecycle.ViewModelProviders and Observer
+    //implementation 'androidx.navigation:navigation-fragment:2.0.0'
+    //implementation 'androidx.navigation:navigation-ui:2.0.0'
+    //implementation 'androidx.navigation:navigation-fragment-ktx:2.0.0'
+    //implementation 'androidx.navigation:navigation-ui-ktx:2.0.0'
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    // sqlite
+    implementation "androidx.sqlite:sqlite:2.0.1"
+
+    // Room
+    def room_version = "2.2.3"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:$room_version"
+
+//    // SQLCipher; https://guardianproject.info/code/sqlcipher/
+//    implementation 'net.zetetic:android-database-sqlcipher:4.3.0'
+
+//    // SCWAC-SafeRoom: A Room<->SQLCipher for Android Bridge with deterministic build
+//    def roomVer="2.1.0"
+//    api "info.hannes.android:android-database-sqlcipher:4.3.0.1"
+//    androidTestAnnotationProcessor "androidx.room:room-compiler:$roomVer"
+//    androidTestImplementation "com.commonsware.misc:support.db.tests.x:0.4.5"
+//    androidTestImplementation("androidx.room:room-runtime:$roomVer") {
+//        exclude group: 'androidx.annotation', module: 'annotation'
+//    }
 
     // material dialog
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
@@ -99,7 +121,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime:2.1.0'
     implementation 'androidx.preference:preference:1.1.0-alpha05'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.1.0'
+    kapt 'androidx.lifecycle:lifecycle-compiler:2.1.0' // For Kotlin use kapt instead of annotationProcessor
 
 
     testImplementation 'junit:junit:4.12'

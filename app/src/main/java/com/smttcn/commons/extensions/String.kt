@@ -25,6 +25,18 @@ fun String.toByteArrayEx() : ByteArray {
     return array
 }
 
+fun String.removeTrailingCharacter(character: Char): String {
+    if (endsWith(character, ignoreCase = false)) {
+        return substring(0, length - 1)
+    } else return this
+}
+
+fun String.withTrailingCharacter(character: Char): String {
+    if (!endsWith(character, ignoreCase = false)) {
+        return this + character
+    } else return this
+}
+
 fun String.getFilenameFromPath() = substring(lastIndexOf("/") + 1)
 
 fun String.getFilenameExtension() = substring(lastIndexOf(".") + 1)

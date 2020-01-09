@@ -8,7 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.smttcn.safebox.Manager.StoreItemManager
+import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
+import com.smttcn.safebox.database.StoreItem
 import kotlinx.android.synthetic.main.fragment_main.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -30,6 +33,8 @@ class MainFragment : Fragment() {
     private var param2: String? = null
     private var listener: OnFragmentInteractionListener? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var adapter: RecyclerAdapter
+    private lateinit var itemList: ArrayList<FileDirItem>
     private lateinit var myContext: Context
 
     companion object {
@@ -71,6 +76,10 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         linearLayoutManager = LinearLayoutManager(myContext)
         itemListRecyclerView.layoutManager = linearLayoutManager
+        // Todo: to load data properly in background with Room database
+        adapter = RecyclerAdapter(ArrayList<StoreItem>(StoreItemManager.GetItemList()))
+        itemListRecyclerView.adapter = adapter
+
 
         super.onViewCreated(view, savedInstanceState)
     }

@@ -6,12 +6,10 @@ import android.os.Bundle
 import android.widget.Toast
 import com.smttcn.commons.extensions.toast
 import com.smttcn.commons.helpers.INTERVAL_BACK_BUTTON_QUIT_IN_MS
-import timber.log.Timber
 import android.view.Menu;
 import android.view.MenuItem;
 import com.google.android.material.snackbar.Snackbar
 import com.smttcn.commons.activities.BaseActivity
-import com.smttcn.safebox.BuildConfig
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
@@ -45,8 +43,7 @@ class MainActivity : BaseActivity(), MainFragment.OnFragmentInteractionListener 
     }
 
     fun initialize() {
-        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
-        MyApplication.setContext(this)
+        MyApplication.setMainContext(this)
 
     }
 
