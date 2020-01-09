@@ -21,8 +21,8 @@ object FileManager {
             f.mkdir()
     }
 
-    public fun GetFileDirItemsInFolder(folder: String = ""): List<FileDirItem> {
-        val files = GetFilesInFolder(folder)
+    public fun getFileDirItemsInFolder(folder: String = ""): List<FileDirItem> {
+        val files = getFilesInFolder(folder)
         var items: MutableList<FileDirItem> = mutableListOf<FileDirItem>()
         for(file in files) {
             items.add(FileDirItem(file))
@@ -31,11 +31,11 @@ object FileManager {
         return items
     }
 
-    public fun GetFilesInFolder(folder: String = "", includeSubfolder: Boolean = false, countHiddenItems: Boolean = false): List<File> {
-        val dir = File(ToFullPath(folder))
+    public fun getFilesInFolder(folder: String = "", includeSubfolder: Boolean = false, countHiddenItems: Boolean = false): List<File> {
+        val dir = File(toFullPath(folder))
 
         if (includeSubfolder) {
-            return GetFilesInSubfolder(dir, countHiddenItems)
+            return getFilesInSubfolder(dir, countHiddenItems)
         } else {
             dir.listFiles()?.let {
                 return it.toList()
@@ -44,18 +44,17 @@ object FileManager {
         }
     }
 
-    private fun GetFilesInSubfolder(dir: File, countHiddenItems: Boolean = false): List<File> {
+    private fun getFilesInSubfolder(dir: File, countHiddenItems: Boolean = false): List<File> {
         var items: ArrayList<File> = ArrayList<File>()
         if (dir.exists()) {
             val files = dir.listFiles()
             if (files != null) {
                 for (i in files.indices) {
                     if (!files[i].isHidden && !dir.isHidden || countHiddenItems) {
-                        // Todo: debug step thru and check why data item is icluded
                         if (files[i].exists()) { // check if the file item really exist
                             items.add(files[i]) // add the item
                             if (files[i].isDirectory) {
-                                items.addAll(GetFilesInSubfolder(files[i], countHiddenItems))
+                                items.addAll(getFilesInSubfolder(files[i], countHiddenItems))
                             }
                         }
                     }
@@ -65,25 +64,25 @@ object FileManager {
         return items.toList()
     }
 
-    private fun ToFullPath(folder: String) : String = documentRoot + folder
+    private fun toFullPath(folder: String) : String = documentRoot + folder
 
     //--------------------------------------------------------------------
     // Dir operation
-    public fun IsFolderExist(dir: String, isHidden: Boolean = false): Boolean {
-        val f = File(ToFullPath(dir))
+    public fun isFolderExist(dir: String, isHidden: Boolean = false): Boolean {
+        val f = File(toFullPath(dir))
         return f.exists() && f.isDirectory() && f.isHidden() == isHidden
     }
 
-    public fun CreateFolder(dir: String) {
-        val f = File(ToFullPath(dir))
+    public fun createFolder(dir: String) {
+        val f = File(toFullPath(dir))
         if (!f.exists() || !f.isDirectory())
             f.mkdir()
     }
 
     //--------------------------------------------------------------------
     // File operations
-    fun IsFileExist(file: String, isHidden: Boolean = false) : Boolean {
-        val f = File(ToFullPath(file))
+    fun isFileExist(file: String, isHidden: Boolean = false) : Boolean {
+        val f = File(toFullPath(file))
         return f.exists() && f.isHidden() == isHidden
     }
 

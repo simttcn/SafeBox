@@ -77,7 +77,7 @@ class MainFragment : Fragment() {
         linearLayoutManager = LinearLayoutManager(myContext)
         itemListRecyclerView.layoutManager = linearLayoutManager
         // Todo: to load data properly in background with Room database
-        adapter = RecyclerAdapter(ArrayList<StoreItem>(StoreItemManager.GetItemList()))
+        adapter = RecyclerAdapter(ArrayList<StoreItem>(StoreItemManager.getItemList()))
         itemListRecyclerView.adapter = adapter
 
 

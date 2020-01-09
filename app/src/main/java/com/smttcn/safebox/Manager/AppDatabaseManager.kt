@@ -5,6 +5,8 @@ import com.smttcn.commons.Manager.FileManager
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.database.AppDatabase
 import com.smttcn.safebox.database.StoreItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object AppDatabaseManager {
 
@@ -19,43 +21,45 @@ object AppDatabaseManager {
         ).build()
     }
 
-    fun Initialize() : Boolean{
-        RefreshDatabase()
+    suspend fun initialize() : Boolean{
+        refreshDatabase()
         return true
     }
 
     fun getDb() = db
 
-    fun RefreshDatabase() {
-        AddNewItems()
-        RemoveObsoleteItems()
+    suspend fun refreshDatabase() {
+        addNewItems()
+        removeObsoleteItems()
     }
 
-    fun RemoveObsoleteItems() {
-        val allItems = db.storeItemDao().getAll()
-        for(item in allItems) {
-            if (item.isFolder) {
-                if (!FileManager.IsFolderExist(item.NameWithPath())) {
-                    // physical item not exist, remove the table entry
-                    db.storeItemDao().delete(item)
+    private suspend fun removeObsoleteItems() {
+        withContext(Dispatchers.Default) {
+            val allItems = db.storeItemDao().getAll()
+            for (item in allItems) {
+                if (item.isFolder) {
+                    if (!FileManager.isFolderExist(item.nameWithPath())) {
+                        // physical item not exist, remove the table entry
+                        db.storeItemDao().delete(item)
+                    }
+                } else {
+                    if (!FileManager.isFileExist(item.nameWithPath())) {
+                        // physical item not exist, remove the table entry
+                        db.storeItemDao().delete(item)
+                    }
                 }
-            } else {
-                if (!FileManager.IsFileExist(item.NameWithPath())) {
-                    // physical item not exist, remove the table entry
-                    db.storeItemDao().delete(item)
-                }
-            }
 
+            }
         }
     }
 
-    fun AddNewItems() {
-        // Todo: 20200107 - should get files from all subfolder
-        val newItems = FileManager.GetFilesInFolder(includeSubfolder = true)
-        for(item in newItems) {
-            if (db.storeItemDao().findByFileName(item.name).isEmpty()) {
-                db.storeItemDao().insertAll(
-                    StoreItem(
+    private suspend fun addNewItems() {
+        // Get files from all subfolder
+        withContext(Dispatchers.Default) {
+            val newItems = FileManager.getFilesInFolder(includeSubfolder = true)
+            for (item in newItems) {
+                if (StoreItemManager.isStoreItemExist(item.name)) {
+                    val storeItem = StoreItem(
                         fileName = item.name,
                         hashedFileName = "",
                         isFolder = item.isDirectory,
@@ -66,7 +70,8 @@ object AppDatabaseManager {
                         salt = "",
                         size = item.length()
                     )
-                )
+                    StoreItemManager.insert(storeItem)
+                }
             }
         }
     }

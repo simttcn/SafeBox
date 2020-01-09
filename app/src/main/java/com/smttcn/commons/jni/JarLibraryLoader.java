@@ -24,7 +24,7 @@ public class JarLibraryLoader implements LibraryLoader {
     private final String libraryPath;
 
     /**
-     * Initialize a new instance that looks for shared libraries located in the same jar
+     * initialize a new instance that looks for shared libraries located in the same jar
      * as this class and with a path starting with {@code lib}.
      */
     public JarLibraryLoader() {
@@ -32,7 +32,7 @@ public class JarLibraryLoader implements LibraryLoader {
     }
 
     /**
-     * Initialize a new instance that looks for shared libraries located in the specified
+     * initialize a new instance that looks for shared libraries located in the specified
      * directory of the supplied code source.
      *
      * @param codeSource    Code source containing shared libraries.

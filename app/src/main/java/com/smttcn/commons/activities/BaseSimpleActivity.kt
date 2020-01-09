@@ -8,6 +8,8 @@ import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.safebox.ui.security.LoginActivity
 import com.smttcn.safebox.ui.main.MainActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 import java.io.File
 import java.io.FileInputStream
 
@@ -15,7 +17,7 @@ import java.io.FileInputStream
 
 
 
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null
     var isAskingPermissions = false
     var isLoginActivity = false

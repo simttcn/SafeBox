@@ -5,10 +5,13 @@ import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import com.smttcn.safebox.Manager.AppDatabaseManager
+import com.smttcn.safebox.Manager.StoreItemManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.concurrent.thread
 
-class MyApplication : Application(), Application.ActivityLifecycleCallbacks {
+class MyApplication : Application(), Application.ActivityLifecycleCallbacks, CoroutineScope by MainScope(){
 
     companion object {
         var globalAppAuthenticated: String = "no"
@@ -42,8 +45,9 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks {
 
         registerActivityLifecycleCallbacks(this)
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
-        thread(start = true) {
-            AppDatabaseManager.Initialize()
+        launch {
+            AppDatabaseManager.initialize()
+            StoreItemManager.initialize()
         }
     }
 

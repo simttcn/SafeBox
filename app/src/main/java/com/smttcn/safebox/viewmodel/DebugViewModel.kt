@@ -16,7 +16,7 @@ class DebugViewModel : ViewModel(){
     private fun getDebugText(): String {
         val ks = KeyStoreUtil().getKey(KEY_STORE_ALIAS).toString()
         val path = FileManager.documentRoot
-        val items = FileManager.GetFileDirItemsInFolder().joinToString("\n--\n")
+        val items = FileManager.getFileDirItemsInFolder().joinToString("\n--\n")
         return ks + "\n" + path + "\n\n" + items + "\n-- Last line --"
     }
 }
