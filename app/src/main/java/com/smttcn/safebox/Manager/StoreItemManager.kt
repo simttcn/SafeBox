@@ -1,18 +1,16 @@
 package com.smttcn.safebox.Manager
 
 import com.smttcn.safebox.database.StoreItem
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
-object StoreItemManager {
+object StoreItemManager : CoroutineScope by MainScope() {
 
-    private var itemList: List<StoreItem>
+    lateinit private var itemList: List<StoreItem>
 
-    init {
-        itemList = AppDatabaseManager.getDb().storeItemDao().getAll()
-    }
+    init {}
 
     fun initialize() : Boolean{
+        launch { refreshItemList() }
         return true
     }
 
@@ -23,15 +21,19 @@ object StoreItemManager {
             return emptyList()
     }
 
-    suspend fun refreshItemList() {
+    suspend fun refreshItemList(withTest : Boolean = false) {
         withContext(Dispatchers.Default) {
+            // Todo: have to force Room to discard the cache and read the data from physical file
+            if (withTest) {
+                AppDatabaseManager.getDb().storeItemDao().deleteByHashedFileName("img17.jpg")
+                AppDatabaseManager.getDb().storeItemDao().deleteByHashedFileName("img18.jpg")
+            }
             itemList = AppDatabaseManager.getDb().storeItemDao().getAll()
         }
     }
 
     suspend fun isStoreItemExist(hashedName: String): Boolean {
         return withContext(Dispatchers.Default) {
-            // Todo: check if StoreItem exist in database
             return@withContext AppDatabaseManager.getDb().storeItemDao().findByHashedFileName(hashedName).isEmpty()
         }
     }

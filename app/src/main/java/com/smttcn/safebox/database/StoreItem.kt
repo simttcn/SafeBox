@@ -16,7 +16,7 @@ data class StoreItem(
     @ColumnInfo(name = "salt") val salt: String,
     @ColumnInfo(name = "size") val size: Long
 ) {
-    fun nameWithPath(): String {
-        return path.withTrailingCharacter('/') + fileName
+    fun hashedFilenameWithPath(): String {
+        return path.withTrailingCharacter('/') + hashedFileName
     }
 }

@@ -45,10 +45,6 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks, Cor
 
         registerActivityLifecycleCallbacks(this)
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
-        launch {
-            AppDatabaseManager.initialize()
-            StoreItemManager.initialize()
-        }
     }
 
     override fun onTerminate() {

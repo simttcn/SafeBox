@@ -10,17 +10,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import com.google.android.material.snackbar.Snackbar
 import com.smttcn.commons.activities.BaseActivity
+import com.smttcn.safebox.Manager.AppDatabaseManager
+import com.smttcn.safebox.Manager.StoreItemManager
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.concurrent.thread
 
 
 class MainActivity : BaseActivity(), MainFragment.OnFragmentInteractionListener {
 
     var BackButtonPressedOnce = false
     var LastPressedBackTime = System.currentTimeMillis()
+    lateinit var StoreItemListFragment : MainFragment
 
     companion object {
         fun isAuthenticated(): Boolean {
@@ -38,21 +44,24 @@ class MainActivity : BaseActivity(), MainFragment.OnFragmentInteractionListener 
                 .setAction("Action", null).show()
         }
 
+        // Todo: find how to better initialize the database when app starts
         initialize()
+        AppDatabaseManager.initialize()
+        StoreItemManager.initialize()
         initializeUI()
     }
 
-    fun initialize() {
+    private fun initialize() {
         MyApplication.setMainContext(this)
-
     }
 
     private fun initializeUI() {
+        StoreItemListFragment = MainFragment()
         supportFragmentManager
             .beginTransaction()
             .replace(
                 R.id.frame_main,
-                MainFragment()
+                StoreItemListFragment
             )
             .commit()
 
@@ -79,19 +88,28 @@ class MainActivity : BaseActivity(), MainFragment.OnFragmentInteractionListener 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
-        if (id == R.id.menu_settings) {
-            startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
-            return true
-        } else if (id == R.id.menu_debug_console) {
-            startActivity(Intent(this@MainActivity, DebugconsoleActivity::class.java))
-            return true
+        when(id) {
+            R.id.menu_refresh -> {
+                launch {
+                    StoreItemListFragment.refreshStoreItemList()
+                }
+                return true
+            }
+            R.id.menu_settings -> {
+                startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+                return true
+            }
+            R.id.menu_debug_console -> {
+                startActivity(Intent(this@MainActivity, DebugconsoleActivity::class.java))
+                return true
+            }
         }
 
         return super.onOptionsItemSelected(item)
     }
 
     override fun onFragmentInteraction(uri: Uri) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //To change body of created functions use File | Settings | File Templates.
     }
 
 }

@@ -21,4 +21,8 @@ interface StoreItemDao {
 
     @Delete
     fun delete(storeItem: StoreItem)
+
+    @Query("DELETE FROM storeItem WHERE hashed_filename = :hashedFilename")
+    fun deleteByHashedFileName(hashedFilename: String) : Int
+
 }

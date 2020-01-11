@@ -7,14 +7,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.smttcn.commons.extensions.toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.smttcn.commons.extensions.waitForLayout
 import com.smttcn.safebox.Manager.StoreItemManager
 import com.smttcn.commons.models.FileDirItem
+import com.smttcn.safebox.Manager.AppDatabaseManager
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.StoreItem
 import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.coroutines.*
 
-// TODO: Rename parameter arguments, choose names that match
+
+// Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -27,14 +33,13 @@ private const val ARG_PARAM2 = "param2"
  * Use the [MainFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class MainFragment : Fragment() {
-    // TODO: Rename and change types of parameters
+class MainFragment : Fragment(), CoroutineScope by MainScope() {
+    // Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
     private var listener: OnFragmentInteractionListener? = null
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var adapter: RecyclerAdapter
-    private lateinit var itemList: ArrayList<FileDirItem>
     private lateinit var myContext: Context
 
     companion object {
@@ -46,7 +51,7 @@ class MainFragment : Fragment() {
          * @param param2 Parameter 2.
          * @return A new instance of fragment MainFragment.
          */
-        // TODO: Rename and change types and number of parameters
+        // Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             MainFragment().apply {
@@ -76,15 +81,13 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         linearLayoutManager = LinearLayoutManager(myContext)
         itemListRecyclerView.layoutManager = linearLayoutManager
-        // Todo: to load data properly in background with Room database
         adapter = RecyclerAdapter(ArrayList<StoreItem>(StoreItemManager.getItemList()))
         itemListRecyclerView.adapter = adapter
-
 
         super.onViewCreated(view, savedInstanceState)
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+    // Rename method, update argument and hook method into UI event
     fun onButtonPressed(uri: Uri) {
         listener?.onFragmentInteraction(uri)
     }
@@ -97,6 +100,7 @@ class MainFragment : Fragment() {
         } else {
             throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
         }
+
     }
 
     override fun onDetach() {
@@ -116,8 +120,27 @@ class MainFragment : Fragment() {
      * for more information.
      */
     interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
+        // Update argument type and name
         fun onFragmentInteraction(uri: Uri)
+    }
+
+    suspend fun refreshStoreItemList() {
+        showProgressBar(true) // show the progress bar
+        StoreItemManager.refreshItemList(true)
+        adapter.notifyDataSetChanged() // invalidate the dataset
+        itemListRecyclerView.waitForLayout {
+            showProgressBar(false) // hide the progress bar when finished loading items
+        }
+    }
+
+    fun showProgressBar(show: Boolean) {
+        if (show) {
+            progressBarContainer.visibility = View.VISIBLE
+            itemListRecyclerView.visibility = View.GONE
+        } else {
+            progressBarContainer.visibility = View.GONE
+            itemListRecyclerView.visibility = View.VISIBLE
+        }
     }
 
 }

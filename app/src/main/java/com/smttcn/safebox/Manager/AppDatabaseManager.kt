@@ -1,36 +1,45 @@
 package com.smttcn.safebox.Manager
 
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.smttcn.commons.Manager.FileManager
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.database.AppDatabase
 import com.smttcn.safebox.database.StoreItem
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
-object AppDatabaseManager {
+object AppDatabaseManager : CoroutineScope by MainScope() {
 
     private val dbName = "SafeBoxDB.data"
-    private val db : AppDatabase
+    lateinit private var db : AppDatabase
+
+    var isReady : Boolean
 
     init {
+        isReady = false
+    }
+
+    fun initialize() : Boolean{
         db = Room.databaseBuilder(
             MyApplication.getAppContext(),
             AppDatabase::class.java,
             dbName
         ).build()
-    }
 
-    suspend fun initialize() : Boolean{
         refreshDatabase()
         return true
     }
 
     fun getDb() = db
 
-    suspend fun refreshDatabase() {
-        addNewItems()
-        removeObsoleteItems()
+    fun refreshDatabase() {
+        launch {
+            isReady = false
+            addNewItems()
+            removeObsoleteItems()
+            isReady = true
+        }
     }
 
     private suspend fun removeObsoleteItems() {
@@ -38,12 +47,12 @@ object AppDatabaseManager {
             val allItems = db.storeItemDao().getAll()
             for (item in allItems) {
                 if (item.isFolder) {
-                    if (!FileManager.isFolderExist(item.nameWithPath())) {
+                    if (!FileManager.isFolderExist(item.hashedFilenameWithPath())) {
                         // physical item not exist, remove the table entry
                         db.storeItemDao().delete(item)
                     }
                 } else {
-                    if (!FileManager.isFileExist(item.nameWithPath())) {
+                    if (!FileManager.isFileExist(item.hashedFilenameWithPath())) {
                         // physical item not exist, remove the table entry
                         db.storeItemDao().delete(item)
                     }
@@ -61,7 +70,7 @@ object AppDatabaseManager {
                 if (StoreItemManager.isStoreItemExist(item.name)) {
                     val storeItem = StoreItem(
                         fileName = item.name,
-                        hashedFileName = "",
+                        hashedFileName = item.name,
                         isFolder = item.isDirectory,
                         path = item.path.replace(FileManager.documentRoot, "").replace(
                             item.name,

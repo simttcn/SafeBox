@@ -36,7 +36,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun showChangePasswordActivity() {
-        // todo: we need the context from settings activity, no the main activity
         val intent = Intent(myContext, PasswordActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE_CHANGE_PASSWORD)
     }
@@ -48,7 +47,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             // Make sure the request was successful
             if (resultCode == Activity.RESULT_OK) {
                 // The user changed his/her app password
-                // todo: we need the context from settings activity, no the main activity
                 MaterialDialog(myContext).show {
                     title(R.string.change_password)
                     message(R.string.change_password_message)
@@ -58,7 +56,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
             } else if (resultCode == Activity.RESULT_CANCELED){
                 // User cancelled password change
-                // todo: we need the context from settings activity, no the main activity
                 MaterialDialog(myContext).show {
                     title(R.string.change_password)
                     message(R.string.change_password_cancel_message)
