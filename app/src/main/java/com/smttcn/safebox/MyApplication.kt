@@ -4,14 +4,10 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
-import com.smttcn.safebox.Manager.AppDatabaseManager
-import com.smttcn.safebox.Manager.StoreItemManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import com.smttcn.commons.helpers.Authenticator
 import timber.log.Timber
 
-class MyApplication : Application(), Application.ActivityLifecycleCallbacks, CoroutineScope by MainScope(){
+class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
     companion object {
         var globalAppAuthenticated: String = "no"
@@ -49,7 +45,6 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks, Cor
 
     override fun onTerminate() {
         super.onTerminate()
-        AppDatabaseManager.getDb().close()
     }
 
 

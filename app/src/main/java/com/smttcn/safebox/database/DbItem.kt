@@ -6,8 +6,8 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.smttcn.commons.extensions.withTrailingCharacter
 
-@Entity(tableName = "storeItem")
-data class StoreItem(
+@Entity(tableName = "dbItem")
+data class DbItem(
     @PrimaryKey(autoGenerate = true) val uid: Int = 0,
     @ColumnInfo(name = "filename") val fileName: String,
     @ColumnInfo(name = "hashed_filename") val hashedFileName: String,

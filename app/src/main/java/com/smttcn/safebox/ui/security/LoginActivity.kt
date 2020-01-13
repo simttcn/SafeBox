@@ -14,13 +14,9 @@ import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.commons.helpers.REQUEST_CODE_NEW_PASSWORD
 import com.smttcn.materialdialogs.MaterialDialog
 import com.smttcn.materialdialogs.callbacks.onDismiss
-import com.smttcn.safebox.Manager.AppDatabaseManager
-import com.smttcn.safebox.Manager.StoreItemManager
 import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.coroutines.launch
 
 
 class LoginActivity : BaseActivity() {
@@ -45,9 +41,11 @@ class LoginActivity : BaseActivity() {
 
         // redirect to create new password screen if necessary
         val authenticator = Authenticator(this)
-        if (!authenticator.isAppPasswordHashExist()) redirectToNewPasswordActivity()
+        if (!authenticator.isAppPasswordHashExist())
+            redirectToNewPasswordActivity()
 
         setContentView(R.layout.activity_login)
+
     }
 
     override fun onResume() {

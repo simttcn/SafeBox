@@ -17,11 +17,16 @@ import com.smttcn.safebox.R
 
 class PasswordActivity : BaseActivity() {
 
-    var toCreateNewPasswordHash = false // or other values
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!MainActivity.isAuthenticated()) finish()
+
+        val authenticator = Authenticator(this)
+        isToCreatePassword = !authenticator.isAppPasswordHashExist()
+
+        // Password exists but not authenticated, then quit the app immediately
+        if (!isToCreatePassword && !MainActivity.isAuthenticated()) finishAndRemoveTask()
+
         initActivity()
         initActivityUI()
     }
@@ -33,12 +38,6 @@ class PasswordActivity : BaseActivity() {
     }
 
     private fun initActivity() {
-
-        //val baseConfig: BaseConfig = BaseConfig.newInstance(this)
-        // to determine which type of UI to be shown
-        val authenticator = Authenticator(this)
-        toCreateNewPasswordHash = !authenticator.isAppPasswordHashExist()
-
         setContentView(R.layout.activity_password)
     }
 
@@ -48,13 +47,13 @@ class PasswordActivity : BaseActivity() {
         val ConfirmPassword = findViewById<EditText>(R.id.confirm_password)
         val ConfirmButton = findViewById<Button>(R.id.confirm)
 
-        if (!toCreateNewPasswordHash) {
+        if (!isToCreatePassword) {
             // user want to change the app password
             val CurrentPassword = findViewById<EditText>(R.id.existing_password)
             val CancelButton = findViewById<Button>(R.id.cancel)
 
-            CancelButton.visibility = if (!toCreateNewPasswordHash) View.VISIBLE else View.GONE
-            CurrentPassword.visibility = if (!toCreateNewPasswordHash) View.VISIBLE else View.GONE
+            CancelButton.visibility = if (!isToCreatePassword) View.VISIBLE else View.GONE
+            CurrentPassword.visibility = if (!isToCreatePassword) View.VISIBLE else View.GONE
 
             CancelButton.setOnClickListener {
                 setResult(Activity.RESULT_CANCELED)
@@ -87,7 +86,7 @@ class PasswordActivity : BaseActivity() {
 
                 val authenticator: Authenticator = Authenticator(this)
 
-                if (toCreateNewPasswordHash) {
+                if (isToCreatePassword) {
                     // create new password on first app entry
                     authenticator.newAppPassword(NewPassword.text.toString()){
                         if (it){
@@ -145,7 +144,7 @@ class PasswordActivity : BaseActivity() {
             }
         }
 
-        if (toCreateNewPasswordHash) {
+        if (isToCreatePassword) {
             showKeyboard(NewPassword)
         }
     }

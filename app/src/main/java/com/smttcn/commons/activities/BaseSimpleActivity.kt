@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
+import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.ui.security.LoginActivity
 import com.smttcn.safebox.ui.main.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +22,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null
     var isAskingPermissions = false
     var isLoginActivity = false
+    var isToCreatePassword = false
     private var sessionDepth = 0
     private val GENERIC_PERM_HANDLER = 100
 
@@ -46,7 +48,9 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     override fun onResume() {
         super.onResume()
 
-        if (!isLoginActivity && !MainActivity.isAuthenticated()) {
+        if (!isLoginActivity
+            && !isToCreatePassword
+            && !MainActivity.isAuthenticated()) {
             performAuthentication()
         }
     }
