@@ -17,6 +17,7 @@ import com.smttcn.materialdialogs.callbacks.onDismiss
 import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
+import com.smttcn.safebox.database.AppDatabase
 
 
 class LoginActivity : BaseActivity() {
@@ -74,6 +75,7 @@ class LoginActivity : BaseActivity() {
                     if (it == true) {
                         // Login successfully
                         MyApplication.globalAppAuthenticated = "yes"
+                        AppDatabase.setKey(Password.text.toString())
 
                         if (!IsCalledFromMainActivity) {
                             // not called from MainActivity, so start one

@@ -1,17 +1,9 @@
 package com.smttcn.commons.crypto
 
-import java.security.SecureRandom
-import java.util.HashMap
-import com.smttcn.commons.helpers.KEY_SALT_LENGTH
-import timber.log.Timber
-import android.R.attr.password
-import com.smttcn.commons.helpers.KEY_LENGTH
-
-
 internal class Hashing {
 
-    private val saltLength: Int = KEY_SALT_LENGTH
-    private val keyLength: Int = KEY_LENGTH
+    private val saltLength: Int = 256
+    private val keyLength: Int = 256
     private val cpuCost: Int = 16
     private val memoryCost: Int = 16
     private val parallelization: Int = 16

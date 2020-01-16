@@ -4,8 +4,6 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
-import com.smttcn.commons.helpers.Authenticator
-import timber.log.Timber
 
 class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
@@ -40,7 +38,6 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
         isActivityChangingConfigurations = false
 
         registerActivityLifecycleCallbacks(this)
-        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
     }
 
     override fun onTerminate() {

@@ -6,18 +6,7 @@ import com.smttcn.safebox.R
 import com.smttcn.commons.extensions.getSharedPrefs
 import java.text.SimpleDateFormat
 import java.util.*
-import android.R.id.edit
-import android.content.SharedPreferences.Editor
 import androidx.core.content.ContextCompat
-import com.smttcn.commons.extensions.toByteArrayEx
-import org.json.JSONObject
-
-
-
-
-
-
-
 
 
 open class BaseConfig(val context: Context) {
@@ -38,6 +27,10 @@ open class BaseConfig(val context: Context) {
     var appPasswordHash: String
         get() = prefs.getString(APP_PASSWORD_HASH, "")!!
         set(passwordHash) = prefs.edit().putString(APP_PASSWORD_HASH, passwordHash).apply()
+
+    var appDatabaseSecretEncrypted: ByteArray
+        get() = prefs.getString(APP_DATABASE_SECRET_ENCRYPTED, "")!!.toByteArray(Charsets.UTF_8)
+        set(secret) = prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED, secret.toString(Charsets.UTF_8)).apply()
 
 //    var appPasswordHashEncrypted: HashMap<String, ByteArray>
 //        get() {

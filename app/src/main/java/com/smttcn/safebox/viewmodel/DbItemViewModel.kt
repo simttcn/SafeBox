@@ -3,6 +3,7 @@ package com.smttcn.safebox.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.smttcn.safebox.database.AppDatabase
 import com.smttcn.safebox.database.DbItem
@@ -13,16 +14,20 @@ import kotlinx.coroutines.launch
 class DbItemViewModel(application: Application) : AndroidViewModel(application) {
 
     // The ViewModel maintains a reference to the repository to get data.
-    private val repo: DbItemRepository
+    lateinit private var repo: DbItemRepository
     // LiveData gives us updated words when they change.
-    val allDbItems: LiveData<List<DbItem>>
+    lateinit var allDbItems: LiveData<List<DbItem>>
 
     init {
         // Gets reference to DbItemDao from AppDatabase to construct
         // the correct DbItemRepository.
-        val dbItemDao = AppDatabase.getDb(application, viewModelScope).dbItemDao()
-        repo = DbItemRepository(dbItemDao)
-        allDbItems = repo.allDbItems
+        if (AppDatabase.getDb(application, viewModelScope) != null) {
+            val dbItemDao = AppDatabase.getDb(application, viewModelScope)!!.dbItemDao()
+            repo = DbItemRepository(dbItemDao)
+            allDbItems = repo.allDbItems
+        } else {
+            allDbItems = MutableLiveData()
+        }
     }
 
     /**

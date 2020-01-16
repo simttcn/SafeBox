@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import timber.log.Timber
 import com.smttcn.commons.extensions.inflate
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.DbItem
@@ -30,7 +29,6 @@ class DbItemAdapter internal constructor(context: Context) : RecyclerView.Adapte
         }
 
         override fun onClick(v: View?) {
-            Timber.d("RecyclerView CLICK!")
         }
     }
 

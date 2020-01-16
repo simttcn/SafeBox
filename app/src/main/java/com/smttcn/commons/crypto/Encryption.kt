@@ -35,7 +35,6 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Log
 import com.smttcn.commons.helpers.*
-import java.security.KeyStore
 import java.security.SecureRandom
 import java.util.*
 import javax.crypto.Cipher
@@ -53,33 +52,33 @@ internal class Encryption {
         try {
             //Random salt for next step
             val random = SecureRandom()
-            val salt = ByteArray(KEY_SALT_LENGTH)
+            val salt = ByteArray(256)
             random.nextBytes(salt)
 
             //PBKDF2 - derive the key from the password, don't use passwords directly
             val pbKeySpec = PBEKeySpec(
                 password, salt,
                 KEY_HASH_ITERATION_COUNT,
-                KEY_LENGTH
+                256
             )
-            val secretKeyFactory = SecretKeyFactory.getInstance(KEY_FACTORY_ALGORITHM)
+            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
             val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
-            val keySpec = SecretKeySpec(keyBytes, KEY_SPEC_ALGORITHM)
+            val keySpec = SecretKeySpec(keyBytes, "AES")
 
             //Create initialization vector for AES
             val ivRandom = SecureRandom() //not caching previous seeded instance of SecureRandom
-            val iv = ByteArray(KEY_IV_LENGTH)
+            val iv = ByteArray(16)
             ivRandom.nextBytes(iv)
             val ivSpec = IvParameterSpec(iv)
 
             //Encrypt
-            val cipher = Cipher.getInstance(KEY_PBKDF2_TRANSFORMATION)
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
             val encrypted = cipher.doFinal(dataToEncrypt)
 
-            map[KEY_TEXT_SALT] = salt
-            map[KEY_TEXT_IV] = iv
-            map[KEY_TEXT_ENCRYPTED] = encrypted
+            map["salt"] = salt
+            map["iv"] = iv
+            map["encrypted"] = encrypted
         } catch (e: Exception) {
             Log.e("MYAPP", "encryption exception", e)
         }
@@ -91,22 +90,22 @@ internal class Encryption {
     fun decrypt(map: HashMap<String, ByteArray>, password: CharArray): ByteArray? {
         var decrypted: ByteArray? = null
         try {
-            val salt = map[KEY_TEXT_SALT]
-            val iv = map[KEY_TEXT_IV]
-            val encrypted = map[KEY_TEXT_ENCRYPTED]
+            val salt = map["salt"]
+            val iv = map["iv"]
+            val encrypted = map["encrypted"]
 
             //regenerate key from password
             val pbKeySpec = PBEKeySpec(
                 password, salt,
                 KEY_HASH_ITERATION_COUNT,
-                KEY_LENGTH
+                256
             )
-            val secretKeyFactory = SecretKeyFactory.getInstance(KEY_FACTORY_ALGORITHM)
+            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
             val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
-            val keySpec = SecretKeySpec(keyBytes, KEY_SPEC_ALGORITHM)
+            val keySpec = SecretKeySpec(keyBytes, "AES")
 
             //Decrypt
-            val cipher = Cipher.getInstance(KEY_PBKDF2_TRANSFORMATION)
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
             val ivSpec = IvParameterSpec(iv)
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
             decrypted = cipher.doFinal(encrypted)
@@ -117,87 +116,5 @@ internal class Encryption {
         return decrypted
     }
 
-    fun keystoreEncryptWithVerification(dataToEncrypt: String, callback : (result: Boolean, encryptedData : HashMap<String, ByteArray>) -> Unit) {
-
-        val encryptedData = keystoreEncrypt(dataToEncrypt)
-        val decryptedData = keystoreDecrypt(encryptedData)
-
-        if (dataToEncrypt.equals(decryptedData ))
-            return callback(true, encryptedData)
-        else
-            return callback(false, encryptedData)
-    }
-
-    fun keystoreEncrypt(dataToEncrypt: String): HashMap<String, ByteArray> {
-        val map = HashMap<String, ByteArray>()
-        try {
-            //Get the key
-            val keyStoreUtil = KeyStoreUtil()
-            val secretKey = keyStoreUtil.getKey()
-
-            //Encrypt data
-            val cipher = Cipher.getInstance(KEY_CRYPTOR_TRANSFORMATION)
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-            val ivBytes = cipher.iv
-            val encryptedBytes = cipher.doFinal(dataToEncrypt.toByteArray(Charsets.UTF_8))
-
-            map[KEY_TEXT_IV] = ivBytes
-            map[KEY_TEXT_ENCRYPTED] = encryptedBytes
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
-
-        return map
-    }
-
-    fun keystoreDecrypt(map: HashMap<String, ByteArray>): ByteArray {
-        lateinit var decrypted: ByteArray
-        try {
-            //Get the key
-            val keyStoreUtil = KeyStoreUtil()
-            val secretKey = keyStoreUtil.getKey()
-
-            //Extract info from map
-            val encryptedBytes = map[KEY_TEXT_ENCRYPTED]
-            val ivBytes = map[KEY_TEXT_IV]
-
-            //Decrypt data
-            val cipher = Cipher.getInstance(KEY_CRYPTOR_TRANSFORMATION)
-            val spec = GCMParameterSpec(128, ivBytes)
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
-            decrypted = cipher.doFinal(encryptedBytes)
-
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
-
-        return decrypted
-    }
-
-    @TargetApi(23)
-    fun keystoreTest() {
-
-        val keyGenerator =
-            KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
-        val keyGenParameterSpec = KeyGenParameterSpec.Builder(
-            KEY_STORE_ALIAS,
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-            )
-            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-            //.setUserAuthenticationRequired(true) // 2 requires lock screen, invalidated if lock screen is disabled
-            //.setUserAuthenticationValidityDurationSeconds(120) // 3 only available x seconds from password authentication. -1 requires finger print - every time
-            .setRandomizedEncryptionRequired(true) // 4 different ciphertext for same plaintext on each call
-            .build()
-        keyGenerator.init(keyGenParameterSpec)
-        keyGenerator.generateKey()
-
-        val map = keystoreEncrypt("My very sensitive string!")
-        val decryptedBytes = keystoreDecrypt(map)
-        decryptedBytes.let {
-            val decryptedString = it
-            Log.e("MyApp", "The decrypted string is: $decryptedString")
-        }
-    }
 }
 

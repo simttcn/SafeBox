@@ -23,9 +23,10 @@ class DebugconsoleActivity : BaseActivity() {
     fun InitActivity() {
         setContentView(R.layout.activity_debugconsole)
 
-        debugViewModel = ViewModelProviders.of(this).get(DebugViewModel::class.java)
         val textView: TextView = findViewById(R.id.text_debug)
         textView.movementMethod = ScrollingMovementMethod()
+
+        debugViewModel = ViewModelProviders.of(this).get(DebugViewModel::class.java)
         debugViewModel.text.observe(this, Observer {
             textView.text = it
         })

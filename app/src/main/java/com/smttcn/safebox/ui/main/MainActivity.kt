@@ -15,16 +15,23 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.AppDatabase
+import com.smttcn.safebox.database.DbItem
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.DbItemViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.itemListRecyclerView
 import kotlinx.android.synthetic.main.activity_main.progressBarContainer
+import java.sql.Time
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 class MainActivity : BaseActivity() {
@@ -114,9 +121,19 @@ class MainActivity : BaseActivity() {
     }
 
     fun refreshDbItemList() {
-        showProgressBar(true) // show the progress bar
         // Todo: how to do manual refresh of database?
         //AppDatabase.refresh()
+        val dt: String = SimpleDateFormat("hhmmss_SSS").format(Date())
+        val dbItem = DbItem(
+            fileName = "filename_" + dt,
+            hashedFileName = "hashed_" + dt,
+            isFolder = true,
+            path = "",
+            salt = "",
+            size = 0
+        )
+
+        dbItemViewModel.insert(dbItem)
     }
 
     fun showProgressBar(show: Boolean) {
