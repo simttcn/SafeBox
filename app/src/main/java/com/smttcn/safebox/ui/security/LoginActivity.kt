@@ -41,7 +41,7 @@ class LoginActivity : BaseActivity() {
         if (param1.equals("yes")) IsCalledFromMainActivity = true
 
         // redirect to create new password screen if necessary
-        val authenticator = Authenticator(this)
+        val authenticator = Authenticator()
         if (!authenticator.isAppPasswordHashExist())
             redirectToNewPasswordActivity()
 
@@ -69,7 +69,7 @@ class LoginActivity : BaseActivity() {
 
         LoginButton.setOnClickListener {
             // togo: perform authenticaiton here
-            val authenticator: Authenticator = Authenticator(this)
+            val authenticator: Authenticator = Authenticator()
             if (Password.length() > 5) {
                 authenticator.authenticateAppPassword((Password.text.toString())) {
                     if (it == true) {

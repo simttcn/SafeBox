@@ -21,7 +21,7 @@ class PasswordActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val authenticator = Authenticator(this)
+        val authenticator = Authenticator()
         isToCreatePassword = !authenticator.isAppPasswordHashExist()
 
         // Password exists but not authenticated, then quit the app immediately
@@ -84,7 +84,7 @@ class PasswordActivity : BaseActivity() {
         ConfirmButton.setOnClickListener {
             if (isNewPasswordValid(NewPassword.text.toString(), ConfirmPassword.text.toString())){
 
-                val authenticator: Authenticator = Authenticator(this)
+                val authenticator: Authenticator = Authenticator()
 
                 if (isToCreatePassword) {
                     // create new password on first app entry

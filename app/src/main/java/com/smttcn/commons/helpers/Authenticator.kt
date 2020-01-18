@@ -2,20 +2,18 @@ package com.smttcn.commons.helpers
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
-import com.smttcn.commons.extensions.baseConfig
 import com.smttcn.commons.crypto.Encryption
 import com.smttcn.commons.crypto.Hashing
+import com.smttcn.safebox.MyApplication
 
-internal class Authenticator(appContext: Context) {
-
-    val baseConfig: BaseConfig = BaseConfig.newInstance(appContext)
+internal class Authenticator() {
 
     public fun isAppPasswordHashExist(): Boolean {
-        return baseConfig.appPasswordHash.length > 20
+        return MyApplication.getBaseConfig().appPasswordHash.length > 20
     }
 
     public fun authenticateAppPassword(password: String, callback: (success: Boolean) -> Unit) {
-        val hashed_password = baseConfig.appPasswordHash
+        val hashed_password = MyApplication.getBaseConfig().appPasswordHash
 
         val hasher = Hashing()
 
@@ -50,7 +48,7 @@ internal class Authenticator(appContext: Context) {
         // verify the password before saving the hash
         if (hashedPasswordWithSalt != null)
         {
-            baseConfig.appPasswordHash = hashedPasswordWithSalt
+            MyApplication.getBaseConfig().appPasswordHash = hashedPasswordWithSalt
             callback(true)
         } else {
             callback(false)

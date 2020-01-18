@@ -71,13 +71,6 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
 
     fun getExtension() = if (isDirectory) name else path.substringAfterLast('.', "")
 
-    fun getBubbleText(context: Context) = when {
-        sorting and SORT_BY_SIZE != 0 -> size.formatSize()
-        sorting and SORT_BY_DATE_MODIFIED != 0 -> modified.formatDate(context)
-        sorting and SORT_BY_EXTENSION != 0 -> getExtension().toLowerCase()
-        else -> name
-    }
-
     fun getProperSize(countHidden: Boolean) = File(path).getProperSize(countHidden)
 
     fun getProperFileCount(countHidden: Boolean) = File(path).getFileCount(countHidden)

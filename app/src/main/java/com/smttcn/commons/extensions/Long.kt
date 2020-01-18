@@ -2,6 +2,7 @@ package com.smttcn.commons.extensions
 
 import android.content.Context
 import android.text.format.DateFormat
+import com.smttcn.safebox.MyApplication
 import java.text.DecimalFormat
 import java.util.*
 
@@ -12,10 +13,4 @@ fun Long.formatSize(): String {
     val units = arrayOf("B", "kB", "MB", "GB", "TB")
     val digitGroups = (Math.log10(toDouble()) / Math.log10(1024.0)).toInt()
     return "${DecimalFormat("#,##0.#").format(this / Math.pow(1024.0, digitGroups.toDouble()))} ${units[digitGroups]}"
-}
-
-fun Long.formatDate(context: Context): String {
-    val cal = Calendar.getInstance(Locale.ENGLISH)
-    cal.timeInMillis = this
-    return DateFormat.format("${context.baseConfig.dateFormat} ${context.getTimeFormat()}", cal).toString()
 }

@@ -124,8 +124,8 @@ object SCryptUtil {
 
     }
 
-    private fun log2(n: Int): Int {
-        var n = n
+    private fun log2(num: Int): Int {
+        var n = num
         var log = 0
         if (n and -0x10000 != 0) {
             n = n ushr 16

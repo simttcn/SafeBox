@@ -1,19 +1,22 @@
 package com.smttcn.commons.helpers
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.text.format.DateFormat
 import com.smttcn.safebox.R
-import com.smttcn.commons.extensions.getSharedPrefs
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.core.content.ContextCompat
+import com.smttcn.safebox.MyApplication
 
 
-open class BaseConfig(val context: Context) {
-    protected val prefs = context.getSharedPrefs()
+open class BaseConfig(val inPrefs: SharedPreferences) {
+
+    val prefs = inPrefs
+    val context = MyApplication.getAppContext()
 
     companion object {
-        fun newInstance(context: Context) = BaseConfig(context)
+        fun newInstance(prefs: SharedPreferences) = BaseConfig(prefs)
     }
 
     var appRunCount: Int
@@ -29,8 +32,13 @@ open class BaseConfig(val context: Context) {
         set(passwordHash) = prefs.edit().putString(APP_PASSWORD_HASH, passwordHash).apply()
 
     var appDatabaseSecretEncrypted: ByteArray
-        get() = prefs.getString(APP_DATABASE_SECRET_ENCRYPTED, "")!!.toByteArray(Charsets.UTF_8)
-        set(secret) = prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED, secret.toString(Charsets.UTF_8)).apply()
+        // Todo implement encryption for this piece of data
+        get() {
+            return  prefs.getString(APP_DATABASE_SECRET_ENCRYPTED, "")!!.toByteArray(Charsets.UTF_8)
+        }
+        set(secret) {
+            prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED, secret.toString(Charsets.UTF_8)).apply()
+        }
 
 //    var appPasswordHashEncrypted: HashMap<String, ByteArray>
 //        get() {

@@ -22,23 +22,16 @@ import com.smttcn.materialdialogs.customview.customView
 import com.smttcn.materialdialogs.customview.getCustomView
 import com.smttcn.materialdialogs.input.input
 import com.smttcn.materialdialogs.lifecycle.lifecycleOwner
+import com.smttcn.safebox.MyApplication
 //import kotlinx.android.synthetic.main.dialog_title.view.*
 import java.io.*
 
-fun AppCompatActivity.updateActionBarTitle(text: String, color: Int = baseConfig.primaryColor) {
-    supportActionBar?.title = HtmlCompat.fromHtml("<font color='${color.getContrastColor().toHex()}'>$text</font>", HtmlCompat.FROM_HTML_MODE_LEGACY)
-}
-
-fun AppCompatActivity.updateActionBarSubtitle(text: String) {
-    supportActionBar?.subtitle = HtmlCompat.fromHtml("<font color='${baseConfig.primaryColor.getContrastColor().toHex()}'>$text</font>", HtmlCompat.FROM_HTML_MODE_LEGACY)
-}
-
 fun Activity.appLaunched(appId: String) {
-    baseConfig.appId = appId
-    if (baseConfig.appRunCount == 0) {
+    MyApplication.getBaseConfig().appId = appId
+    if (MyApplication.getBaseConfig().appRunCount == 0) {
         // first run
     }
-    baseConfig.appRunCount++
+    MyApplication.getBaseConfig().appRunCount++
 }
 
 fun Activity.launchViewIntent(id: Int) = launchViewIntent(getString(id))

@@ -16,15 +16,6 @@ import java.text.Normalizer
 import java.util.*
 import java.util.regex.Pattern
 
-fun String.toByteArrayEx() : ByteArray {
-    val split = this.substring(1, this.length - 1).split(", ")
-    val array = ByteArray(split.size)
-    for (i in split.indices) {
-        array[i] = java.lang.Byte.parseByte(split[i])
-    }
-    return array
-}
-
 fun String.removeTrailingCharacter(character: Char): String {
     if (endsWith(character, ignoreCase = false)) {
         return substring(0, length - 1)

@@ -35,6 +35,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Log
 import com.smttcn.commons.helpers.*
+import com.smttcn.safebox.MyApplication
 import java.security.SecureRandom
 import java.util.*
 import javax.crypto.Cipher
@@ -47,6 +48,9 @@ import javax.crypto.spec.SecretKeySpec
 
 internal class Encryption {
 
+    fun genSecret() {
+    }
+
     fun encrypt(dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
         val map = HashMap<String, ByteArray>()
         try {
@@ -55,29 +59,13 @@ internal class Encryption {
             val salt = ByteArray(256)
             random.nextBytes(salt)
 
-            //PBKDF2 - derive the key from the password, don't use passwords directly
-            val pbKeySpec = PBEKeySpec(
-                password, salt,
-                KEY_HASH_ITERATION_COUNT,
-                256
-            )
-            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-            val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
-            val keySpec = SecretKeySpec(keyBytes, "AES")
-
-            //Create initialization vector for AES
-            val ivRandom = SecureRandom() //not caching previous seeded instance of SecureRandom
-            val iv = ByteArray(16)
-            ivRandom.nextBytes(iv)
-            val ivSpec = IvParameterSpec(iv)
+            val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
 
             //Encrypt
-            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
             val encrypted = cipher.doFinal(dataToEncrypt)
 
             map["salt"] = salt
-            map["iv"] = iv
+            map["iv"] = cipher.iv
             map["encrypted"] = encrypted
         } catch (e: Exception) {
             Log.e("MYAPP", "encryption exception", e)
@@ -94,26 +82,40 @@ internal class Encryption {
             val iv = map["iv"]
             val encrypted = map["encrypted"]
 
-            //regenerate key from password
-            val pbKeySpec = PBEKeySpec(
-                password, salt,
-                KEY_HASH_ITERATION_COUNT,
-                256
-            )
-            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-            val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
-            val keySpec = SecretKeySpec(keyBytes, "AES")
+            val cipher = getCipher(Cipher.DECRYPT_MODE, password, salt, iv)
 
             //Decrypt
-            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            val ivSpec = IvParameterSpec(iv)
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
             decrypted = cipher.doFinal(encrypted)
         } catch (e: Exception) {
             Log.e("MYAPP", "decryption exception", e)
         }
 
         return decrypted
+    }
+
+    private fun getCipher(mode: Int, password: CharArray, s: ByteArray?, i: ByteArray?) : Cipher {
+
+        var salt = s
+        var iv = i
+
+        if (mode == Cipher.ENCRYPT_MODE) {
+            //Create initialization vector for AES
+            val ivRandom = SecureRandom() //not caching previous seeded instance of SecureRandom
+            iv = ByteArray(16)
+            ivRandom.nextBytes(iv)
+        }
+
+        val pbKeySpec = PBEKeySpec(password, salt, KEY_HASH_ITERATION_COUNT, 256)
+        val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+        val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
+        val keySpec = SecretKeySpec(keyBytes, "AES")
+
+        val ivSpec = IvParameterSpec(iv)
+
+        val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+        cipher.init(mode, keySpec, ivSpec)
+
+        return cipher
     }
 
 }

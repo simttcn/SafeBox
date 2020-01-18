@@ -16,7 +16,7 @@ class DbItemViewModel(application: Application) : AndroidViewModel(application) 
     // The ViewModel maintains a reference to the repository to get data.
     lateinit private var repo: DbItemRepository
     // LiveData gives us updated words when they change.
-    lateinit var allDbItems: LiveData<List<DbItem>>
+    var allDbItems: LiveData<List<DbItem>>
 
     init {
         // Gets reference to DbItemDao from AppDatabase to construct
