@@ -2,12 +2,13 @@
 
 package com.smttcn.commons.crypto
 
+import com.smttcn.commons.helpers.Base64.decode
+import com.smttcn.commons.helpers.Base64.encode
 import java.io.UnsupportedEncodingException
 import java.security.GeneralSecurityException
 import java.security.SecureRandom
-
-import com.smttcn.commons.helpers.Base64.*
 import kotlin.experimental.xor
+
 
 /**
  * Simple [SCrypt] interface for hashing passwords using the
