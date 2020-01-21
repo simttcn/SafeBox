@@ -11,6 +11,7 @@ import android.widget.*
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
+import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.smttcn.commons.helpers.REQUEST_CODE_NEW_PASSWORD
 import com.smttcn.materialdialogs.MaterialDialog
 import com.smttcn.materialdialogs.callbacks.onDismiss
@@ -62,7 +63,7 @@ class LoginActivity : BaseActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                LoginButton.isEnabled = s.toString().length > 5
+                LoginButton.isEnabled = s.toString().length >= MIN_PASSWORD_LENGTH
             }
 
         })
@@ -70,12 +71,13 @@ class LoginActivity : BaseActivity() {
         LoginButton.setOnClickListener {
             // togo: perform authenticaiton here
             val authenticator: Authenticator = Authenticator()
-            if (Password.length() > 5) {
+            if (Password.length() >= MIN_PASSWORD_LENGTH) {
                 authenticator.authenticateAppPassword((Password.text.toString())) {
                     if (it == true) {
                         // Login successfully
                         MyApplication.globalAppAuthenticated = "yes"
-                        AppDatabase.setKey(Password.text.toString())
+                        val dbSecret = authenticator.getAppDatabaseSecretWithAppPassword(Password.text.toString())
+                        AppDatabase.setKey(dbSecret)
 
                         if (!IsCalledFromMainActivity) {
                             // not called from MainActivity, so start one

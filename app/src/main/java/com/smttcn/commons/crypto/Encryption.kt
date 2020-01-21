@@ -30,25 +30,24 @@
 
 package com.smttcn.commons.crypto
 
-import android.annotation.TargetApi
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import android.util.Log
 import com.smttcn.commons.helpers.*
-import com.smttcn.safebox.MyApplication
+import com.smttcn.commons.helpers.Base64
 import java.security.SecureRandom
 import java.util.*
 import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
 import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
 internal class Encryption {
 
-    fun genSecret() {
+    fun generateSecret(saltLen : Int = 64) : String {
+        val random = SecureRandom()
+        val pwd = ByteArray(saltLen)
+        random.nextBytes(pwd)
+        return String(Base64.encode(pwd)).dropLast(2)
     }
 
     fun encrypt(dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {

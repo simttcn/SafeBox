@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
+    android:gravity="top"
     tools:context=".ui.debug.DebugconsoleActivity">
 
     <TextView
@@ -14,11 +14,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:scrollbars="vertical"
-        android:textSize="8pt"
-        app:layout_constraintHorizontal_bias="0.6"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:textSize="10pt" />
 
 </LinearLayout>

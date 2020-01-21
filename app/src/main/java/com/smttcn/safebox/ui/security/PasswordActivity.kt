@@ -10,6 +10,7 @@ import android.widget.EditText
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.showKeyboard
 import com.smttcn.commons.helpers.Authenticator
+import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.smttcn.materialdialogs.MaterialDialog
 import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.R
@@ -104,7 +105,7 @@ class PasswordActivity : BaseActivity() {
                     // change password
                     val CurrentPassword = findViewById<EditText>(R.id.existing_password)
 
-                    if (CurrentPassword.text.toString().length > 5) {
+                    if (CurrentPassword.text.toString().length >= MIN_PASSWORD_LENGTH) {
                         authenticator.authenticateAppPassword(CurrentPassword.text.toString()) {
                             if (it == true) {
                                 // correct app password, so go ahead to change the password
@@ -168,8 +169,8 @@ class PasswordActivity : BaseActivity() {
 
 
     private fun isNewPasswordValid(newPassword: String, confirmPassword: String) : Boolean {
-        return (newPassword.length > 5
-                && confirmPassword.length > 5
+        return (newPassword.length >= MIN_PASSWORD_LENGTH
+                && confirmPassword.length >= MIN_PASSWORD_LENGTH
                 && newPassword.equals(confirmPassword, false))
     }
 

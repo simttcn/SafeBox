@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import com.smttcn.commons.helpers.BaseConfig
 import com.smttcn.commons.helpers.PREFS_KEY
+import com.smttcn.safebox.database.AppDatabase
 
 class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
@@ -47,6 +48,11 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
         instance = this
     }
 
+    fun lockApp() {
+        globalAppAuthenticated = "no"
+        // Todo: do we have to close the database manually?
+    }
+
     override fun onCreate() {
         super.onCreate()
         activityReferences = 0
@@ -67,7 +73,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
         //      in order to set the Authentication status and trigger the login screen
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
             // App enters foreground
-            globalAppAuthenticated = "no"
+            lockApp()
         }
     }
 
@@ -81,7 +87,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
         isActivityChangingConfigurations = activity.isChangingConfigurations();
         if (--activityReferences == 0 && !isActivityChangingConfigurations) {
             // App enters background
-            globalAppAuthenticated = "no"
+            lockApp()
         }
     }
 

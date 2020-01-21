@@ -7,6 +7,8 @@ import com.smttcn.safebox.R
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.core.content.ContextCompat
+import com.smttcn.commons.extensions.fromBase64String
+import com.smttcn.commons.extensions.toBase64String
 import com.smttcn.safebox.MyApplication
 
 
@@ -31,13 +33,16 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
         get() = prefs.getString(APP_PASSWORD_HASH, "")!!
         set(passwordHash) = prefs.edit().putString(APP_PASSWORD_HASH, passwordHash).apply()
 
-    var appDatabaseSecretEncrypted: ByteArray
-        // Todo implement encryption for this piece of data
+    var appDatabaseSecretString: String
+        get() = prefs.getString(APP_DATABASE_SECRET_ENCRYPTED, "")!!
+        set(secret) = prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED, secret).apply()
+
+    var appDatabaseSecretHashMap: HashMap<String, ByteArray>
         get() {
-            return  prefs.getString(APP_DATABASE_SECRET_ENCRYPTED, "")!!.toByteArray(Charsets.UTF_8)
+            return  HashMap<String, ByteArray>().fromBase64String(prefs.getString(APP_DATABASE_SECRET_ENCRYPTED, "")!!)
         }
         set(secret) {
-            prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED, secret.toString(Charsets.UTF_8)).apply()
+            prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED, secret.toBase64String()).apply()
         }
 
 //    var appPasswordHashEncrypted: HashMap<String, ByteArray>

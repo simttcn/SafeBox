@@ -40,6 +40,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
         startActivityForResult(intent, REQUEST_CODE_CHANGE_PASSWORD)
     }
 
+    //Todo: to have an activity to let user change the database's secret
+    private fun showChangeDatabaseSecretActivity() {
+        TODO()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         // Check which request we're responding to
