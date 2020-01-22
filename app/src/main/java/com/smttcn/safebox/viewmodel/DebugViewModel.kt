@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.crypto.Encryption
+import com.smttcn.commons.crypto.KeyUtil
 import com.smttcn.commons.extensions.toBase64String
 import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.Base64.encode
@@ -23,8 +24,7 @@ class DebugViewModel : ViewModel(){
         var result: StringBuilder = java.lang.StringBuilder()
 
         val pwd = "111111"
-        //result.append(">" + Authenticator().generateAndSaveAppDatabaseSecret(pwd))
-        result.append(">" + Authenticator().getAppDatabaseSecretWithAppPassword(pwd) + "\n")
+        result.append(">" + KeyUtil().getAppDatabaseSecretWithAppPassword(pwd) + "\n")
 
         return result.toString()
     }

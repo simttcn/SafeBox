@@ -116,7 +116,7 @@ class PasswordActivity : BaseActivity() {
                                         setResult(Activity.RESULT_OK)
                                         finish()
                                     } else {
-                                        showChangePasswordDialog(R.string.change_password_error_occurs_message) {
+                                        showChangePasswordDialog(R.string.dlg_msg_change_password_error) {
                                             CurrentPassword.selectAll()
                                             showKeyboard(CurrentPassword)
                                         }
@@ -128,14 +128,14 @@ class PasswordActivity : BaseActivity() {
 
                             } else {
                                 // incorrect app password
-                                showChangePasswordDialog(R.string.change_password_error_message) {
+                                showChangePasswordDialog(R.string.dlg_msg_change_password_incorrect) {
                                     CurrentPassword.selectAll()
                                     showKeyboard(CurrentPassword)
                                 }
                             }
                         }
                     } else {
-                        showChangePasswordDialog(R.string.change_password_error_message) {
+                        showChangePasswordDialog(R.string.dlg_msg_change_password_incorrect) {
                             CurrentPassword.selectAll()
                             showKeyboard(CurrentPassword)
                         }
@@ -152,9 +152,9 @@ class PasswordActivity : BaseActivity() {
 
     private fun showChangePasswordDialog(stringID: Int, callback: () -> Unit){
         MaterialDialog(this).show {
-            title(R.string.change_password)
+            title(R.string.dlg_title_change_password)
             message(stringID)
-            positiveButton(R.string.ok)
+            positiveButton(R.string.btn_ok)
             cancelable(false)  // calls setCancelable on the underlying dialog
             cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
         }.positiveButton {

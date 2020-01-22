@@ -42,7 +42,7 @@ fun Int.addBitIf(add: Boolean, bit: Int) =
             removeBit(bit)
         }
 
-// TODO: how to do "bits & ~bit" in kotlin?
+// how to do "bits & ~bit" in kotlin?
 fun Int.removeBit(bit: Int) = addBit(bit) - bit
 
 fun Int.addBit(bit: Int) = this or bit

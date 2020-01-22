@@ -1,6 +1,5 @@
 package com.smttcn.commons.helpers
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.text.format.DateFormat
 import com.smttcn.safebox.R
@@ -34,15 +33,39 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
         set(passwordHash) = prefs.edit().putString(APP_PASSWORD_HASH, passwordHash).apply()
 
     var appDatabaseSecretString: String
-        get() = prefs.getString(APP_DATABASE_SECRET_ENCRYPTED, "")!!
-        set(secret) = prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED, secret).apply()
+        get() = prefs.getString(APP_DATABASE_SECRET_ENCRYPTED_01, "")!!
+        set(secret) = prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED_01, secret).apply()
+
+    var appDatabaseSecretStringBackup1: String
+        get() = prefs.getString(APP_DATABASE_SECRET_ENCRYPTED_02, "")!!
+        set(secret) = prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED_02, secret).apply()
+
+    var appDatabaseSecretStringBackup2: String
+        get() = prefs.getString(APP_DATABASE_SECRET_ENCRYPTED_03, "")!!
+        set(secret) = prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED_03, secret).apply()
 
     var appDatabaseSecretHashMap: HashMap<String, ByteArray>
         get() {
-            return  HashMap<String, ByteArray>().fromBase64String(prefs.getString(APP_DATABASE_SECRET_ENCRYPTED, "")!!)
+            return  HashMap<String, ByteArray>().fromBase64String(prefs.getString(APP_DATABASE_SECRET_ENCRYPTED_01, "")!!)
         }
         set(secret) {
-            prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED, secret.toBase64String()).apply()
+            prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED_01, secret.toBase64String()).apply()
+        }
+
+    var appDatabaseSecretHashMapBackup1: HashMap<String, ByteArray>
+        get() {
+            return  HashMap<String, ByteArray>().fromBase64String(prefs.getString(APP_DATABASE_SECRET_ENCRYPTED_02, "")!!)
+        }
+        set(secret) {
+            prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED_02, secret.toBase64String()).apply()
+        }
+
+    var appDatabaseSecretHashMapBackup2: HashMap<String, ByteArray>
+        get() {
+            return  HashMap<String, ByteArray>().fromBase64String(prefs.getString(APP_DATABASE_SECRET_ENCRYPTED_03, "")!!)
+        }
+        set(secret) {
+            prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED_03, secret.toBase64String()).apply()
         }
 
 //    var appPasswordHashEncrypted: HashMap<String, ByteArray>

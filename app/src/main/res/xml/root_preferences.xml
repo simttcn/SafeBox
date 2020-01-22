@@ -25,6 +25,11 @@
             app:title="@string/change_password"
             app:iconSpaceReserved="false" />
 
+        <Preference
+            app:key="resetdatakey"
+            app:title="@string/reset_data_key"
+            app:iconSpaceReserved="false" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/messages_header"

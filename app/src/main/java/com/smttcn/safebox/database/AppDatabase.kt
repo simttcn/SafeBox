@@ -9,6 +9,7 @@ import com.smttcn.commons.Manager.FileManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.*
+import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
 @Database(entities = arrayOf(DbItem::class), version = 1, exportSchema = false)
@@ -21,6 +22,7 @@ abstract class AppDatabase : RoomDatabase() {
     ) : RoomDatabase.Callback() {
 
         override fun onOpen(db: SupportSQLiteDatabase) {
+            database = db
             super.onOpen(db)
             INSTANCE?.let { database ->
                 scope.launch {
@@ -36,10 +38,18 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
         private val dbName = "SafeBoxDB.data"
-        private var supportFactory: SupportFactory? = null
+        private var supportFactory : SupportFactory? = null
+        private var database :  SupportSQLiteDatabase? = null
 
         fun setKey(secretKey: String) {
             supportFactory = SupportFactory(secretKey.toByteArray())
+        }
+
+        fun reKey(secretKey: String) {
+            database?.query("PRAGMA rekey='" + secretKey + "'")
+            database?.close()
+            INSTANCE?.close()
+            INSTANCE = null
         }
 
         fun getDb(appContext: Context, scope: CoroutineScope): AppDatabase? {

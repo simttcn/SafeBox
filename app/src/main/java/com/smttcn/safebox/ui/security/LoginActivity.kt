@@ -9,6 +9,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.*
 import com.smttcn.commons.activities.BaseActivity
+import com.smttcn.commons.crypto.KeyUtil
 import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
@@ -76,7 +77,8 @@ class LoginActivity : BaseActivity() {
                     if (it == true) {
                         // Login successfully
                         MyApplication.globalAppAuthenticated = "yes"
-                        val dbSecret = authenticator.getAppDatabaseSecretWithAppPassword(Password.text.toString())
+                        val keyUtil = KeyUtil()
+                        val dbSecret = keyUtil.getAppDatabaseSecretWithAppPassword(Password.text.toString())
                         AppDatabase.setKey(dbSecret)
 
                         if (!IsCalledFromMainActivity) {
@@ -120,18 +122,18 @@ class LoginActivity : BaseActivity() {
             if (resultCode == Activity.RESULT_OK) {
                 // The user set a password, so will return to this activity for user to login
                 MaterialDialog(this).show {
-                    title(R.string.new_password)
-                    message(R.string.new_password_message)
-                    positiveButton(R.string.ok)
+                    title(R.string.dlg_title_success)
+                    message(R.string.dlg_msg_new_password_success)
+                    positiveButton(R.string.btn_ok)
                     cancelable(false)  // calls setCancelable on the underlying dialog
                     cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
                 }
             } else {
                 // password not set, so quit the app
                 MaterialDialog(this).show {
-                    title(R.string.error)
-                    message(R.string.new_password_error_message)
-                    positiveButton(R.string.ok)
+                    title(R.string.dlg_title_error)
+                    message(R.string.dlg_msg_new_password_error)
+                    positiveButton(R.string.btn_ok)
                     cancelable(false)  // calls setCancelable on the underlying dialog
                     cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
                     onDismiss {

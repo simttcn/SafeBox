@@ -4,14 +4,26 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
+import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import com.smttcn.commons.crypto.KeyUtil
+import com.smttcn.commons.extensions.toast
+import com.smttcn.commons.helpers.Authenticator
+import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.smttcn.commons.helpers.PREFS_KEY
 import com.smttcn.commons.helpers.REQUEST_CODE_CHANGE_PASSWORD
 import com.smttcn.materialdialogs.MaterialDialog
+import com.smttcn.materialdialogs.WhichButton
+import com.smttcn.materialdialogs.actions.setActionButtonEnabled
+import com.smttcn.materialdialogs.input.getInputField
+import com.smttcn.materialdialogs.input.input
+import com.smttcn.materialdialogs.lifecycle.lifecycleOwner
 import com.smttcn.safebox.ui.security.PasswordActivity
 import com.smttcn.safebox.R
+import com.smttcn.safebox.database.AppDatabase
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -29,8 +41,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     override fun onPreferenceTreeClick(preference: Preference?): Boolean {
-        if (preference?.key.equals("changepassword"))
-            showChangePasswordActivity()
+        when (preference?.key?.toLowerCase()) {
+            "changepassword" -> showChangePasswordActivity()
+            "resetdatakey" -> showResetDataKeyActivity()
+        }
 
         return super.onPreferenceTreeClick(preference)
     }
@@ -41,8 +55,40 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     //Todo: to have an activity to let user change the database's secret
-    private fun showChangeDatabaseSecretActivity() {
-        TODO()
+    private fun showResetDataKeyActivity() {
+        val ku = KeyUtil()
+
+            MaterialDialog(myContext).show {
+                title(R.string.dlg_title_reset_data_key)
+                message(R.string.dlg_msg_reset_data_key_confirmation)
+                input(
+                    hint = "Enter password to proceed",
+                    inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD,
+                    waitForPositiveButton = false
+                ) { _, text ->
+                    setActionButtonEnabled(WhichButton.POSITIVE, text.length >= MIN_PASSWORD_LENGTH)
+                }
+                positiveButton(R.string.btn_ok) {
+                    // Todo: find a cleaner way to  perform reset data key operation
+                    // Todo: app crashed when trying to read again after key reset
+                    val pwd = it.getInputField().text.toString()
+                    Authenticator().authenticateAppPassword(pwd) {
+                        if (it == true) {
+                            val newSecret = KeyUtil().generateAndSaveAppDatabaseSecret(pwd,true)
+                            if (!newSecret.isEmpty()) {
+                                AppDatabase.reKey(newSecret)
+                                myContext.toast("Key successfully reset.")
+                            } else
+                                myContext.toast("Key reset failed!")
+                        } else {
+                            myContext.toast("Incorrect password!")
+                        }
+                    }
+                }
+                negativeButton(R.string.btn_cancel)
+                lifecycleOwner(this@SettingsFragment)
+            }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -53,18 +99,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
             if (resultCode == Activity.RESULT_OK) {
                 // The user changed his/her app password
                 MaterialDialog(myContext).show {
-                    title(R.string.change_password)
-                    message(R.string.change_password_message)
-                    positiveButton(R.string.ok)
+                    title(R.string.dlg_title_change_password)
+                    message(R.string.dlg_msg_change_password_success)
+                    positiveButton(R.string.btn_ok)
                     cancelable(false)  // calls setCancelable on the underlying dialog
                     cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
                 }
             } else if (resultCode == Activity.RESULT_CANCELED){
                 // User cancelled password change
                 MaterialDialog(myContext).show {
-                    title(R.string.change_password)
-                    message(R.string.change_password_cancel_message)
-                    positiveButton(R.string.ok)
+                    title(R.string.dlg_title_change_password)
+                    message(R.string.dlg_msg_change_password_cancel)
+                    positiveButton(R.string.btn_ok)
                     cancelable(false)  // calls setCancelable on the underlying dialog
                     cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
                 }

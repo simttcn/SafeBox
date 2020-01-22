@@ -17,14 +17,12 @@
     <string name="menu_refresh">Refresh</string>
     <string name="menu_settings">Settings</string>
 
+    <!-- Button -->
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+
     <!--  UI  -->
     <string name="new_password">New Password</string>
-    <string name="new_password_message">New password successfully created, please proceed to login.</string>
-    <string name="new_password_error_message">Unable to save the password, please launch the app and try again.</string>
-    <string name="change_password_message">Your password has been successfully changed.</string>
-    <string name="change_password_cancel_message">Password change cancelled.</string>
-    <string name="change_password_error_message">You have entered an incorrect current password, please try again.</string>
-    <string name="change_password_error_occurs_message">Error occurs when changing password, please try again.</string>
     <string name="enter_password">Enter Password</string>
     <string name="enter_password_error">Password incorrect, please try again.</string>
     <string name="enter_your_password">enter password</string>
@@ -33,10 +31,24 @@
     <string name="confirm_new_password">confirm new password</string>
     <string name="reset">Reset</string>
     <string name="signin">Sign In</string>
-    <string name="cancel">Cancel</string>
-    <string name="ok">OK</string>
     <string name="error">Error</string>
     <string name="press_back_again_to_quit">Press back button again to quit this app.</string>
+
+    <!-- Dialog Title -->
+    <string name="dlg_title_success">Success</string>
+    <string name="dlg_title_error">Error</string>
+    <string name="dlg_title_new_password">New Password</string>
+    <string name="dlg_title_change_password">Change Password</string>
+    <string name="dlg_title_reset_data_key">Reset Data Key</string>
+
+    <!-- Dialog Message -->
+    <string name="dlg_msg_new_password_success">New password successfully created, please proceed to login.</string>
+    <string name="dlg_msg_new_password_error">Unable to save the password, please launch the app and try again.</string>
+    <string name="dlg_msg_change_password_success">Your password has been successfully changed.</string>
+    <string name="dlg_msg_change_password_cancel">Password change cancelled.</string>
+    <string name="dlg_msg_change_password_incorrect">You have entered an incorrect current password, please try again.</string>
+    <string name="dlg_msg_change_password_error">Error occurs when changing password, please try again.</string>
+    <string name="dlg_msg_reset_data_key_confirmation">Are you sure you want to reset the data key?\n\nResetting a large dataset may take minutes to complete.</string>
 
     <!-- Dates -->
     <string name="january">January</string>
@@ -240,6 +252,7 @@
 
     <!-- Security Preferences -->
     <string name="change_password">Change Password</string>
+    <string name="reset_data_key">Reset Data Encryption Key</string>
 
     <!-- Messages Preferences -->
     <string name="signature_title">Your signature</string>

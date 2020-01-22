@@ -12,11 +12,13 @@ const val APP_VERSION_NAME = "app_version_name"
 const val APP_ICON_IDS = "app_icon_ids"
 const val APP_ID = "app_id"
 const val APP_LAUNCHER_NAME = "app_launcher_name"
-const val APP_PASSWORD_HASH = "app_password_hash"
-const val APP_DATABASE_SECRET_ENCRYPTED = "app_database_secret_encrypted"
+const val APP_PASSWORD_HASH = "key_00"
+const val APP_DATABASE_SECRET_ENCRYPTED_01 = "key_01"
+const val APP_DATABASE_SECRET_ENCRYPTED_02 = "key_02"
+const val APP_DATABASE_SECRET_ENCRYPTED_03 = "key_03"
 const val KEY_STORE = "AndroidKeyStore"
 const val KEY_STORE_ALIAS = "smttcn_safebox_key_00"
-const val KEY_HASH_ITERATION_COUNT = 10000 // todo: to be increased in production
+const val KEY_HASH_ITERATION_COUNT = 10000
 const val PATH_DOCUMENT_ROOT = "data/"
 const val MIN_PASSWORD_LENGTH = 6
 
