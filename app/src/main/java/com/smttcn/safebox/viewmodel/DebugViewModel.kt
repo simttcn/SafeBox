@@ -7,11 +7,9 @@ import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.crypto.Encryption
 import com.smttcn.commons.crypto.KeyUtil
 import com.smttcn.commons.extensions.toBase64String
-import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.Base64.encode
 import com.smttcn.commons.helpers.Base64.decode
 import com.smttcn.safebox.MyApplication
-import java.util.HashMap
 
 class DebugViewModel : ViewModel(){
     private val _text = MutableLiveData<String>().apply {
@@ -88,7 +86,7 @@ class DebugViewModel : ViewModel(){
 
     private fun getDebugText1(): String {
         val path = FileManager.documentRoot
-        val items = FileManager.getFileDirItemsInFolder().joinToString("\n--\n")
+        val items = FileManager.getFileDirItemsInFolderInDocumentRoot().joinToString("\n--\n")
         return path + "\n\n" + items + "\n-- Last line --"
     }
 }

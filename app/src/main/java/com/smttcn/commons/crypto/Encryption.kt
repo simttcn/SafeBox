@@ -50,6 +50,14 @@ internal class Encryption {
         return String(Base64.encode(pwd)).dropLast(2)
     }
 
+    fun encryptWithFilename(filename: String, dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
+
+        var map = encrypt(dataToEncrypt, password)
+        map["filename"] = filename.toByteArray()
+
+        return map
+    }
+
     fun encrypt(dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
         val map = HashMap<String, ByteArray>()
         try {

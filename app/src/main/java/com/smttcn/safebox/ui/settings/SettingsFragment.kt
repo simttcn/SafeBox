@@ -21,6 +21,7 @@ import com.smttcn.materialdialogs.actions.setActionButtonEnabled
 import com.smttcn.materialdialogs.input.getInputField
 import com.smttcn.materialdialogs.input.input
 import com.smttcn.materialdialogs.lifecycle.lifecycleOwner
+import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.ui.security.PasswordActivity
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.AppDatabase
@@ -54,41 +55,68 @@ class SettingsFragment : PreferenceFragmentCompat() {
         startActivityForResult(intent, REQUEST_CODE_CHANGE_PASSWORD)
     }
 
-    //Todo: to have an activity to let user change the database's secret
     private fun showResetDataKeyActivity() {
-        val ku = KeyUtil()
+        MaterialDialog(myContext).show {
+            title(R.string.dlg_title_reset_data_key)
+            message(R.string.dlg_msg_reset_data_key_confirmation)
+            input(
+                hint = getString(R.string.dlg_msg_reset_data_key_hint),
+                inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD,
+                waitForPositiveButton = false
+            ) { _, text ->
+                setActionButtonEnabled(WhichButton.POSITIVE, text.length >= MIN_PASSWORD_LENGTH)
+            }
+            positiveButton(R.string.btn_ok) {
+                doResetDataKey(it)
+            }
+            negativeButton(R.string.btn_cancel)
+            lifecycleOwner(this@SettingsFragment)
+        }
 
-            MaterialDialog(myContext).show {
-                title(R.string.dlg_title_reset_data_key)
-                message(R.string.dlg_msg_reset_data_key_confirmation)
-                input(
-                    hint = "Enter password to proceed",
-                    inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD,
-                    waitForPositiveButton = false
-                ) { _, text ->
-                    setActionButtonEnabled(WhichButton.POSITIVE, text.length >= MIN_PASSWORD_LENGTH)
-                }
-                positiveButton(R.string.btn_ok) {
-                    // Todo: find a cleaner way to  perform reset data key operation
-                    // Todo: app crashed when trying to read again after key reset
-                    val pwd = it.getInputField().text.toString()
-                    Authenticator().authenticateAppPassword(pwd) {
+    }
+
+    private fun doResetDataKey(dlg : MaterialDialog) {
+        val pwd = dlg.getInputField().text.toString()
+        Authenticator().authenticateAppPassword(pwd) {
+            if (it == true) {
+                val newSecret = KeyUtil().generateAndSaveAppDatabaseSecret(pwd,true)
+                if (!newSecret.isEmpty()) {
+                    AppDatabase.reKey(newSecret) {
                         if (it == true) {
-                            val newSecret = KeyUtil().generateAndSaveAppDatabaseSecret(pwd,true)
-                            if (!newSecret.isEmpty()) {
-                                AppDatabase.reKey(newSecret)
-                                myContext.toast("Key successfully reset.")
-                            } else
-                                myContext.toast("Key reset failed!")
+                            showResetDataKeyResultDialog(
+                                R.string.dlg_title_reset_data_key,
+                                R.string.dlg_msg_reset_data_key_success,
+                                true)
                         } else {
-                            myContext.toast("Incorrect password!")
+                            showResetDataKeyResultDialog(
+                                R.string.dlg_title_reset_data_key,
+                                R.string.dlg_msg_reset_data_key_error)
                         }
                     }
-                }
-                negativeButton(R.string.btn_cancel)
-                lifecycleOwner(this@SettingsFragment)
-            }
 
+                } else {
+                    showResetDataKeyResultDialog(
+                        R.string.dlg_title_reset_data_key,
+                        R.string.dlg_msg_reset_data_key_error)
+                }
+            } else {
+                showResetDataKeyResultDialog(
+                    R.string.dlg_title_reset_data_key,
+                    R.string.dlg_msg_change_password_incorrect)
+            }
+        }
+    }
+
+    private fun showResetDataKeyResultDialog(titleID : Int, msgID : Int, shutdown : Boolean = false) {
+        MaterialDialog(myContext).show {
+            title(titleID)
+            message(msgID)
+            positiveButton(R.string.btn_ok) {
+                if (shutdown)
+                    activity!!.finishAffinity()
+            }
+            lifecycleOwner(this@SettingsFragment)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

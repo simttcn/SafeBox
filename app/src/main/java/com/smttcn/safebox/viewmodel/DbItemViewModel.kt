@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.database.AppDatabase
 import com.smttcn.safebox.database.DbItem
 import com.smttcn.safebox.database.DbItemRepository
@@ -16,9 +17,19 @@ class DbItemViewModel(application: Application) : AndroidViewModel(application) 
     // The ViewModel maintains a reference to the repository to get data.
     lateinit private var repo: DbItemRepository
     // LiveData gives us updated words when they change.
-    var allDbItems: LiveData<List<DbItem>>
+    lateinit var allDbItems: LiveData<List<DbItem>>
+    var app : Application
 
     init {
+        app = application
+        initViewModel(app)
+    }
+
+    fun reload() {
+        initViewModel(app)
+    }
+
+    private fun initViewModel(application : Application) {
         // Gets reference to DbItemDao from AppDatabase to construct
         // the correct DbItemRepository.
         if (AppDatabase.getDb(application, viewModelScope) != null) {

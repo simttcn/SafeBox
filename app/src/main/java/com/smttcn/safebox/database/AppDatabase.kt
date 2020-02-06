@@ -9,7 +9,6 @@ import com.smttcn.commons.Manager.FileManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.*
-import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
 @Database(entities = arrayOf(DbItem::class), version = 1, exportSchema = false)
@@ -45,11 +44,26 @@ abstract class AppDatabase : RoomDatabase() {
             supportFactory = SupportFactory(secretKey.toByteArray())
         }
 
-        fun reKey(secretKey: String) {
-            database?.query("PRAGMA rekey='" + secretKey + "'")
-            database?.close()
-            INSTANCE?.close()
-            INSTANCE = null
+        fun reKey(secretKey: String, callback : (result: Boolean) -> Unit) {
+            if (database != null && database!!.isOpen) {
+                try {
+                    database?.query("PRAGMA rekey='" + secretKey + "'")
+                    close()
+                    callback(true)
+                } catch(ignored: Exception){
+                    callback(false)
+                }
+            } else {
+                callback(false)
+            }
+        }
+
+        fun close() {
+            if (database != null && database!!.isOpen) {
+                database!!.close()
+                INSTANCE!!.close()
+                INSTANCE = null
+            }
         }
 
         fun getDb(appContext: Context, scope: CoroutineScope): AppDatabase? {
@@ -84,13 +98,13 @@ abstract class AppDatabase : RoomDatabase() {
             for (item in allDbItems) { // loop them through
                 if (item.isFolder) {
                     // it's a folder, so does it exist?
-                    if (!FileManager.isFolderExist(item.hashedFilenameWithPath())) {
+                    if (!FileManager.isFolderExistInDocumentRoot(item.hashedFilenameWithPath())) {
                         // physical item not exist, remove the table entry
                         dbItemDao.delete(item)
                     }
                 } else {
                     // it's a file, so does it exist?
-                    if (!FileManager.isFileExist(item.hashedFilenameWithPath())) {
+                    if (!FileManager.isFileExistInDocumentRoot(item.hashedFilenameWithPath())) {
                         // physical item not exist, remove the table entry
                         dbItemDao.delete(item)
                     }
@@ -101,7 +115,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         suspend private fun addNewItems(dbItemDao: DbItemDao) {
             // get all files within the data folder
-            val newItems = FileManager.getFilesInFolder(includeSubfolder = true)
+            val newItems = FileManager.getFilesInFolderInDocumentRoot(includeSubfolder = true)
             // get all existing hashed filename from the database in a temp array
             val allDbItems = dbItemDao.getAllDbItemHashedFilenames()
             // loop through all the files we found in the data folders

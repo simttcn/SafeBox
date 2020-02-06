@@ -48,7 +48,10 @@
     <string name="dlg_msg_change_password_cancel">Password change cancelled.</string>
     <string name="dlg_msg_change_password_incorrect">You have entered an incorrect current password, please try again.</string>
     <string name="dlg_msg_change_password_error">Error occurs when changing password, please try again.</string>
-    <string name="dlg_msg_reset_data_key_confirmation">Are you sure you want to reset the data key?\n\nResetting a large dataset may take minutes to complete.</string>
+    <string name="dlg_msg_reset_data_key_confirmation">Are you sure you want to reset the data key?\n\nResetting a large dataset may take minutes to complete and the app will have to be shutdown to complete the operation.</string>
+    <string name="dlg_msg_reset_data_key_success">Data key successfully reset and the app will be shutdown now. Please restart it manually.</string>
+    <string name="dlg_msg_reset_data_key_error">Failed to reset data key.</string>
+    <string name="dlg_msg_reset_data_key_hint">Enter your current password</string>
 
     <!-- Dates -->
     <string name="january">January</string>

@@ -9,6 +9,9 @@ import com.smttcn.commons.helpers.BaseConfig
 import com.smttcn.commons.helpers.PREFS_KEY
 import com.smttcn.safebox.database.AppDatabase
 
+// Todo: Try to do without the sqlite database and instead to put the encryption info into the
+//      file header to more robust data storing
+
 class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
     companion object {
@@ -50,7 +53,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
     fun lockApp() {
         globalAppAuthenticated = "no"
-        // Todo: do we have to close the database manually?
+        AppDatabase.close()
     }
 
     override fun onCreate() {

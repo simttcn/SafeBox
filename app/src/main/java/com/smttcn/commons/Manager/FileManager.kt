@@ -1,9 +1,11 @@
 package com.smttcn.commons.Manager
 
+import com.smttcn.commons.crypto.Encryption
+import com.smttcn.commons.extensions.getParentPath
 import com.smttcn.commons.helpers.PATH_DOCUMENT_ROOT
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
-import java.io.File
+import java.io.*
 
 object FileManager {
 
@@ -21,8 +23,8 @@ object FileManager {
             f.mkdir()
     }
 
-    public fun getFileDirItemsInFolder(folder: String = ""): List<FileDirItem> {
-        val files = getFilesInFolder(folder)
+    public fun getFileDirItemsInFolderInDocumentRoot(folder: String = ""): List<FileDirItem> {
+        val files = getFilesInFolderInDocumentRoot(folder)
         var items: MutableList<FileDirItem> = mutableListOf<FileDirItem>()
         for(file in files) {
             items.add(FileDirItem(file))
@@ -31,8 +33,8 @@ object FileManager {
         return items
     }
 
-    public fun getFilesInFolder(folder: String = "", includeSubfolder: Boolean = false, countHiddenItems: Boolean = false): List<File> {
-        val dir = File(toFullPath(folder))
+    fun getFilesInFolderInDocumentRoot(folder: String = "", includeSubfolder: Boolean = false, countHiddenItems: Boolean = false): List<File> {
+        val dir = File(toFullPathInDocumentRoot(folder))
 
         if (includeSubfolder) {
             return getFilesInSubfolder(dir, countHiddenItems)
@@ -64,26 +66,84 @@ object FileManager {
         return items.toList()
     }
 
-    private fun toFullPath(folder: String) : String = documentRoot + folder
+    private fun toFullPathInDocumentRoot(folder: String) : String = documentRoot + folder
 
     //--------------------------------------------------------------------
     // Dir operation
-    public fun isFolderExist(dir: String, isHidden: Boolean = false): Boolean {
-        val f = File(toFullPath(dir))
+    fun isFolderExistInDocumentRoot(dir: String, isHidden: Boolean = false): Boolean {
+        val f = File(toFullPathInDocumentRoot(dir))
         return f.exists() && f.isDirectory() && f.isHidden() == isHidden
     }
 
-    public fun createFolder(dir: String) {
-        val f = File(toFullPath(dir))
+    fun createFolderInDocumentRoot(dir: String) {
+        val f = File(toFullPathInDocumentRoot(dir))
         if (!f.exists() || !f.isDirectory())
             f.mkdir()
     }
 
     //--------------------------------------------------------------------
     // File operations
-    fun isFileExist(file: String, isHidden: Boolean = false) : Boolean {
-        val f = File(toFullPath(file))
+    fun isFileExistInDocumentRoot(file: String, isHidden: Boolean = false) : Boolean {
+        val f = File(toFullPathInDocumentRoot(file))
         return f.exists() && f.isHidden() == isHidden
     }
+
+    fun EncryptFile(file: File, password: CharArray, deleteOriginal: Boolean = true) {
+        val originalFilename = file.name
+        val encryptedFilePath = file.path + ".enc"
+
+        val inputStream = file.inputStream()
+        val bytes = inputStream.readBytes()
+        inputStream.close()
+
+        val map = Encryption().encryptWithFilename(originalFilename, bytes, password)
+        ObjectOutputStream(FileOutputStream(encryptedFilePath)).use {
+                it -> it.writeObject(map)
+        }
+
+        if (isFileExistInDocumentRoot(encryptedFilePath) && deleteOriginal)
+            file.delete()
+
+    }
+
+    fun DecryptFile(file: File, password: CharArray, deleteOriginal: Boolean = true) {
+
+        var filename: String = ""
+        var decryptedFilePath = file.path.getParentPath().removeSuffix("/") + "/"
+
+        var decrypted: ByteArray? = null
+        ObjectInputStream(FileInputStream(file)).use { it ->
+            val data = it.readObject()
+
+            when(data) {
+                is Map<*, *> -> {
+
+                    if (data.containsKey("filename") && data.containsKey("iv") && data.containsKey("salt") && data.containsKey("encrypted")) {
+                        val fn = data["filename"]
+                        val iv = data["iv"]
+                        val salt = data["salt"]
+                        val encrypted = data["encrypted"]
+                        if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
+                            decryptedFilePath += String(fn)
+                            decrypted = Encryption().decrypt(
+                                hashMapOf("iv" to iv, "salt" to salt, "encrypted" to encrypted), password)
+                        }
+                    }
+                }
+            }
+        }
+
+        if (decrypted != null) {
+            ObjectOutputStream(FileOutputStream(decryptedFilePath)).use {
+                    it -> it.writeObject(decrypted)
+            }
+
+            if (isFileExistInDocumentRoot(decryptedFilePath) && deleteOriginal)
+                file.delete()
+
+        }
+    }
+
+
 
 }
