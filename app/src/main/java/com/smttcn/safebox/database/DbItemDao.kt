@@ -11,6 +11,9 @@ interface DbItemDao {
     @Query("SELECT hashed_filename FROM dbItem")
     suspend fun getAllDbItemHashedFilenames(): List<String>
 
+    @Query("SELECT full_path_with_filename  FROM dbItem")
+    suspend fun getAllDbItemWithPathFromDocumentRoot(): List<String>
+
     @Query("SELECT * FROM dbItem")
     suspend fun getAllDbItems(): List<DbItem>
 

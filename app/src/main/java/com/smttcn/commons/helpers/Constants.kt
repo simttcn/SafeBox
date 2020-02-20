@@ -19,7 +19,6 @@ const val APP_DATABASE_SECRET_ENCRYPTED_03 = "key_03"
 const val KEY_STORE = "AndroidKeyStore"
 const val KEY_STORE_ALIAS = "smttcn_safebox_key_00"
 const val KEY_HASH_ITERATION_COUNT = 10000
-const val PATH_DOCUMENT_ROOT = "data/"
 const val MIN_PASSWORD_LENGTH = 6
 
 const val INTERVAL_BACK_BUTTON_QUIT_IN_MS = 3000

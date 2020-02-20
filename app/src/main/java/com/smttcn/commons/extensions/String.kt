@@ -16,6 +16,10 @@ import java.text.Normalizer
 import java.util.*
 import java.util.regex.Pattern
 
+fun String.addExtension(ext: String) = this + "." + ext
+
+fun String.appendPath(path: String) = this.removeSuffix("/") + "/" + path
+
 fun String.removeTrailingCharacter(character: Char): String {
     if (endsWith(character, ignoreCase = false)) {
         return substring(0, length - 1)

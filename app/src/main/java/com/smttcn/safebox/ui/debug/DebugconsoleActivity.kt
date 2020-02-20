@@ -27,9 +27,19 @@ class DebugconsoleActivity : BaseActivity() {
         textView.movementMethod = ScrollingMovementMethod()
 
         debugViewModel = ViewModelProviders.of(this).get(DebugViewModel::class.java)
-        debugViewModel.text.observe(this, Observer {
-            textView.text = it
+//        debugViewModel.text.observe(this, Observer {
+//            textView.text = it
+//        })
+        debugViewModel.allDbItems.observe(this, Observer { item ->
+            val str : StringBuilder = StringBuilder()
+
+            item?.forEach {
+                str.append(it.fileName + "\n" + it.hashedFileName + "\n" + it.fullPathWithFilename + "\n\n")
+            }
+
+            textView.text = str.toString()
         })
+
     }
 
     fun initActivityUI() {

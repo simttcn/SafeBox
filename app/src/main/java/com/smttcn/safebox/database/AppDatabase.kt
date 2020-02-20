@@ -98,13 +98,13 @@ abstract class AppDatabase : RoomDatabase() {
             for (item in allDbItems) { // loop them through
                 if (item.isFolder) {
                     // it's a folder, so does it exist?
-                    if (!FileManager.isFolderExistInDocumentRoot(item.hashedFilenameWithPath())) {
+                    if (!FileManager.isFileExist(item.fullPathWithFilename)) {
                         // physical item not exist, remove the table entry
                         dbItemDao.delete(item)
                     }
                 } else {
                     // it's a file, so does it exist?
-                    if (!FileManager.isFileExistInDocumentRoot(item.hashedFilenameWithPath())) {
+                    if (!FileManager.isFileExist(item.fullPathWithFilename)) {
                         // physical item not exist, remove the table entry
                         dbItemDao.delete(item)
                     }
@@ -115,22 +115,20 @@ abstract class AppDatabase : RoomDatabase() {
 
         suspend private fun addNewItems(dbItemDao: DbItemDao) {
             // get all files within the data folder
-            val newItems = FileManager.getFilesInFolderInDocumentRoot(includeSubfolder = true)
+            val newItems = FileManager.getFilesInDocumentRoot(includeSubfolder = true)
             // get all existing hashed filename from the database in a temp array
-            val allDbItems = dbItemDao.getAllDbItemHashedFilenames()
+            val allDbItems = dbItemDao.getAllDbItemWithPathFromDocumentRoot()
             // loop through all the files we found in the data folders
             for (item in newItems) {
+                // todo: last 20200218
                 // see if it not already exist in the database by checking the temp array
-                if (!allDbItems.contains(item.name)) {
+                if (!allDbItems.contains(item.canonicalPath)) {
                     // not found in the array, i.e. the database, so create an object for inserting
                     val dbItem = DbItem(
                         fileName = item.name,
                         hashedFileName = item.name,
                         isFolder = item.isDirectory,
-                        path = item.path.replace(FileManager.documentRoot, "").replace(
-                            item.name,
-                            ""
-                        ),
+                        fullPathWithFilename = item.canonicalPath,
                         salt = "",
                         size = item.length()
                     )
@@ -139,7 +137,6 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
         }
-
 
     }
 }

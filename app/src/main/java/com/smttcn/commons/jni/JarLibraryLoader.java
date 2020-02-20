@@ -14,7 +14,7 @@ import java.util.jar.JarFile;
  * This loader will attempt to detect the {@link Platform platform} (CPU architecture and OS)
  * it is running on and load the appropriate shared library.
  *
- * Given a library path and name this loader looks for a native library with path
+ * Given a library path and name this loader looks for a native library with fullPathWithFilename
  * [libraryPath]/[arch]/[os]/lib[name].[ext]
  *
  * @author Will Glozer
@@ -25,7 +25,7 @@ public class JarLibraryLoader implements LibraryLoader {
 
     /**
      * initialize a new instance that looks for shared libraries located in the same jar
-     * as this class and with a path starting with {@code lib}.
+     * as this class and with a fullPathWithFilename starting with {@code lib}.
      */
     public JarLibraryLoader() {
         this(JarLibraryLoader.class.getProtectionDomain().getCodeSource(), "lib");

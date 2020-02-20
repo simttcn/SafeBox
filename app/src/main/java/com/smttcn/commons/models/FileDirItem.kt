@@ -19,7 +19,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
     var modified: Long = 0L
 
     init {
-        path = _file.path
+        path = _file.canonicalPath
         name = _file.name
         isDirectory = _file.isDirectory
         children = 0
@@ -27,7 +27,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         modified = _file.lastModified()
     }
 
-    override fun toString() = "FileDirItem(path=$path, name=$name, isDirectory=$isDirectory, children=$children, size=$size, modified=$modified)"
+    override fun toString() = "FileDirItem(fullPathWithFilename=$path, name=$name, isDirectory=$isDirectory, children=$children, size=$size, modified=$modified)"
 
     override fun compareTo(other: FileDirItem): Int {
         return if (isDirectory && !other.isDirectory) {
@@ -51,7 +51,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
                     }
                 }
                 sorting and SORT_BY_FOLDERNAME != 0 -> result = when {
-                    // sort by folder/path name
+                    // sort by folder/fullPathWithFilename name
                     getParentPath() == other.getParentPath() -> 0
                     getParentPath() > other.getParentPath() -> 1
                     else -> -1

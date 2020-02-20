@@ -1,7 +1,6 @@
 package com.smttcn.safebox.ui.main
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import com.smttcn.commons.extensions.toast
@@ -10,16 +9,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
-import com.smttcn.safebox.database.AppDatabase
 import com.smttcn.safebox.database.DbItem
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
@@ -27,10 +23,7 @@ import com.smttcn.safebox.viewmodel.DbItemViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.itemListRecyclerView
 import kotlinx.android.synthetic.main.activity_main.progressBarContainer
-import java.sql.Time
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -128,7 +121,7 @@ class MainActivity : BaseActivity() {
             fileName = "filename_" + dt,
             hashedFileName = "hashed_" + dt,
             isFolder = true,
-            path = "",
+            fullPathWithFilename = "",
             salt = "",
             size = 0
         )

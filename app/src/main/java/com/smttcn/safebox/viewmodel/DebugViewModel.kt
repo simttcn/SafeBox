@@ -1,8 +1,7 @@
 package com.smttcn.safebox.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
 import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.crypto.Encryption
 import com.smttcn.commons.crypto.KeyUtil
@@ -10,15 +9,69 @@ import com.smttcn.commons.extensions.toBase64String
 import com.smttcn.commons.helpers.Base64.encode
 import com.smttcn.commons.helpers.Base64.decode
 import com.smttcn.safebox.MyApplication
+import com.smttcn.safebox.database.AppDatabase
+import com.smttcn.safebox.database.DbItem
+import com.smttcn.safebox.database.DbItemRepository
+import com.smttcn.safebox.ui.main.MainActivity
 
-class DebugViewModel : ViewModel(){
+class DebugViewModel(application: Application) : AndroidViewModel(application){
+
+    lateinit private var repo: DbItemRepository
+    lateinit var allDbItems: LiveData<List<DbItem>>
+    var app : Application
+
     private val _text = MutableLiveData<String>().apply {
         value = getDebugText()
     }
     val text: LiveData<String> = _text
 
+    init {
+        app = application
+        initViewModel(app)
+    }
+
+    private fun initViewModel(application : Application) {
+        // Gets reference to DbItemDao from AppDatabase to construct
+        // the correct DbItemRepository.
+        if (AppDatabase.getDb(application, viewModelScope) != null) {
+            val dbItemDao = AppDatabase.getDb(application, viewModelScope)!!.dbItemDao()
+            repo = DbItemRepository(dbItemDao)
+            allDbItems = repo.allDbItems
+        } else {
+            allDbItems = MutableLiveData()
+        }
+    }
 
     private fun getDebugText(): String {
+
+        var result: StringBuilder = java.lang.StringBuilder()
+
+        return result.toString()
+    }
+
+    private fun getDebugText5(): String {
+        var result: StringBuilder = java.lang.StringBuilder()
+
+        val files = FileManager.getFilesInDocumentRoot()
+
+        files.forEach(){
+            if (!FileManager.isEncryptedFile(it)) {
+                val encFilename = FileManager.EncryptFile(it, "111111".toCharArray())
+                if (encFilename.length > 5) result.append(encFilename + "\n")
+            }
+        }
+
+//        if (FileManager.isEncryptedFile(file)) {
+//            result.append("Decrypting : " + file.name)
+//            FileManager.DecryptFile(file, "password".toCharArray())
+//        } else {
+//            result.append("Encrypted file not found!")
+//        }
+
+        return result.toString()
+    }
+
+    private fun getDebugText4(): String {
         var result: StringBuilder = java.lang.StringBuilder()
 
         val pwd = "111111"
@@ -85,8 +138,8 @@ class DebugViewModel : ViewModel(){
 
 
     private fun getDebugText1(): String {
-        val path = FileManager.documentRoot
-        val items = FileManager.getFileDirItemsInFolderInDocumentRoot().joinToString("\n--\n")
+        val path = FileManager.documentDataRoot
+        val items = FileManager.getFileDirItemsInDocumentRoot().joinToString("\n--\n")
         return path + "\n\n" + items + "\n-- Last line --"
     }
 }

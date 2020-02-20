@@ -20,6 +20,7 @@ import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.AppDatabase
+import com.smttcn.safebox.helpers.SampleHelper
 
 
 class LoginActivity : BaseActivity() {
@@ -80,6 +81,8 @@ class LoginActivity : BaseActivity() {
                         val keyUtil = KeyUtil()
                         val dbSecret = keyUtil.getAppDatabaseSecretWithAppPassword(Password.text.toString())
                         AppDatabase.setKey(dbSecret)
+                        SampleHelper().Initialze(Password.text.toString().toCharArray())
+                        Password.text.clear()
 
                         if (!IsCalledFromMainActivity) {
                             // not called from MainActivity, so start one
