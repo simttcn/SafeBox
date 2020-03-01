@@ -1,7 +1,11 @@
 package com.smttcn.commons.Manager
 
+import android.content.ContentResolver
+import android.net.Uri
+import android.provider.OpenableColumns
 import com.smttcn.commons.crypto.Encryption
 import com.smttcn.commons.extensions.addExtension
+import com.smttcn.commons.extensions.getFilenameFromPath
 import com.smttcn.commons.extensions.getParentPath
 import com.smttcn.commons.extensions.withTrailingCharacter
 import com.smttcn.commons.models.FileDirItem
@@ -75,6 +79,11 @@ object FileManager {
 
     //--------------------------------------------------------------------
     // Dir operation
+    fun isFolderExist(file: String, isHidden: Boolean = false) : Boolean {
+        val f = File(file)
+        return f.isDirectory() && f.exists() && f.isHidden() == isHidden
+    }
+
     fun isFolderExistInDocumentRoot(dir: String, isHidden: Boolean = false): Boolean {
         val f = File(toFullPathInDocumentRoot(dir))
         return f.exists() && f.isDirectory() && f.isHidden() == isHidden
@@ -98,8 +107,85 @@ object FileManager {
         return f.exists() && f.isHidden() == isHidden
     }
 
+    fun copyFileFromUriToFolder(contentResolver: ContentResolver, uri: Uri, folder: String = "") {
+        val (filename, size) = getFilenameAndSizeFromUri(contentResolver, uri)
+        val inputStream = contentResolver.openInputStream(uri)
+        var targetFilePath: String = ""
+
+        if (folder.length > 0)
+            targetFilePath =  FileManager.toFullPathInDocumentRoot(folder.withTrailingCharacter('/') + filename)
+        else
+            targetFilePath =  FileManager.toFullPathInDocumentRoot(filename)
+
+        FileOutputStream(targetFilePath).use { fileOut ->
+            inputStream!!.copyTo(fileOut)
+            fileOut.close()
+        }
+        inputStream!!.close()
+    }
+
+    fun encryptFileFromUriToFolder(contentResolver: ContentResolver, password: CharArray, uri: Uri, folder: String = "") : String {
+        var encryptedFilePath: String = ""
+        val (filename, size) = getFilenameAndSizeFromUri(contentResolver, uri)
+        val inputStream = contentResolver.openInputStream(uri)
+
+        if (folder.length > 0)
+            encryptedFilePath =  FileManager.toFullPathInDocumentRoot(folder.withTrailingCharacter('/') + filename)
+        else
+            encryptedFilePath =  FileManager.toFullPathInDocumentRoot(filename)
+
+        encryptedFilePath = encryptedFilePath + ".enc"
+
+        //todo: got to check inputStream vaidity
+        val bytes = inputStream!!.readBytes()
+        inputStream!!.close()
+        val map = Encryption().encryptWithFilename(filename, bytes, password)
+
+        if (map.containsKey("filename") && map.containsKey("iv") && map.containsKey("salt") && map.containsKey("encrypted")) {
+            ObjectOutputStream(FileOutputStream(encryptedFilePath)).use {
+                    it -> it.writeObject(map)
+            }
+
+            return encryptedFilePath
+        }
+
+        return ""
+
+    }
+
+    fun getFilenameAndSizeFromUri(contentResolver: ContentResolver, uri: Uri) : Pair<String, Long> {
+        /*
+         * Get the file's content URI from the incoming Intent,
+         * then query the server app to get the file's display name
+         * and size.
+         */
+        var result = Pair("", 0L)
+        contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            /*
+             * Get the column indexes of the data in the Cursor,
+             * move to the first row in the Cursor, get the data,
+             * and display it.
+             */
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+            cursor.moveToFirst()
+            result = Pair(cursor.getString(nameIndex), cursor.getLong(sizeIndex))
+        }
+
+        return result
+    }
+
+    fun isEncryptedFileExist(filepath: String, originalFilename: String) : Boolean {
+        val f = File(filepath)
+        if (!isEncryptedFile(f)) return false
+
+        val fn = GetFilenameFromEncryptedFile(f)
+
+        return originalFilename.equals(fn)
+    }
+
     fun isEncryptedFile(file: File) : Boolean {
-        if (file.isDirectory()) return false
+        if (!file.exists() || file.isDirectory()) return false
 
         try {
             ObjectInputStream(FileInputStream(file)).use { it ->
@@ -119,7 +205,30 @@ object FileManager {
         return false
     }
 
-    fun EncryptFile(inputStream: InputStream, filename: String, encryptedFilePath: String, password: CharArray, deleteOriginal: Boolean = true) : Boolean {
+    fun GetFilenameFromEncryptedFile(file: File) : String {
+        if (file.isDirectory()) return ""
+
+        try {
+            ObjectInputStream(FileInputStream(file)).use { it ->
+                val data = it.readObject()
+                when(data) {
+                    is Map<*, *> -> {
+                        if (data.containsKey("filename") && data.containsKey("iv") && data.containsKey("salt") && data.containsKey("encrypted")) {
+                            val fn = data["filename"]
+                            if (fn is ByteArray)
+                                return String(fn).getFilenameFromPath()
+                        }
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            return ""
+        }
+
+        return ""
+    }
+
+    fun EncryptFile(inputStream: InputStream, filename: String, encryptedFilePath: String, password: CharArray) : Boolean {
 
         try {
             val bytes = inputStream.readBytes()
@@ -136,63 +245,70 @@ object FileManager {
         }
     }
 
-    // Todo: to have more fail safe check
     fun EncryptFile(file: File, password: CharArray, deleteOriginal: Boolean = true) : String {
         if (file.isDirectory()) return ""
 
         val originalFilename = file.name
         val encryptedFilePath = file.path.addExtension(ENCRYPT_EXT)
 
-        val inputStream = file.inputStream()
-        val result = EncryptFile(inputStream, originalFilename, encryptedFilePath, password, deleteOriginal)
-        inputStream.close()
+        try {
+            val inputStream = file.inputStream()
+            val result = EncryptFile(inputStream, originalFilename, encryptedFilePath, password)
+            inputStream.close()
 
-        if (deleteOriginal && result && isFileExist(encryptedFilePath))
-            file.delete()
+            if (deleteOriginal && result && isFileExist(encryptedFilePath))
+                file.delete()
 
-        return if (result) encryptedFilePath else ""
+            return if (result) encryptedFilePath else ""
+        } catch (ex: Exception) {
+            return ""
+        }
     }
 
-    // Todo: to have more fail safe check
     fun DecryptFile(file: File, password: CharArray, deleteOriginal: Boolean = true) : String {
         if (file.isDirectory()) return ""
 
         var filename: String = ""
         var decryptedFilePath = file.path.getParentPath().removeSuffix("/") + "/"
 
-        var decrypted: ByteArray? = null
-        ObjectInputStream(FileInputStream(file)).use { it ->
-            val data = it.readObject()
-            when(data) {
-                is Map<*, *> -> {
-                    if (data.containsKey("filename") && data.containsKey("iv") && data.containsKey("salt") && data.containsKey("encrypted")) {
-                        val fn = data["filename"]
-                        val iv = data["iv"]
-                        val salt = data["salt"]
-                        val encrypted = data["encrypted"]
-                        if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
-                            decryptedFilePath += String(fn)
-                            decrypted = Encryption().decrypt(
-                                hashMapOf("iv" to iv, "salt" to salt, "encrypted" to encrypted), password)
+        try {
+            var decrypted: ByteArray? = null
+            ObjectInputStream(FileInputStream(file)).use { it ->
+                val data = it.readObject()
+                when(data) {
+                    is Map<*, *> -> {
+                        if (data.containsKey("filename") && data.containsKey("iv") && data.containsKey("salt") && data.containsKey("encrypted")) {
+                            val fn = data["filename"]
+                            val iv = data["iv"]
+                            val salt = data["salt"]
+                            val encrypted = data["encrypted"]
+                            if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
+                                decryptedFilePath += String(fn)
+                                decrypted = Encryption().decrypt(
+                                    hashMapOf("iv" to iv, "salt" to salt, "encrypted" to encrypted), password)
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if (decrypted != null) {
-            ObjectOutputStream(FileOutputStream(decryptedFilePath)).use {
-                    it -> it.writeObject(decrypted)
+            if (decrypted != null) {
+                ObjectOutputStream(FileOutputStream(decryptedFilePath)).use {
+                        it -> it.writeObject(decrypted)
+                }
+
+                if (isFileExist(decryptedFilePath) && deleteOriginal)
+                    file.delete()
+
+                return decryptedFilePath
+
             }
 
-            if (isFileExist(decryptedFilePath) && deleteOriginal)
-                file.delete()
+            return ""
 
-            return decryptedFilePath
-
+        } catch (ex: Exception) {
+            return ""
         }
-
-        return ""
     }
 
 

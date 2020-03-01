@@ -22,7 +22,7 @@ class SampleHelper {
             val inputStream = MyApplication.getAppContext().assets.open(filename)
             val encrypt = Encryption()
             val encryptedFilePath = FileManager.documentDataRoot.appendPath(filename.addExtension(FileManager.ENCRYPT_EXT))
-            FileManager.EncryptFile(inputStream, filename,encryptedFilePath, password, false)
+            FileManager.EncryptFile(inputStream, filename,encryptedFilePath, password)
             inputStream.close()
         }
     }

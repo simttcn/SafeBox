@@ -75,7 +75,7 @@ class DebugViewModel(application: Application) : AndroidViewModel(application){
         var result: StringBuilder = java.lang.StringBuilder()
 
         val pwd = "111111"
-        result.append(">" + KeyUtil().getAppDatabaseSecretWithAppPassword(pwd) + "\n")
+        result.append(">" + KeyUtil().getAppDatabaseSecretWithAppPassword(pwd.toCharArray()) + "\n")
 
         return result.toString()
     }

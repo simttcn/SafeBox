@@ -32,7 +32,12 @@ fun String.withTrailingCharacter(character: Char): String {
     } else return this
 }
 
-fun String.getFilenameFromPath() = substring(lastIndexOf("/") + 1)
+fun String.getFilenameFromPath() : String {
+    if (lastIndexOf("/") < 1)
+        return this
+    else
+        return substring(lastIndexOf("/") + 1)
+}
 
 fun String.getFilenameExtension() = substring(lastIndexOf(".") + 1)
 

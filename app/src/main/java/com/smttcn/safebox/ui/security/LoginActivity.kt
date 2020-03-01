@@ -77,11 +77,7 @@ class LoginActivity : BaseActivity() {
                 authenticator.authenticateAppPassword((Password.text.toString())) {
                     if (it == true) {
                         // Login successfully
-                        MyApplication.globalAppAuthenticated = "yes"
-                        val keyUtil = KeyUtil()
-                        val dbSecret = keyUtil.getAppDatabaseSecretWithAppPassword(Password.text.toString())
-                        AppDatabase.setKey(dbSecret)
-                        SampleHelper().Initialze(Password.text.toString().toCharArray())
+                        onSuccessfulLogin(Password.text.toString().toCharArray())
                         Password.text.clear()
 
                         if (!IsCalledFromMainActivity) {
@@ -106,6 +102,18 @@ class LoginActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    private fun onSuccessfulLogin(password: CharArray) {
+        // todo: may have to put spinner here for long processing time
+        var pwd : CharArray = CharArray(password.size)
+        password.copyInto(pwd, 0, 0, password.size)
+        MyApplication.globalAppAuthenticated = "yes"
+        val keyUtil = KeyUtil()
+        val dbSecret = keyUtil.getAppDatabaseSecretWithAppPassword(pwd)
+        AppDatabase.setKey(dbSecret)
+        SampleHelper().Initialze(pwd)
+        pwd.fill('0', 0, pwd.size)
     }
 
     private fun redirectToNewPasswordActivity() {

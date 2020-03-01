@@ -16,9 +16,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun dbItemDao(): DbItemDao
 
-    private class AppDatabaseCallback(
-        private val scope: CoroutineScope
-    ) : RoomDatabase.Callback() {
+    private class AppDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
 
         override fun onOpen(db: SupportSQLiteDatabase) {
             database = db
@@ -98,13 +96,13 @@ abstract class AppDatabase : RoomDatabase() {
             for (item in allDbItems) { // loop them through
                 if (item.isFolder) {
                     // it's a folder, so does it exist?
-                    if (!FileManager.isFileExist(item.fullPathWithFilename)) {
+                    if (!FileManager.isFolderExist(item.fullPathWithFilename)) {
                         // physical item not exist, remove the table entry
                         dbItemDao.delete(item)
                     }
                 } else {
                     // it's a file, so does it exist?
-                    if (!FileManager.isFileExist(item.fullPathWithFilename)) {
+                    if (!FileManager.isEncryptedFileExist(item.fullPathWithFilename, item.fileName)) {
                         // physical item not exist, remove the table entry
                         dbItemDao.delete(item)
                     }
@@ -120,12 +118,11 @@ abstract class AppDatabase : RoomDatabase() {
             val allDbItems = dbItemDao.getAllDbItemWithPathFromDocumentRoot()
             // loop through all the files we found in the data folders
             for (item in newItems) {
-                // todo: last 20200218
                 // see if it not already exist in the database by checking the temp array
                 if (!allDbItems.contains(item.canonicalPath)) {
                     // not found in the array, i.e. the database, so create an object for inserting
                     val dbItem = DbItem(
-                        fileName = item.name,
+                        fileName = FileManager.GetFilenameFromEncryptedFile(item),
                         hashedFileName = item.name,
                         isFolder = item.isDirectory,
                         fullPathWithFilename = item.canonicalPath,

@@ -79,7 +79,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val pwd = dlg.getInputField().text.toString()
         Authenticator().authenticateAppPassword(pwd) {
             if (it == true) {
-                val newSecret = KeyUtil().generateAndSaveAppDatabaseSecret(pwd,true)
+                val newSecret = KeyUtil().generateAndSaveAppDatabaseSecret(pwd.toCharArray(),true)
                 if (!newSecret.isEmpty()) {
                     AppDatabase.reKey(newSecret) {
                         if (it == true) {
