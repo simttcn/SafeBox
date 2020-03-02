@@ -109,8 +109,11 @@ object FileManager {
 
     fun copyFileFromUriToFolder(contentResolver: ContentResolver, uri: Uri, folder: String = "") {
         val (filename, size) = getFilenameAndSizeFromUri(contentResolver, uri)
+
+        if (size < 1) return
+
         val inputStream = contentResolver.openInputStream(uri)
-        var targetFilePath: String = ""
+        var targetFilePath: String
 
         if (folder.length > 0)
             targetFilePath =  FileManager.toFullPathInDocumentRoot(folder.withTrailingCharacter('/') + filename)
@@ -125,8 +128,11 @@ object FileManager {
     }
 
     fun encryptFileFromUriToFolder(contentResolver: ContentResolver, password: CharArray, uri: Uri, folder: String = "") : String {
-        var encryptedFilePath: String = ""
+        var encryptedFilePath: String
         val (filename, size) = getFilenameAndSizeFromUri(contentResolver, uri)
+
+        if (size < 1) return ""
+
         val inputStream = contentResolver.openInputStream(uri)
 
         if (folder.length > 0)
@@ -138,7 +144,7 @@ object FileManager {
 
         //todo: got to check inputStream vaidity
         val bytes = inputStream!!.readBytes()
-        inputStream!!.close()
+        inputStream.close()
         val map = Encryption().encryptWithFilename(filename, bytes, password)
 
         if (map.containsKey("filename") && map.containsKey("iv") && map.containsKey("salt") && map.containsKey("encrypted")) {
@@ -268,7 +274,6 @@ object FileManager {
     fun DecryptFile(file: File, password: CharArray, deleteOriginal: Boolean = true) : String {
         if (file.isDirectory()) return ""
 
-        var filename: String = ""
         var decryptedFilePath = file.path.getParentPath().removeSuffix("/") + "/"
 
         try {

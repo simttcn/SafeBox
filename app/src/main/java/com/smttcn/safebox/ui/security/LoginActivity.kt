@@ -2,12 +2,15 @@ package com.smttcn.safebox.ui.security
 
 import android.app.Activity
 import android.content.*
+import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.annotation.StringRes
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.*
+import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.crypto.KeyUtil
 import com.smttcn.commons.helpers.Authenticator
@@ -106,14 +109,31 @@ class LoginActivity : BaseActivity() {
 
     private fun onSuccessfulLogin(password: CharArray) {
         // todo: may have to put spinner here for long processing time
+        // make a copy of the password
         var pwd : CharArray = CharArray(password.size)
         password.copyInto(pwd, 0, 0, password.size)
+        // set a global flag
         MyApplication.globalAppAuthenticated = "yes"
+        // handle share from sharesheet
+        handleShareFrom(pwd)
+        // get database secret and initialize the database
         val keyUtil = KeyUtil()
         val dbSecret = keyUtil.getAppDatabaseSecretWithAppPassword(pwd)
         AppDatabase.setKey(dbSecret)
+        // do we need to crate some sample files?
         SampleHelper().Initialze(pwd)
+        // clear the password for security
         pwd.fill('0', 0, pwd.size)
+    }
+
+    private fun handleShareFrom(pwd: CharArray) {
+        if (intent?.action == Intent.ACTION_SEND) {
+            if (intent.type?.startsWith("image/") == true) {
+                (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
+                    FileManager.encryptFileFromUriToFolder(contentResolver, pwd, it)
+                }
+            }
+        }
     }
 
     private fun redirectToNewPasswordActivity() {
