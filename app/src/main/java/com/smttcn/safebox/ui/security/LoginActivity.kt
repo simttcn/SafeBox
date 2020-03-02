@@ -80,7 +80,8 @@ class LoginActivity : BaseActivity() {
                 authenticator.authenticateAppPassword((Password.text.toString())) {
                     if (it == true) {
                         // Login successfully
-                        onSuccessfulLogin(Password.text.toString().toCharArray())
+                        MyApplication.setUS(Password.text.toString().toCharArray())
+                        onSuccessfulLogin()
                         Password.text.clear()
 
                         if (!IsCalledFromMainActivity) {
@@ -107,23 +108,18 @@ class LoginActivity : BaseActivity() {
         }
     }
 
-    private fun onSuccessfulLogin(password: CharArray) {
+    private fun onSuccessfulLogin() {
         // todo: may have to put spinner here for long processing time
-        // make a copy of the password
-        var pwd : CharArray = CharArray(password.size)
-        password.copyInto(pwd, 0, 0, password.size)
         // set a global flag
         MyApplication.globalAppAuthenticated = "yes"
         // handle share from sharesheet
-        handleShareFrom(pwd)
+        handleShareFrom(MyApplication.getUS())
         // get database secret and initialize the database
         val keyUtil = KeyUtil()
-        val dbSecret = keyUtil.getAppDatabaseSecretWithAppPassword(pwd)
+        val dbSecret = keyUtil.getAppDatabaseSecretWithAppPassword(MyApplication.getUS())
         AppDatabase.setKey(dbSecret)
         // do we need to crate some sample files?
-        SampleHelper().Initialze(pwd)
-        // clear the password for security
-        pwd.fill('0', 0, pwd.size)
+        SampleHelper().Initialze(MyApplication.getUS())
     }
 
     private fun handleShareFrom(pwd: CharArray) {

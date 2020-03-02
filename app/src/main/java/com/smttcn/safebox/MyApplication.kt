@@ -9,6 +9,7 @@ import com.smttcn.commons.helpers.BaseConfig
 import com.smttcn.commons.helpers.PREFS_KEY
 import com.smttcn.safebox.database.AppDatabase
 
+// Todo: to clean every bit of password and encryption key off the memory when application goes into background and ot active.
 class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
     companion object {
@@ -16,6 +17,20 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
         lateinit var mainActivityContext: Context
         private var instance: MyApplication? = null
         private var baseConfig: BaseConfig? = null
+        private var uS: CharArray = charArrayOf()
+
+        fun getUS(): CharArray {
+            return uS
+        }
+
+        fun setUS(value: CharArray) {
+            uS = CharArray(value.size)
+            value.copyInto(uS, 0, 0, value.size)
+        }
+
+        fun clearUS() {
+            uS.fill('0', 0, uS.size)
+        }
 
         fun getMainContext(): Context {
             return mainActivityContext
@@ -50,6 +65,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
     fun lockApp() {
         globalAppAuthenticated = "no"
+        clearUS()
         AppDatabase.close()
     }
 
