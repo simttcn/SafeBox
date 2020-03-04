@@ -1,6 +1,7 @@
 package com.smttcn.commons.Manager
 
 import android.content.ContentResolver
+import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.smttcn.commons.crypto.Encryption
@@ -12,6 +13,7 @@ import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import java.io.*
 
+
 object FileManager {
 
     const val ENCRYPT_EXT = "enc"
@@ -21,8 +23,9 @@ object FileManager {
         get() { return MyApplication.getAppContext().filesDir.toString().removeSuffix("/") }
         private set(value) {}
 
+    @Suppress("UNUSED_PARAMETER")
     var documentDataRoot: String
-        get() { return MyApplication.getAppContext().filesDir.toString().withTrailingCharacter('/') + DATA_FOLDER }
+        get() { return MyApplication.getAppContext().filesDir.canonicalPath.withTrailingCharacter('/') + DATA_FOLDER }
         private set(value) {}
 
     init {
@@ -75,7 +78,7 @@ object FileManager {
         return items.sorted().toList()
     }
 
-    private fun toFullPathInDocumentRoot(item: String) : String = documentDataRoot.withTrailingCharacter('/') + item
+    fun toFullPathInDocumentRoot(itemName: String) : String = documentDataRoot.withTrailingCharacter('/') + itemName
 
     //--------------------------------------------------------------------
     // Dir operation
@@ -95,6 +98,49 @@ object FileManager {
             f.mkdir()
     }
 
+    fun getFolderInCacheFolder(dir: String, toCreate: Boolean = false): File? {
+        val f = File(MyApplication.getAppContext().cacheDir.canonicalPath.withTrailingCharacter('/') + dir)
+
+        if (f.exists() && f.isDirectory()) {
+            return f
+        } else {
+            if (toCreate) {
+                f.mkdir()
+                return f
+            }
+        }
+
+        return null
+    }
+
+    fun deleteCache(context: Context) {
+        try {
+            val cacheDir: File = context.getCacheDir()
+            val dir = File(cacheDir.canonicalPath)
+            deleteDir(dir, true)
+        } catch (e: java.lang.Exception) {
+            //e.printStackTrace()
+        }
+    }
+
+    fun deleteDir(dir: File?, deleteNotEmpty: Boolean = false): Boolean {
+        return if (dir != null && dir.isDirectory) {
+            val children = dir.list()
+            if (children.count() > 0 && deleteNotEmpty) {
+                for (i in children.indices) {
+                    val success = deleteDir(File(dir, children[i]), deleteNotEmpty)
+                    if (!success) {
+                        return false
+                    }
+                }
+            }
+            dir.delete()
+        } else if (dir != null && dir.isFile) {
+            dir.delete()
+        } else {
+            false
+        }
+    }
     //--------------------------------------------------------------------
     // File operations
     fun isFileExistInDocumentRoot(file: String, isHidden: Boolean = false) : Boolean {
@@ -271,10 +317,16 @@ object FileManager {
         }
     }
 
-    fun DecryptFile(file: File, password: CharArray, deleteOriginal: Boolean = true) : String {
+    fun DecryptFile(file: File, password: CharArray, targetFolder: String = "", deleteOriginal: Boolean = true) : String {
         if (file.isDirectory()) return ""
 
-        var decryptedFilePath = file.path.getParentPath().removeSuffix("/") + "/"
+        var decryptedFilePath = ""
+
+        if (targetFolder.length > 0)
+            decryptedFilePath = targetFolder.withTrailingCharacter('/')
+        else
+            decryptedFilePath = file.path.getParentPath().withTrailingCharacter('/')
+
 
         try {
             var decrypted: ByteArray? = null
@@ -298,8 +350,9 @@ object FileManager {
             }
 
             if (decrypted != null) {
-                ObjectOutputStream(FileOutputStream(decryptedFilePath)).use {
-                        it -> it.writeObject(decrypted)
+                // write decrypted data out as binary file object
+                FileOutputStream(decryptedFilePath).use {
+                        it -> it.write(decrypted)
                 }
 
                 if (isFileExist(decryptedFilePath) && deleteOriginal)

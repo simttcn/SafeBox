@@ -4,6 +4,13 @@
     tools:context="com.smttcn.myapplication.MainActivity">
 
     <item
+        android:id="@+id/menu_share"
+        android:orderInCategory="90"
+        android:title="@string/menu_refresh"
+        android:icon="@drawable/icon_share_light"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/menu_refresh"
         android:orderInCategory="90"
         android:title="@string/menu_refresh"

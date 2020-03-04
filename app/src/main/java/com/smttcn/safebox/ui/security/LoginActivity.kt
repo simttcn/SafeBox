@@ -58,6 +58,7 @@ class LoginActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         MyApplication.globalAppAuthenticated = "no"
+        FileManager.deleteCache(this)
     }
 
     private fun initializeUI() {

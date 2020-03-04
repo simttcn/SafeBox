@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.helpers.BaseConfig
 import com.smttcn.commons.helpers.PREFS_KEY
 import com.smttcn.safebox.database.AppDatabase
@@ -75,6 +76,8 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
         isActivityChangingConfigurations = false
 
         registerActivityLifecycleCallbacks(this)
+
+        FileManager.deleteCache(this)
     }
 
     override fun onTerminate() {

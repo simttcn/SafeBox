@@ -8,12 +8,15 @@ import com.smttcn.commons.helpers.INTERVAL_BACK_BUTTON_QUIT_IN_MS
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View
+import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
+import com.smttcn.commons.extensions.getFilenameFromPath
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.DbItem
@@ -23,6 +26,7 @@ import com.smttcn.safebox.viewmodel.DbItemViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.itemListRecyclerView
 import kotlinx.android.synthetic.main.activity_main.progressBarContainer
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -96,6 +100,10 @@ class MainActivity : BaseActivity() {
         val id = item.itemId
 
         when(id) {
+            R.id.menu_share -> {
+                shareItem()
+                return true
+            }
             R.id.menu_refresh -> {
                 refreshDbItemList()
                 return true
@@ -111,6 +119,40 @@ class MainActivity : BaseActivity() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    // todo: to further define the share routine to share all type of files
+    private fun shareItem() {
+        val files = FileManager.getFilesInDocumentRoot()
+
+        if (files.isEmpty()) return
+
+        var decryptedFilepath: String = ""
+        val filename = files[0].name.getFilenameFromPath()
+        val filepath = FileManager.toFullPathInDocumentRoot(filename)
+        val file = File(filepath)
+
+        val targetpath = FileManager.getFolderInCacheFolder("temp_file_share", true)
+        if (file.length() > 0 && targetpath != null) {
+            decryptedFilepath = FileManager.DecryptFile(file, MyApplication.getUS(), targetpath.canonicalPath, false)
+        }
+
+        if (decryptedFilepath.isNotEmpty()) {
+            val AUTHORITY = "com.simttcn.safebox.fileprovider"
+
+            val file = File(decryptedFilepath)
+            val contentUri = FileProvider.getUriForFile(applicationContext, AUTHORITY, file)
+            // create new Intent
+            val sharingIntent = Intent(Intent.ACTION_SEND)
+            // set flag to give temporary permission to external app to use your FileProvider
+            sharingIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            // I am opening a PDF file so I give it a valid MIME type
+            sharingIntent.setDataAndType(contentUri, "image/jpeg");
+            sharingIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            // start sharing activity sheet
+            startActivity(Intent.createChooser(sharingIntent, "Share Image"));
+        }
+
     }
 
     fun refreshDbItemList() {
