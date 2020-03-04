@@ -8,6 +8,7 @@ import com.smttcn.commons.helpers.INTERVAL_BACK_BUTTON_QUIT_IN_MS
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View
+import android.view.View.OnClickListener
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -69,6 +70,10 @@ class MainActivity : BaseActivity() {
         val adapter = DbItemAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        adapter.onItemClick = { item ->
+            toast("Clicked" + item.fileName)
+        }
 
         dbItemViewModel = ViewModelProviders.of(this).get(DbItemViewModel::class.java)
 
@@ -180,5 +185,6 @@ class MainActivity : BaseActivity() {
             itemListRecyclerView.visibility = View.VISIBLE
         }
     }
+
 
 }

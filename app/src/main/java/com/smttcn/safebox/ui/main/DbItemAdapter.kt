@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.smttcn.commons.extensions.inflate
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.DbItem
 import kotlinx.android.synthetic.main.recyclerview_item.view.*
@@ -15,21 +14,23 @@ class DbItemAdapter internal constructor(context: Context) : RecyclerView.Adapte
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var dbItems = emptyList<DbItem>() // Cached copy of DbItems
+    var onItemClick: ((DbItem) -> Unit)? = null // to point to the onItemClick method in MainActivity
 
     override fun getItemCount() = dbItems.size
 
-    inner class DbItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class DbItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         init {
-            itemView.setOnClickListener(this)
+            itemView.setOnClickListener{
+                // invoke the onItemClick method in MainActivity
+                onItemClick?.invoke(dbItems[adapterPosition])
+            }
         }
 
         fun bindItem(item: DbItem) {
             itemView.item_name.text = item.fileName
         }
 
-        override fun onClick(v: View?) {
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DbItemViewHolder {
