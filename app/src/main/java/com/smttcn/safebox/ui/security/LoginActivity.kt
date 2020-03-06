@@ -17,8 +17,8 @@ import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.smttcn.commons.helpers.REQUEST_CODE_NEW_PASSWORD
-import com.smttcn.materialdialogs.MaterialDialog
-import com.smttcn.materialdialogs.callbacks.onDismiss
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R

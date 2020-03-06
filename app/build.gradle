@@ -78,9 +78,13 @@ android.applicationVariants.all { variant ->
 }
 
 dependencies {
+	// local copy library
+    implementation project(path: ':imageviewer')
+    implementation project(path: ':materialdialogs')
+
     // material dialog
-    api 'com.afollestad:date-picker:0.6.1'
-    api 'androidx.annotation:annotation:1.1.0'
+    //api 'com.afollestad:date-picker:0.6.1'
+    //api 'androidx.annotation:annotation:1.1.0'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.multidex:multidex:2.0.1'
@@ -122,11 +126,11 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
 
     // material dialog
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    implementation 'com.afollestad:viewpagerdots:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime:2.1.0'
+    //implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    //implementation 'com.afollestad:viewpagerdots:1.0.0'
+    //implementation 'androidx.lifecycle:lifecycle-runtime:2.1.0'
     implementation 'androidx.preference:preference:1.1.0-alpha05'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     // Testing
     def coreTestingVersion = "2.1.0"

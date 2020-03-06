@@ -1,8 +1,0 @@
-<resources>
-  <!-- files -->
-  <public name="dummy2" type="drawable"/>
-
-  <!-- input -->
-  <public name="dummy1" type="drawable"/>
-
-</resources>

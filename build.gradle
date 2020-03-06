@@ -11,6 +11,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        //classpath 'com.novoda:bintray-release:0.9.1'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -20,10 +21,10 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven { url "https://dl.bintray.com/drummer-aidan/maven" }
+        //maven { url "https://dl.bintray.com/drummer-aidan/maven" }
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.google.com' } // for Room
-        maven { url "https://s3.amazonaws.com/repo.commonsware.com" } // for com.commonsware.misc:support.db.tests.x:0.4.5
+        //maven { url "https://s3.amazonaws.com/repo.commonsware.com" } // for com.commonsware.misc:support.db.tests.x:0.4.5
     }
 
     buildDir = "D:/build/${rootProject.name}/${project.name}"

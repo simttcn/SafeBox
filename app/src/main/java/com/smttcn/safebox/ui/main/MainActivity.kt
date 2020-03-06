@@ -72,7 +72,7 @@ class MainActivity : BaseActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         adapter.onItemClick = { item ->
-            toast("Clicked" + item.fileName)
+            onRecyclerItemClicked(item)
         }
 
         dbItemViewModel = ViewModelProviders.of(this).get(DbItemViewModel::class.java)
@@ -124,6 +124,10 @@ class MainActivity : BaseActivity() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun onRecyclerItemClicked(item : DbItem) {
+        toast("Clicked" + item.fileName)
     }
 
     // todo: to further define the share routine to share all type of files

@@ -11,7 +11,7 @@ import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.showKeyboard
 import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
-import com.smttcn.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.MaterialDialog
 import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.R
 
