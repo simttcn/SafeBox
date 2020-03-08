@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Color
 import android.graphics.Point
+import android.graphics.drawable.Drawable
 import android.media.ExifInterface
 import android.media.MediaMetadataRetriever
 import android.media.RingtoneManager
@@ -25,7 +26,9 @@ import android.provider.OpenableColumns
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.loader.content.CursorLoader
@@ -89,4 +92,9 @@ fun Context.getPermissionString(id: Int) = when (id) {
     PERMISSION_GET_ACCOUNTS -> Manifest.permission.GET_ACCOUNTS
     else -> ""
 }
+
+fun Context.getDrawableCompat(@DrawableRes drawableRes: Int): Drawable? {
+    return AppCompatResources.getDrawable(this, drawableRes)
+}
+
 

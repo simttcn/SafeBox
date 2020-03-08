@@ -19,6 +19,7 @@ object FileManager {
     const val ENCRYPT_EXT = "enc"
     const val DATA_FOLDER = "data"
 
+    @Suppress("UNUSED_PARAMETER")
     var documentRoot: String
         get() { return MyApplication.getAppContext().filesDir.toString().removeSuffix("/") }
         private set(value) {}
@@ -98,7 +99,7 @@ object FileManager {
             f.mkdir()
     }
 
-    fun getFolderInCacheFolder(dir: String, toCreate: Boolean = false): File? {
+    fun getFolderInCacheFolder(dir: String = "", toCreate: Boolean = false): File? {
         val f = File(MyApplication.getAppContext().cacheDir.canonicalPath.withTrailingCharacter('/') + dir)
 
         if (f.exists() && f.isDirectory()) {
@@ -126,9 +127,9 @@ object FileManager {
     fun deleteDir(dir: File?, deleteNotEmpty: Boolean = false): Boolean {
         return if (dir != null && dir.isDirectory) {
             val children = dir.list()
-            if (children.count() > 0 && deleteNotEmpty) {
+            if (children != null && children.count() > 0 && deleteNotEmpty) {
                 for (i in children.indices) {
-                    val success = deleteDir(File(dir, children[i]), deleteNotEmpty)
+                    val success = deleteDir(File(dir, children[i]!!), deleteNotEmpty)
                     if (!success) {
                         return false
                     }
@@ -320,7 +321,7 @@ object FileManager {
     fun DecryptFile(file: File, password: CharArray, targetFolder: String = "", deleteOriginal: Boolean = true) : String {
         if (file.isDirectory()) return ""
 
-        var decryptedFilePath = ""
+        var decryptedFilePath: String
 
         if (targetFolder.length > 0)
             decryptedFilePath = targetFolder.withTrailingCharacter('/')

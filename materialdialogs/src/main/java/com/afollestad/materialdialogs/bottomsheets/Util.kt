@@ -31,9 +31,9 @@ import kotlin.math.abs
 
 internal fun BottomSheetBehavior<*>.setCallbacks(
   onSlide: (currentHeight: Int) -> Unit,
-  onHide: () -> Unit
-) {
-  setBottomSheetCallback(object : BottomSheetCallback() {
+  onHide: () -> Unit) {
+
+  addBottomSheetCallback(object : BottomSheetCallback() {
     private var currentState: Int = STATE_COLLAPSED
 
     override fun onSlide(

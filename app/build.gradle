@@ -78,7 +78,7 @@ android.applicationVariants.all { variant ->
 }
 
 dependencies {
-	// local copy library
+    // local copy library
     implementation project(path: ':imageviewer')
     implementation project(path: ':materialdialogs')
 
@@ -103,12 +103,16 @@ dependencies {
     // UI
     def materialVersion = "1.0.0"
     implementation "com.google.android.material:material:$materialVersion"
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
 
     // Room components
     def room_version = "2.2.3"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    kapt "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    kapt "androidx.room:room-compiler:$room_version"
+    // For Kotlin use kapt instead of annotationProcessor
     androidTestImplementation "androidx.room:room-testing:$room_version"
 
     // Lifecycle components

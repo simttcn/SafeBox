@@ -1,6 +1,8 @@
 package com.smttcn.safebox.ui.main
 
 import android.content.Intent
+import android.graphics.Color
+import android.media.Image
 import android.os.Bundle
 import android.widget.Toast
 import com.smttcn.commons.extensions.toast
@@ -9,7 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View
 import android.view.View.OnClickListener
+import android.widget.ImageView
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,16 +21,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
+import com.smttcn.commons.extensions.getDrawableCompat
 import com.smttcn.commons.extensions.getFilenameFromPath
+import com.smttcn.commons.extensions.loadImage
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.DbItem
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.DbItemViewModel
+import com.squareup.picasso.Picasso
+import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.itemListRecyclerView
 import kotlinx.android.synthetic.main.activity_main.progressBarContainer
+import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -71,8 +80,8 @@ class MainActivity : BaseActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter.onItemClick = { item ->
-            onRecyclerItemClicked(item)
+        adapter.onItemClick = { view, item ->
+            onRecyclerItemClicked(view, item)
         }
 
         dbItemViewModel = ViewModelProviders.of(this).get(DbItemViewModel::class.java)
@@ -126,8 +135,27 @@ class MainActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun onRecyclerItemClicked(item : DbItem) {
-        toast("Clicked" + item.fileName)
+    // todo: to decrypt and pass the inputstream to Picassoon loader
+    private fun onRecyclerItemClicked(view: View, item : DbItem) {
+        //toast("Clicked" + item.fullPathWithFilename)
+
+        // temporary decrypt to cach folder
+        val targetfile = File(item.fullPathWithFilename)
+        val targetpath = FileManager.getFolderInCacheFolder()
+        if (targetfile.length() > 0 && targetpath != null) {
+            val decryptedFilePath = FileManager.DecryptFile(targetfile, MyApplication.getUS(), targetpath.canonicalPath,false)
+            val imagePaths = listOf(decryptedFilePath)
+            StfalconImageViewer.Builder<String>(this, imagePaths, ::loadImage)
+                .withTransitionFrom(view.item_thumbnail)
+                .show()
+        }
+    }
+
+    private fun loadImage(imageView: ImageView, imagePath: String) {
+        imageView.apply {
+            background = getDrawableCompat(R.drawable.shape_placeholder)
+            loadImage(imagePath)
+        }
     }
 
     // todo: to further define the share routine to share all type of files
@@ -139,11 +167,11 @@ class MainActivity : BaseActivity() {
         var decryptedFilepath: String = ""
         val filename = files[0].name.getFilenameFromPath()
         val filepath = FileManager.toFullPathInDocumentRoot(filename)
-        val file = File(filepath)
+        val targetfile = File(filepath)
 
         val targetpath = FileManager.getFolderInCacheFolder("temp_file_share", true)
-        if (file.length() > 0 && targetpath != null) {
-            decryptedFilepath = FileManager.DecryptFile(file, MyApplication.getUS(), targetpath.canonicalPath, false)
+        if (targetfile.length() > 0 && targetpath != null) {
+            decryptedFilepath = FileManager.DecryptFile(targetfile, MyApplication.getUS(), targetpath.canonicalPath, false)
         }
 
         if (decryptedFilepath.isNotEmpty()) {

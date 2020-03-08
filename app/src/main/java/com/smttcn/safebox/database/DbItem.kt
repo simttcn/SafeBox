@@ -3,6 +3,7 @@ package com.smttcn.safebox.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.smttcn.commons.extensions.getParentPath
 import com.smttcn.commons.extensions.withTrailingCharacter
 
 @Entity(tableName = "dbItem")
@@ -15,7 +16,7 @@ data class DbItem(
     @ColumnInfo(name = "salt") val salt: String,
     @ColumnInfo(name = "size") val size: Long
 ) {
-    fun hashedFilenameWithPath(): String {
-        return fullPathWithFilename.withTrailingCharacter('/') + hashedFileName
+    fun pathOnly(): String {
+        return fullPathWithFilename.getParentPath()
     }
 }

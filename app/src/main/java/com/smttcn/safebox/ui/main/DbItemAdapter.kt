@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.smttcn.commons.extensions.getDrawableCompat
+import com.smttcn.commons.extensions.loadImage
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.DbItem
 import kotlinx.android.synthetic.main.recyclerview_item.view.*
@@ -14,7 +16,8 @@ class DbItemAdapter internal constructor(context: Context) : RecyclerView.Adapte
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var dbItems = emptyList<DbItem>() // Cached copy of DbItems
-    var onItemClick: ((DbItem) -> Unit)? = null // to point to the onItemClick method in MainActivity
+    var onItemClick: ((View, DbItem) -> Unit)? = null // to point to the onItemClick method in MainActivity
+    val currentContext = context
 
     override fun getItemCount() = dbItems.size
 
@@ -23,11 +26,12 @@ class DbItemAdapter internal constructor(context: Context) : RecyclerView.Adapte
         init {
             itemView.setOnClickListener{
                 // invoke the onItemClick method in MainActivity
-                onItemClick?.invoke(dbItems[adapterPosition])
+                onItemClick?.invoke(it, dbItems[adapterPosition])
             }
         }
 
-        fun bindItem(item: DbItem) {
+        fun bindItem(context: Context, item: DbItem) {
+            itemView.item_thumbnail.setImageResource(R.drawable.ic_image_white_24dp)
             itemView.item_name.text = item.fileName
         }
 
@@ -40,7 +44,7 @@ class DbItemAdapter internal constructor(context: Context) : RecyclerView.Adapte
 
     override fun onBindViewHolder(holder: DbItemViewHolder, position: Int) {
         val current = dbItems[position]
-        holder.bindItem(current)
+        holder.bindItem(currentContext, current)
     }
 
     internal fun setDbItems(items: List<DbItem>) {
