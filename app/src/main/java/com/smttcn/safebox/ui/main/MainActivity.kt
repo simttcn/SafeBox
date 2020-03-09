@@ -135,7 +135,7 @@ class MainActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    // todo: to decrypt and pass the inputstream to Picassoon loader
+    // todo: to make the pop up transition effect more smoother
     private fun onRecyclerItemClicked(view: View, item : DbItem) {
         //toast("Clicked" + item.fullPathWithFilename)
 
@@ -143,7 +143,7 @@ class MainActivity : BaseActivity() {
         val targetfile = File(item.fullPathWithFilename)
         val targetpath = FileManager.getFolderInCacheFolder()
         if (targetfile.length() > 0 && targetpath != null) {
-            val decryptedFilePath = FileManager.DecryptFile(targetfile, MyApplication.getUS(), targetpath.canonicalPath,false)
+            val decryptedFilePath = FileManager.decryptFile(targetfile, MyApplication.getUS(), targetpath.canonicalPath,false)
             val imagePaths = listOf(decryptedFilePath)
             StfalconImageViewer.Builder<String>(this, imagePaths, ::loadImage)
                 .withTransitionFrom(view.item_thumbnail)
@@ -171,7 +171,7 @@ class MainActivity : BaseActivity() {
 
         val targetpath = FileManager.getFolderInCacheFolder("temp_file_share", true)
         if (targetfile.length() > 0 && targetpath != null) {
-            decryptedFilepath = FileManager.DecryptFile(targetfile, MyApplication.getUS(), targetpath.canonicalPath, false)
+            decryptedFilepath = FileManager.decryptFile(targetfile, MyApplication.getUS(), targetpath.canonicalPath, false)
         }
 
         if (decryptedFilepath.isNotEmpty()) {
@@ -202,7 +202,8 @@ class MainActivity : BaseActivity() {
             isFolder = true,
             fullPathWithFilename = "",
             salt = "",
-            size = 0
+            size = 0,
+            thumbnail = null
         )
 
         dbItemViewModel.insert(dbItem)

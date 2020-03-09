@@ -21,7 +21,7 @@ class SampleHelper {
         for (filename in sampleImages) {
             val inputStream = MyApplication.getAppContext().assets.open(filename)
             val encryptedFilePath = FileManager.documentDataRoot.appendPath(filename.addExtension(FileManager.ENCRYPT_EXT))
-            FileManager.EncryptFile(inputStream, filename,encryptedFilePath, password)
+            FileManager.encryptFile(inputStream, filename,encryptedFilePath, password)
             inputStream.close()
         }
     }

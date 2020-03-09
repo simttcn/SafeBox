@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.smttcn.commons.Manager.FileManager
+import com.smttcn.commons.Manager.ImageManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.*
@@ -122,12 +123,13 @@ abstract class AppDatabase : RoomDatabase() {
                 if (!allDbItems.contains(item.canonicalPath)) {
                     // not found in the array, i.e. the database, so create an object for inserting
                     val dbItem = DbItem(
-                        fileName = FileManager.GetFilenameFromEncryptedFile(item),
+                        fileName = FileManager.getFilenameFromEncryptedFile(item),
                         hashedFileName = item.name,
                         isFolder = item.isDirectory,
                         fullPathWithFilename = item.canonicalPath,
                         salt = "",
-                        size = item.length()
+                        size = item.length(),
+                        thumbnail = ImageManager.getThumbnailByteArrayFromEncryptedFile(item)
                     )
                     // add the file info into the database
                     dbItemDao.insert(dbItem)

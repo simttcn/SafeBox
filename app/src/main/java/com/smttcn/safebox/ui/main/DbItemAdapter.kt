@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.smttcn.commons.Manager.ImageManager
 import com.smttcn.commons.extensions.getDrawableCompat
 import com.smttcn.commons.extensions.loadImage
 import com.smttcn.safebox.R
@@ -31,7 +32,11 @@ class DbItemAdapter internal constructor(context: Context) : RecyclerView.Adapte
         }
 
         fun bindItem(context: Context, item: DbItem) {
-            itemView.item_thumbnail.setImageResource(R.drawable.ic_image_white_24dp)
+            if (item.thumbnail != null)
+                itemView.item_thumbnail.setImageBitmap(ImageManager.toBitmap(item.thumbnail))
+            else
+                itemView.item_thumbnail.setImageResource(R.drawable.ic_image_gray_24dp)
+
             itemView.item_name.text = item.fileName
         }
 

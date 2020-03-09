@@ -14,7 +14,8 @@ data class DbItem(
     @ColumnInfo(name = "is_folder") val isFolder: Boolean,
     @ColumnInfo(name = "full_path_with_filename") val fullPathWithFilename: String,
     @ColumnInfo(name = "salt") val salt: String,
-    @ColumnInfo(name = "size") val size: Long
+    @ColumnInfo(name = "size") val size: Long,
+    @ColumnInfo(name = "thumbnail", typeAffinity = ColumnInfo.BLOB) val thumbnail: ByteArray? = null
 ) {
     fun pathOnly(): String {
         return fullPathWithFilename.getParentPath()

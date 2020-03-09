@@ -23,6 +23,9 @@ const val MIN_PASSWORD_LENGTH = 6
 
 const val INTERVAL_BACK_BUTTON_QUIT_IN_MS = 3000
 
+const val SIZE_THUMBNAIL_WIDTH = 48
+const val SIZE_THUMBNAIL_HEIGHT = 48
+
 // activity for result request code
 const val REQUEST_CODE_NEW_PASSWORD = 100
 const val REQUEST_CODE_CHANGE_PASSWORD = 110

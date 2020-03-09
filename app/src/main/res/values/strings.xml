@@ -34,6 +34,11 @@
     <string name="error">Error</string>
     <string name="press_back_again_to_quit">Press back button again to quit this app.</string>
 
+    <!-- Recyclerview item list -->
+    <string name="itemlist_thumbnail">Thumbnail</string>
+    <string name="itemlist_image">Image</string>
+    <string name="itemlist_default_text">item name</string>
+
     <!-- Dialog Title -->
     <string name="dlg_title_success">Success</string>
     <string name="dlg_title_error">Error</string>

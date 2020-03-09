@@ -1,18 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/itemlist_padding_horizontal"
+    android:paddingLeft="@dimen/itemlist_padding_horizontal"
+    android:paddingTop="@dimen/itemlist_padding_vertical"
+    android:paddingEnd="@dimen/itemlist_padding_horizontal"
+    android:paddingRight="@dimen/itemlist_padding_horizontal"
+    android:paddingBottom="@dimen/itemlist_padding_vertical">
 
     <ImageView
         android:id="@+id/item_thumbnail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="@dimen/itemlist_thumbnail_width"
+        android:layout_height="@dimen/itemlist_thumbnail_height"
+        android:contentDescription="@string/itemlist_thumbnail" />
 
     <TextView
         android:id="@+id/item_name"
-        style="@style/item_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/holo_orange_light" />
-</LinearLayout>
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/itemlist_thumbnail_width"
+        android:background="@android:color/white"
+        android:paddingStart="@dimen/itemlist_filename_padding_horizontal"
+        android:paddingLeft="@dimen/itemlist_filename_padding_horizontal"
+        android:paddingTop="@dimen/itemlist_filename_padding_vertical"
+        android:paddingEnd="@dimen/itemlist_filename_padding_horizontal"
+        android:paddingRight="@dimen/itemlist_filename_padding_horizontal"
+        android:paddingBottom="@dimen/itemlist_filename_padding_vertical"
+        android:text="@string/itemlist_default_text"
+        android:textSize="@dimen/itemlist_textsize" />
+</FrameLayout>

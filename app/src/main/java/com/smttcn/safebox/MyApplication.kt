@@ -11,6 +11,8 @@ import com.smttcn.commons.helpers.PREFS_KEY
 import com.smttcn.safebox.database.AppDatabase
 
 // Todo: to clean every bit of password and encryption key off the memory when application goes into background and ot active.
+// Todo: to generate thumbnail and store in sql database
+
 class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
     companion object {

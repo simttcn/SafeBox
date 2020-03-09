@@ -2,6 +2,7 @@ package com.smttcn.commons.Manager
 
 import android.content.ContentResolver
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.smttcn.commons.crypto.Encryption
@@ -232,7 +233,7 @@ object FileManager {
         val f = File(filepath)
         if (!isEncryptedFile(f)) return false
 
-        val fn = GetFilenameFromEncryptedFile(f)
+        val fn = getFilenameFromEncryptedFile(f)
 
         return originalFilename.equals(fn)
     }
@@ -258,7 +259,7 @@ object FileManager {
         return false
     }
 
-    fun GetFilenameFromEncryptedFile(file: File) : String {
+    fun getFilenameFromEncryptedFile(file: File) : String {
         if (file.isDirectory()) return ""
 
         try {
@@ -281,7 +282,7 @@ object FileManager {
         return ""
     }
 
-    fun EncryptFile(inputStream: InputStream, filename: String, encryptedFilePath: String, password: CharArray) : Boolean {
+    fun encryptFile(inputStream: InputStream, filename: String, encryptedFilePath: String, password: CharArray) : Boolean {
 
         try {
             val bytes = inputStream.readBytes()
@@ -298,7 +299,7 @@ object FileManager {
         }
     }
 
-    fun EncryptFile(file: File, password: CharArray, deleteOriginal: Boolean = true) : String {
+    fun encryptFile(file: File, password: CharArray, deleteOriginal: Boolean = true) : String {
         if (file.isDirectory()) return ""
 
         val originalFilename = file.name
@@ -306,7 +307,7 @@ object FileManager {
 
         try {
             val inputStream = file.inputStream()
-            val result = EncryptFile(inputStream, originalFilename, encryptedFilePath, password)
+            val result = encryptFile(inputStream, originalFilename, encryptedFilePath, password)
             inputStream.close()
 
             if (deleteOriginal && result && isFileExist(encryptedFilePath))
@@ -318,7 +319,7 @@ object FileManager {
         }
     }
 
-    fun DecryptFile(file: File, password: CharArray, targetFolder: String = "", deleteOriginal: Boolean = true) : String {
+    fun decryptFile(file: File, password: CharArray, targetFolder: String = "", deleteOriginal: Boolean = true) : String {
         if (file.isDirectory()) return ""
 
         var decryptedFilePath: String
@@ -370,6 +371,35 @@ object FileManager {
         }
     }
 
+    fun decryptFileContentToByteArray(file: File, password: CharArray) : ByteArray? {
+        if (file.isDirectory()) return null
+
+        try {
+            var decrypted: ByteArray? = null
+            ObjectInputStream(FileInputStream(file)).use { it ->
+                val data = it.readObject()
+                when(data) {
+                    is Map<*, *> -> {
+                        if (data.containsKey("filename") && data.containsKey("iv") && data.containsKey("salt") && data.containsKey("encrypted")) {
+                            val fn = data["filename"]
+                            val iv = data["iv"]
+                            val salt = data["salt"]
+                            val encrypted = data["encrypted"]
+                            if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
+                                decrypted = Encryption().decrypt(
+                                    hashMapOf("iv" to iv, "salt" to salt, "encrypted" to encrypted), password)
+                            }
+                        }
+                    }
+                }
+            }
+
+            return decrypted
+
+        } catch (ex: Exception) {
+            return null
+        }
+    }
 
 
 }

@@ -56,14 +56,14 @@ class DebugViewModel(application: Application) : AndroidViewModel(application){
 
         files.forEach(){
             if (!FileManager.isEncryptedFile(it)) {
-                val encFilename = FileManager.EncryptFile(it, "111111".toCharArray())
+                val encFilename = FileManager.encryptFile(it, "111111".toCharArray())
                 if (encFilename.length > 5) result.append(encFilename + "\n")
             }
         }
 
 //        if (FileManager.isEncryptedFile(file)) {
 //            result.append("Decrypting : " + file.name)
-//            FileManager.DecryptFile(file, "password".toCharArray())
+//            FileManager.decryptFile(file, "password".toCharArray())
 //        } else {
 //            result.append("Encrypted file not found!")
 //        }

@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.getFilenameFromPath
+import com.smttcn.commons.helpers.Base64
 import com.smttcn.safebox.R
 import com.smttcn.safebox.ui.settings.SettingsFragment
 import com.smttcn.safebox.viewmodel.DebugViewModel
@@ -35,7 +36,11 @@ class DebugconsoleActivity : BaseActivity() {
             val str : StringBuilder = StringBuilder()
 
             item?.forEach {
-                str.append(it.fileName + "\n" + it.hashedFileName + "\n" + it.fullPathWithFilename + "\n" + it.fullPathWithFilename.getFilenameFromPath() + "\n\n")
+                str.append(it.fileName + "\n" + it.hashedFileName
+                        + "\n" + it.fullPathWithFilename
+                        + "\n" + it.fullPathWithFilename.getFilenameFromPath()
+                        + "\n" + Base64.encode(it.thumbnail!!)
+                        + "\n\n")
             }
 
             textView.text = str.toString()
