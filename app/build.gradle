@@ -103,7 +103,7 @@ dependencies {
     // UI
     def materialVersion = "1.0.0"
     implementation "com.google.android.material:material:$materialVersion"
-    implementation 'com.squareup.picasso:picasso:2.71828'
+    //implementation 'com.squareup.picasso:picasso:2.71828'
 
 
     // Room components

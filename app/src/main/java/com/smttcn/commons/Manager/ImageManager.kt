@@ -1,6 +1,5 @@
 package com.smttcn.commons.Manager
 
-import android.R
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.smttcn.commons.helpers.SIZE_THUMBNAIL_HEIGHT
@@ -30,25 +29,60 @@ object ImageManager {
         return BitmapFactory.decodeByteArray(img, 0, img.size)
     }
 
-    fun resizeToBitmap(img: ByteArray, width: Int, height: Int) : Bitmap {
-        // New bitmap with the correct size, may not return a null object
-        return Bitmap.createScaledBitmap(toBitmap(img), width, height, false)
+    fun toByteArray(img: Bitmap) : ByteArray {
+        // Get the byte array from tbe bitmap to be returned
+        val outputStream = ByteArrayOutputStream()
+        img.compress(Bitmap.CompressFormat.PNG, 0, outputStream)
+        return outputStream.toByteArray()
     }
 
-    // Todo: to retain the aspect ration when resizing, choose to crop or padded with empty space
-    fun resizeToByteArray(img: ByteArray, width: Int, height: Int) : ByteArray {
+    fun resizeToBitmap(img: ByteArray, width: Int, height: Int) : Bitmap? {
         // New bitmap with the correct size, may not return a null object
-        val newImg = Bitmap.createScaledBitmap(toBitmap(img), width, height, false)
+        // New bitmap with the correct size, may not return a null object
+        val originalImg = toBitmap(img)
+        val newImg = resize(originalImg, width, height)
+
+        if (newImg == null)
+            return null
+
+        //val result = toByteArray(newImg)
+        originalImg.recycle()
+
+        return newImg
+    }
+
+    fun resizeToByteArray(img: ByteArray, width: Int, height: Int) : ByteArray? {
+        // New bitmap with the correct size, may not return a null object
+        val originalImg = toBitmap(img)
+        val newImg = resize(originalImg, width, height)
+
+        if (newImg == null)
+            return null
+
         val result = toByteArray(newImg)
+        originalImg.recycle()
         newImg.recycle()
 
         return result
     }
 
-    fun toByteArray(img: Bitmap) : ByteArray {
-        // Get the byte array from tbe bitmap to be returned
-        val outputStream = ByteArrayOutputStream()
-        img.compress(Bitmap.CompressFormat.PNG, 40, outputStream)
-        return outputStream.toByteArray()
+    private fun resize(image: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap? {
+
+        return if (maxHeight > 0 && maxWidth > 0) {
+            val width = image.width
+            val height = image.height
+            val ratioBitmap = width.toFloat() / height.toFloat()
+            val ratioMax = maxWidth.toFloat() / maxHeight.toFloat()
+            var finalWidth = maxWidth
+            var finalHeight = maxHeight
+            if (ratioMax > ratioBitmap) {
+                finalWidth = (maxHeight.toFloat() * ratioBitmap).toInt()
+            } else {
+                finalHeight = (maxWidth.toFloat() / ratioBitmap).toInt()
+            }
+            Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true)
+        } else {
+            null
+        }
     }
 }

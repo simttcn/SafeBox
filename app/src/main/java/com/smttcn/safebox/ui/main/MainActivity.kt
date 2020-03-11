@@ -1,5 +1,6 @@
 package com.smttcn.safebox.ui.main
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Color
 import android.media.Image
@@ -11,7 +12,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View
 import android.view.View.OnClickListener
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
@@ -20,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.smttcn.commons.Manager.FileManager
+import com.smttcn.commons.Manager.ImageManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.getDrawableCompat
 import com.smttcn.commons.extensions.getFilenameFromPath
@@ -135,27 +139,28 @@ class MainActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    // todo: to make the pop up transition effect more smoother
     private fun onRecyclerItemClicked(view: View, item : DbItem) {
-        //toast("Clicked" + item.fullPathWithFilename)
+        // Todo: to open various type of files
 
-        // temporary decrypt to cach folder
-        val targetfile = File(item.fullPathWithFilename)
-        val targetpath = FileManager.getFolderInCacheFolder()
-        if (targetfile.length() > 0 && targetpath != null) {
-            val decryptedFilePath = FileManager.decryptFile(targetfile, MyApplication.getUS(), targetpath.canonicalPath,false)
-            val imagePaths = listOf(decryptedFilePath)
+        // Todo: try not to cache any physical file, use inputstream instead
+        val targetfile = item.fullPathWithFilename
+        if (targetfile.length > 0) {
+            val imagePaths = listOf(targetfile)
             StfalconImageViewer.Builder<String>(this, imagePaths, ::loadImage)
-                .withTransitionFrom(view.item_thumbnail)
+                .withTransitionFrom(view.item_background)
                 .show()
         }
     }
 
     private fun loadImage(imageView: ImageView, imagePath: String) {
-        imageView.apply {
-            background = getDrawableCompat(R.drawable.shape_placeholder)
-            loadImage(imagePath)
+        val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadein)
+        imageView.startAnimation(aniFade)
+        imageView.setImageDrawable(getDrawableCompat(R.drawable.ic_image_gray_24dp))
+        val decryptedFileByteArray = FileManager.decryptFileContentToByteArray(File(imagePath), MyApplication.getUS())
+        if (decryptedFileByteArray != null) {
+            imageView.setImageBitmap(ImageManager.toBitmap(decryptedFileByteArray!!))
         }
+
     }
 
     // todo: to further define the share routine to share all type of files
