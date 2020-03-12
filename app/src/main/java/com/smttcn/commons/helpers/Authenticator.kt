@@ -50,7 +50,7 @@ internal class Authenticator() {
             MyApplication.getBaseConfig().appPasswordHash = hashedPasswordWithSalt
             if (oldPassword.length >= MIN_PASSWORD_LENGTH) {
                 val keyUtil = KeyUtil()
-                keyUtil.reEncryptAndSaveAppDatabaseSecret(oldPassword, newPassword)
+                keyUtil.reEncryptAndSaveAppDatabaseSecret(oldPassword.toCharArray(), newPassword.toCharArray())
             }
             callback(true)
         } else {

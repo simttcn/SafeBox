@@ -20,6 +20,7 @@
     <!-- Button -->
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_change_password">Change Password</string>
 
     <!--  UI  -->
     <string name="new_password">New Password</string>
@@ -49,6 +50,7 @@
     <!-- Dialog Message -->
     <string name="dlg_msg_new_password_success">New password successfully created, please proceed to login.</string>
     <string name="dlg_msg_new_password_error">Unable to save the password, please launch the app and try again.</string>
+    <string name="dlg_msg_change_password_confirmation">Are you sure you want to change your password?\n\nChanging password will re-encrypt all your data and will take several minutes to complete.</string>
     <string name="dlg_msg_change_password_success">Your password has been successfully changed.</string>
     <string name="dlg_msg_change_password_cancel">Password change cancelled.</string>
     <string name="dlg_msg_change_password_incorrect">You have entered an incorrect current password, please try again.</string>

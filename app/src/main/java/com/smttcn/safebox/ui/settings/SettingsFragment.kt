@@ -51,8 +51,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun showChangePasswordActivity() {
-        val intent = Intent(myContext, PasswordActivity::class.java)
-        startActivityForResult(intent, REQUEST_CODE_CHANGE_PASSWORD)
+        MaterialDialog(myContext).show {
+            title(R.string.dlg_title_change_password)
+            message(R.string.dlg_msg_change_password_confirmation)
+            positiveButton(R.string.btn_change_password) {
+                val intent = Intent(myContext, PasswordActivity::class.java)
+                startActivityForResult(intent, REQUEST_CODE_CHANGE_PASSWORD)
+            }
+            negativeButton(R.string.btn_cancel)
+            lifecycleOwner(this@SettingsFragment)
+        }
     }
 
     private fun showResetDataKeyActivity() {

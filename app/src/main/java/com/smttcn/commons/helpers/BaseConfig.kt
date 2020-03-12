@@ -29,20 +29,12 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
         set(lastVersion) = prefs.edit().putInt(LAST_VERSION, lastVersion).apply()
 
     var appPasswordHash: String
-        get() = prefs.getString(APP_PASSWORD_HASH, "")!!
-        set(passwordHash) = prefs.edit().putString(APP_PASSWORD_HASH, passwordHash).apply()
+        get() = prefs.getString(APP_PASSWORD_HASH_01, "")!!
+        set(passwordHash) = prefs.edit().putString(APP_PASSWORD_HASH_01, passwordHash).apply()
 
-    var appDatabaseSecretString: String
-        get() = prefs.getString(APP_DATABASE_SECRET_ENCRYPTED_01, "")!!
-        set(secret) = prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED_01, secret).apply()
-
-    var appDatabaseSecretStringBackup1: String
-        get() = prefs.getString(APP_DATABASE_SECRET_ENCRYPTED_02, "")!!
-        set(secret) = prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED_02, secret).apply()
-
-    var appDatabaseSecretStringBackup2: String
-        get() = prefs.getString(APP_DATABASE_SECRET_ENCRYPTED_03, "")!!
-        set(secret) = prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED_03, secret).apply()
+    var appPasswordHashBackup: String
+        get() = prefs.getString(APP_PASSWORD_HASH_02, "")!!
+        set(passwordHash) = prefs.edit().putString(APP_PASSWORD_HASH_02, passwordHash).apply()
 
     var appDatabaseSecretHashMap: HashMap<String, ByteArray>
         get() {

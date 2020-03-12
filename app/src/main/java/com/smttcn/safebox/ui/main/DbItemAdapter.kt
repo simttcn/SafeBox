@@ -4,11 +4,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.smttcn.commons.Manager.ImageManager
-import com.smttcn.commons.extensions.getDrawableCompat
-import com.smttcn.commons.extensions.loadImage
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.DbItem
 import kotlinx.android.synthetic.main.recyclerview_item.view.*
@@ -30,16 +27,6 @@ class DbItemAdapter internal constructor(context: Context) : RecyclerView.Adapte
                 onItemClick?.invoke(it, dbItems[adapterPosition])
             }
         }
-
-        fun bindItem(context: Context, item: DbItem) {
-            if (item.thumbnail != null)
-                itemView.item_thumbnail.setImageBitmap(ImageManager.toBitmap(item.thumbnail))
-            else
-                itemView.item_thumbnail.setImageResource(R.drawable.ic_image_gray_24dp)
-
-            itemView.item_name.text = item.fileName
-        }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DbItemViewHolder {
@@ -57,4 +44,14 @@ class DbItemAdapter internal constructor(context: Context) : RecyclerView.Adapte
         notifyDataSetChanged()
     }
 
+}
+
+@Suppress("UNUSED_PARAMETER")
+fun DbItemAdapter.DbItemViewHolder.bindItem(context: Context, item: DbItem) {
+    if (item.thumbnail != null)
+        itemView.item_thumbnail.setImageBitmap(ImageManager.toBitmap(item.thumbnail))
+    else
+        itemView.item_thumbnail.setImageResource(R.drawable.ic_image_gray_24dp)
+
+    itemView.item_name.text = item.fileName
 }

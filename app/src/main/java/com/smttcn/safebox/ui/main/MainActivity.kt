@@ -1,22 +1,14 @@
 package com.smttcn.safebox.ui.main
 
-import android.app.ProgressDialog
 import android.content.Intent
-import android.graphics.Color
-import android.media.Image
 import android.os.Bundle
-import android.widget.Toast
-import com.smttcn.commons.extensions.toast
-import com.smttcn.commons.helpers.INTERVAL_BACK_BUTTON_QUIT_IN_MS
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
-import android.view.View.OnClickListener
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
-import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,18 +19,16 @@ import com.smttcn.commons.Manager.ImageManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.getDrawableCompat
 import com.smttcn.commons.extensions.getFilenameFromPath
-import com.smttcn.commons.extensions.loadImage
+import com.smttcn.commons.extensions.toast
+import com.smttcn.commons.helpers.INTERVAL_BACK_BUTTON_QUIT_IN_MS
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.DbItem
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.DbItemViewModel
-import com.squareup.picasso.Picasso
 import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.itemListRecyclerView
-import kotlinx.android.synthetic.main.activity_main.progressBarContainer
 import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import java.io.File
 import java.text.SimpleDateFormat
@@ -142,7 +132,6 @@ class MainActivity : BaseActivity() {
     private fun onRecyclerItemClicked(view: View, item : DbItem) {
         // Todo: to open various type of files
 
-        // Todo: try not to cache any physical file, use inputstream instead
         val targetfile = item.fullPathWithFilename
         if (targetfile.length > 0) {
             val imagePaths = listOf(targetfile)
@@ -158,7 +147,7 @@ class MainActivity : BaseActivity() {
         imageView.setImageDrawable(getDrawableCompat(R.drawable.ic_image_gray_24dp))
         val decryptedFileByteArray = FileManager.decryptFileContentToByteArray(File(imagePath), MyApplication.getUS())
         if (decryptedFileByteArray != null) {
-            imageView.setImageBitmap(ImageManager.toBitmap(decryptedFileByteArray!!))
+            imageView.setImageBitmap(ImageManager.toBitmap(decryptedFileByteArray))
         }
 
     }
