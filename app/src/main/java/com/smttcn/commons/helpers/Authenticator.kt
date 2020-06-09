@@ -47,6 +47,7 @@ internal class Authenticator() {
         val hashedPasswordWithSalt = hasher.hashWithSaltWithVerification(newPassword)
         if (hashedPasswordWithSalt != null)
         {
+            MyApplication.getBaseConfig().appPasswordHashBackup = MyApplication.getBaseConfig().appPasswordHash
             MyApplication.getBaseConfig().appPasswordHash = hashedPasswordWithSalt
             if (oldPassword.length >= MIN_PASSWORD_LENGTH) {
                 val keyUtil = KeyUtil()

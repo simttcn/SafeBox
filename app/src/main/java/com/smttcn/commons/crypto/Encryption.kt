@@ -53,7 +53,7 @@ internal class Encryption {
     fun encryptWithFilename(filename: String, dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
 
         var map = encrypt(dataToEncrypt, password)
-        map["filename"] = filename.toByteArray()
+        map[APP_ENCRYPT_VAR0] = filename.toByteArray()
 
         return map
     }
@@ -71,9 +71,9 @@ internal class Encryption {
             //Encrypt
             val encrypted = cipher.doFinal(dataToEncrypt)
 
-            map["salt"] = salt
-            map["iv"] = cipher.iv
-            map["encrypted"] = encrypted
+            map[APP_ENCRYPT_VAR2] = salt
+            map[APP_ENCRYPT_VAR1] = cipher.iv
+            map[APP_ENCRYPT_VAR3] = encrypted
         } catch (e: Exception) {
             Log.e("MYAPP", "encryption exception", e)
         }
@@ -85,9 +85,9 @@ internal class Encryption {
     fun decrypt(map: HashMap<String, ByteArray>, password: CharArray): ByteArray? {
         var decrypted: ByteArray? = null
         try {
-            val salt = map["salt"]
-            val iv = map["iv"]
-            val encrypted = map["encrypted"]
+            val iv = map[APP_ENCRYPT_VAR1]
+            val salt = map[APP_ENCRYPT_VAR2]
+            val encrypted = map[APP_ENCRYPT_VAR3]
 
             val cipher = getCipher(Cipher.DECRYPT_MODE, password, salt, iv)
 
@@ -98,6 +98,28 @@ internal class Encryption {
         }
 
         return decrypted
+    }
+
+    fun decryptToHashMap(map: HashMap<String, ByteArray>, password: CharArray): HashMap<String, ByteArray> {
+        val result = HashMap<String, ByteArray>()
+        try {
+            val iv = map[APP_ENCRYPT_VAR1]
+            val salt = map[APP_ENCRYPT_VAR2]
+            val encrypted = map[APP_ENCRYPT_VAR3]
+
+            if (salt != null && iv != null && encrypted != null) {
+                val cipher = getCipher(Cipher.DECRYPT_MODE, password, salt, iv)
+
+                //Decrypt
+                result[APP_ENCRYPT_VAR1] = cipher.iv
+                result[APP_ENCRYPT_VAR2] = salt
+                result[APP_ENCRYPT_VAR3] = cipher.doFinal(encrypted)
+            }
+        } catch (e: Exception) {
+            Log.e("MYAPP", "decryption exception", e)
+        }
+
+        return result
     }
 
     private fun getCipher(mode: Int, password: CharArray, s: ByteArray?, i: ByteArray?) : Cipher {

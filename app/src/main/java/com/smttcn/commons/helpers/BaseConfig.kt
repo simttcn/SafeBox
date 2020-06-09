@@ -2,13 +2,15 @@ package com.smttcn.commons.helpers
 
 import android.content.SharedPreferences
 import android.text.format.DateFormat
-import com.smttcn.safebox.R
-import java.text.SimpleDateFormat
-import java.util.*
 import androidx.core.content.ContextCompat
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.smttcn.commons.extensions.fromBase64String
 import com.smttcn.commons.extensions.toBase64String
 import com.smttcn.safebox.MyApplication
+import com.smttcn.safebox.R
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 open class BaseConfig(val inPrefs: SharedPreferences) {
@@ -59,6 +61,18 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
         set(secret) {
             prefs.edit().putString(APP_DATABASE_SECRET_ENCRYPTED_03, secret.toBase64String()).apply()
         }
+
+    var appUnfinishedReencryptFiles: ArrayList<String>?
+        get() {
+            val json = prefs.getString(APP_UNFINISHED_REENCRYPT_FILES, null)
+            val gson = Gson()
+            val type = object : TypeToken<ArrayList<String>>() {}.type
+            return gson.fromJson<ArrayList<String>>(json, type)
+        }
+        set(files) {
+            prefs.edit().putString(APP_UNFINISHED_REENCRYPT_FILES, Gson().toJson(files)).apply()
+        }
+
 
 //    var appPasswordHashEncrypted: HashMap<String, ByteArray>
 //        get() {

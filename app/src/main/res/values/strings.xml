@@ -20,6 +20,7 @@
     <!-- Button -->
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_close">Close</string>
     <string name="btn_change_password">Change Password</string>
 
     <!--  UI  -->
@@ -46,6 +47,7 @@
     <string name="dlg_title_new_password">New Password</string>
     <string name="dlg_title_change_password">Change Password</string>
     <string name="dlg_title_reset_data_key">Reset Data Key</string>
+    <string name="dlg_title_unfinished_task">Unfinished Task</string>
 
     <!-- Dialog Message -->
     <string name="dlg_msg_new_password_success">New password successfully created, please proceed to login.</string>
@@ -59,6 +61,10 @@
     <string name="dlg_msg_reset_data_key_success">Data key successfully reset and the app will be shutdown now. Please restart it manually.</string>
     <string name="dlg_msg_reset_data_key_error">Failed to reset data key.</string>
     <string name="dlg_msg_reset_data_key_hint">Enter your current password</string>
+    <string name="dlg_msg_unfinished_reencrypt_error">Error processing unfinished task from previous session, please restart the app and try again.</string>
+    <string name="dlg_msg_initialization_error">Error initializing app, please restart the app and try again.</string>
+    <string name="dlg_msg_unfinished_task_password_prompt">Please enter your previous password to complete the unfinished task of re-encrypting the files after password change.</string>
+    <string name="dlg_msg_unfinished_task_previous_password_hint">Enter your previous password</string>
 
     <!-- Dates -->
     <string name="january">January</string>

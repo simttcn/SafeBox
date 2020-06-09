@@ -6,13 +6,15 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.smttcn.commons.crypto.Encryption
-import com.smttcn.commons.extensions.addExtension
-import com.smttcn.commons.extensions.getFilenameFromPath
-import com.smttcn.commons.extensions.getParentPath
-import com.smttcn.commons.extensions.withTrailingCharacter
+import com.smttcn.commons.extensions.*
+import com.smttcn.commons.helpers.APP_ENCRYPT_VAR0
+import com.smttcn.commons.helpers.APP_ENCRYPT_VAR2
+import com.smttcn.commons.helpers.APP_ENCRYPT_VAR1
+import com.smttcn.commons.helpers.APP_ENCRYPT_VAR3
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import java.io.*
+import java.util.HashMap
 
 
 object FileManager {
@@ -195,7 +197,9 @@ object FileManager {
         inputStream.close()
         val map = Encryption().encryptWithFilename(filename, bytes, password)
 
-        if (map.containsKey("filename") && map.containsKey("iv") && map.containsKey("salt") && map.containsKey("encrypted")) {
+        if (map.containsKey(APP_ENCRYPT_VAR0) && map.containsKey(APP_ENCRYPT_VAR1) && map.containsKey(
+                APP_ENCRYPT_VAR2
+            ) && map.containsKey(APP_ENCRYPT_VAR3)) {
             ObjectOutputStream(FileOutputStream(encryptedFilePath)).use {
                     it -> it.writeObject(map)
             }
@@ -229,6 +233,8 @@ object FileManager {
         return result
     }
 
+    //--------------------------------------------------------------------
+    // File encrypt/decrypt operations
     fun isEncryptedFileExist(filepath: String, originalFilename: String) : Boolean {
         val f = File(filepath)
         if (!isEncryptedFile(f)) return false
@@ -243,13 +249,9 @@ object FileManager {
 
         try {
             ObjectInputStream(FileInputStream(file)).use { it ->
-                val data = it.readObject()
-                when(data) {
-                    is Map<*, *> -> {
-                        if (data.containsKey("filename") && data.containsKey("iv") && data.containsKey("salt") && data.containsKey("encrypted")) {
-                            return true
-                        }
-                    }
+                val map = getEncryptedHashMap(it.readObject())
+                if (map != null) {
+                    return true
                 }
             }
         } catch (ex: Exception) {
@@ -264,14 +266,11 @@ object FileManager {
 
         try {
             ObjectInputStream(FileInputStream(file)).use { it ->
-                val data = it.readObject()
-                when(data) {
-                    is Map<*, *> -> {
-                        if (data.containsKey("filename") && data.containsKey("iv") && data.containsKey("salt") && data.containsKey("encrypted")) {
-                            val fn = data["filename"]
-                            if (fn is ByteArray)
-                                return String(fn).getFilenameFromPath()
-                        }
+                val map = getEncryptedHashMap(it.readObject())
+                if (map != null) {
+                    val fn = map[APP_ENCRYPT_VAR0]
+                    if (fn is ByteArray){
+                        return String(fn).getFilenameFromPath()
                     }
                 }
             }
@@ -282,13 +281,50 @@ object FileManager {
         return ""
     }
 
+    // re-encrypt files with new password
+    fun reencryptFiles(filePaths: ArrayList<String>, oldPwd: CharArray, newPwd: CharArray) : Boolean {
+
+        var tempFilePaths = filePaths.duplicate()
+
+        // Todo: last to test unfinished re-encryption task
+        // save unfinished file list to sharedpreferences
+        MyApplication.getBaseConfig().appUnfinishedReencryptFiles = filePaths
+
+        for (filePath in filePaths) {
+            // Todo: should decrypt to hashmap in memory then encrypt it back to file
+            // decrypt file with delete original
+            val decryptedFilePath = decryptFile(File(filePath), oldPwd, deleteOriginal = true)
+            // encrypt file with delete original
+            val encryptedFilePath = encryptFile(File(decryptedFilePath), newPwd, true)
+
+            // update unfinished file list in sharedpreferences
+            if (isEncryptedFile(File(encryptedFilePath))) {
+                tempFilePaths.remove(filePath)
+                MyApplication.getBaseConfig().appUnfinishedReencryptFiles = tempFilePaths
+            }
+        }
+
+        return tempFilePaths.count() == 0
+
+    }
+
+    // to re-encrypt all files found in document root folder
+    fun reencryptAllFiles(oldPwd: CharArray, newPwd: CharArray) : Boolean {
+        val filePaths = getFilesInDocumentRoot("", true).map {
+                                            it.canonicalPath
+                                        } as ArrayList<String>
+
+        return reencryptFiles(filePaths, oldPwd, newPwd)
+
+    }
+
     fun encryptFile(inputStream: InputStream, filename: String, encryptedFilePath: String, password: CharArray) : Boolean {
 
         try {
             val bytes = inputStream.readBytes()
             val map = Encryption().encryptWithFilename(filename, bytes, password)
 
-            if (map.containsKey("filename") && map.containsKey("iv") && map.containsKey("salt") && map.containsKey("encrypted")) {
+            if (map.containsKey(APP_ENCRYPT_VAR0) && map.containsKey(APP_ENCRYPT_VAR1) && map.containsKey(APP_ENCRYPT_VAR2) && map.containsKey(APP_ENCRYPT_VAR3)) {
                 ObjectOutputStream(FileOutputStream(encryptedFilePath)).use {
                         it -> it.writeObject(map)
                 }
@@ -303,7 +339,7 @@ object FileManager {
         if (file.isDirectory()) return ""
 
         val originalFilename = file.name
-        val encryptedFilePath = file.path.addExtension(ENCRYPT_EXT)
+        val encryptedFilePath = file.canonicalPath.addExtension(ENCRYPT_EXT)
 
         try {
             val inputStream = file.inputStream()
@@ -327,26 +363,22 @@ object FileManager {
         if (targetFolder.length > 0)
             decryptedFilePath = targetFolder.withTrailingCharacter('/')
         else
-            decryptedFilePath = file.path.getParentPath().withTrailingCharacter('/')
+            decryptedFilePath = file.canonicalPath.getParentPath().withTrailingCharacter('/')
 
 
         try {
             var decrypted: ByteArray? = null
             ObjectInputStream(FileInputStream(file)).use { it ->
-                val data = it.readObject()
-                when(data) {
-                    is Map<*, *> -> {
-                        if (data.containsKey("filename") && data.containsKey("iv") && data.containsKey("salt") && data.containsKey("encrypted")) {
-                            val fn = data["filename"]
-                            val iv = data["iv"]
-                            val salt = data["salt"]
-                            val encrypted = data["encrypted"]
-                            if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
-                                decryptedFilePath += String(fn)
-                                decrypted = Encryption().decrypt(
-                                    hashMapOf("iv" to iv, "salt" to salt, "encrypted" to encrypted), password)
-                            }
-                        }
+                val map = getEncryptedHashMap(it.readObject())
+                if (map != null) {
+                    val fn = map[APP_ENCRYPT_VAR0]
+                    val iv = map[APP_ENCRYPT_VAR1]
+                    val salt = map[APP_ENCRYPT_VAR2]
+                    val encrypted = map[APP_ENCRYPT_VAR3]
+                    if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
+                        decryptedFilePath += String(fn)
+                        decrypted = Encryption().decrypt(
+                            hashMapOf(APP_ENCRYPT_VAR1 to iv, APP_ENCRYPT_VAR2 to salt, APP_ENCRYPT_VAR3 to encrypted), password)
                     }
                 }
             }
@@ -377,19 +409,15 @@ object FileManager {
         try {
             var decrypted: ByteArray? = null
             ObjectInputStream(FileInputStream(file)).use { it ->
-                val data = it.readObject()
-                when(data) {
-                    is Map<*, *> -> {
-                        if (data.containsKey("filename") && data.containsKey("iv") && data.containsKey("salt") && data.containsKey("encrypted")) {
-                            val fn = data["filename"]
-                            val iv = data["iv"]
-                            val salt = data["salt"]
-                            val encrypted = data["encrypted"]
-                            if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
-                                decrypted = Encryption().decrypt(
-                                    hashMapOf("iv" to iv, "salt" to salt, "encrypted" to encrypted), password)
-                            }
-                        }
+                val map = getEncryptedHashMap(it.readObject())
+                if (map != null) {
+                    val fn = map[APP_ENCRYPT_VAR0]
+                    val iv = map[APP_ENCRYPT_VAR1]
+                    val salt = map[APP_ENCRYPT_VAR2]
+                    val encrypted = map[APP_ENCRYPT_VAR3]
+                    if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
+                        decrypted = Encryption().decrypt(
+                            hashMapOf(APP_ENCRYPT_VAR1 to iv, APP_ENCRYPT_VAR2 to salt, APP_ENCRYPT_VAR3 to encrypted), password)
                     }
                 }
             }
@@ -401,5 +429,22 @@ object FileManager {
         }
     }
 
+    //--------------------------------------------------------------------
+    // helper methods
+    private fun getEncryptedHashMap(data: Any) : HashMap<String, ByteArray>? {
+        try {
+            when(data) {
+                is HashMap<*, *> -> {
+                    if (data.containsKey(APP_ENCRYPT_VAR0) && data.containsKey(APP_ENCRYPT_VAR1) && data.containsKey(APP_ENCRYPT_VAR2) && data.containsKey(APP_ENCRYPT_VAR3)) {
+                        @Suppress("UNCHECKED_CAST")
+                        return data as? HashMap<String, ByteArray>
+                    }
+                }
+            }
+        } catch (ex: java.lang.Exception) {
+            return null
+        }
 
+        return null
+    }
 }

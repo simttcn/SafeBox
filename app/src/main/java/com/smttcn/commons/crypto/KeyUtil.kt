@@ -1,14 +1,21 @@
 package com.smttcn.commons.crypto
 
+import com.smttcn.commons.helpers.APP_ENCRYPT_VAR2
+import com.smttcn.commons.helpers.APP_ENCRYPT_VAR1
+import com.smttcn.commons.helpers.APP_ENCRYPT_VAR3
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.smttcn.safebox.MyApplication
 
 class KeyUtil {
 
     fun isAppDatabaseSecretExist(): Boolean {
-        return MyApplication.getBaseConfig().appDatabaseSecretHashMap.containsKey("salt")
-                && MyApplication.getBaseConfig().appDatabaseSecretHashMap.containsKey("iv")
-                && MyApplication.getBaseConfig().appDatabaseSecretHashMap.containsKey("encrypted")
+        return MyApplication.getBaseConfig().appDatabaseSecretHashMap.containsKey(APP_ENCRYPT_VAR2)
+                && MyApplication.getBaseConfig().appDatabaseSecretHashMap.containsKey(
+            APP_ENCRYPT_VAR1
+        )
+                && MyApplication.getBaseConfig().appDatabaseSecretHashMap.containsKey(
+            APP_ENCRYPT_VAR3
+        )
     }
 
     fun generateAndSaveAppDatabaseSecret(pwd : CharArray, overwrite: Boolean = false) : String {
@@ -42,7 +49,7 @@ class KeyUtil {
     private fun encryptDatabaseSecretWithBackup(pwd: CharArray, secret: String) {
         val enc = Encryption()
         val key = enc.encrypt(secret.toByteArray(Charsets.UTF_8), pwd)
-        if (key.containsKey("salt") && key.containsKey("iv") && key.containsKey("encrypted")) {
+        if (key.containsKey(APP_ENCRYPT_VAR2) && key.containsKey(APP_ENCRYPT_VAR1) && key.containsKey(APP_ENCRYPT_VAR3)) {
             backupAppDatabaseSecret()
             MyApplication.getBaseConfig().appDatabaseSecretHashMap = key
         }

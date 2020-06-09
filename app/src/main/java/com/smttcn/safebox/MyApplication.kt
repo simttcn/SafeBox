@@ -19,7 +19,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
         lateinit var mainActivityContext: Context
         private var instance: MyApplication? = null
         private var baseConfig: BaseConfig? = null
-        private var uS: CharArray = charArrayOf()
+        private var uS: CharArray = charArrayOf() // password stored
 
         fun getUS(): CharArray {
             return uS

@@ -12,6 +12,8 @@ import com.smttcn.commons.extensions.showKeyboard
 import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.afollestad.materialdialogs.MaterialDialog
+import com.smttcn.commons.Manager.FileManager
+import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.R
 
@@ -109,10 +111,25 @@ class PasswordActivity : BaseActivity() {
                         authenticator.authenticateAppPassword(CurrentPassword.text.toString()) {
                             if (it == true) {
                                 // correct app password, so go ahead to change the password
-                                authenticator.changeAppPassword(CurrentPassword.text.toString(),
+                                authenticator.changeAppPassword(
+                                    CurrentPassword.text.toString(),
                                     NewPassword.text.toString()) {
 
                                     if (it == true) {
+                                        // success, store password to MyApplication
+                                        MyApplication.setUS(NewPassword.text.toString().toCharArray())
+
+                                        // Todo: show a progression bar while re-encrypting all files
+                                        // Todo: Last, doing test
+                                        // we need to re-encrypt all the file upon password change
+                                        FileManager.reencryptAllFiles(
+                                            CurrentPassword.text.toString().toCharArray(),
+                                            NewPassword.text.toString().toCharArray()
+                                        )
+
+                                        CurrentPassword.text.clear()
+                                        NewPassword.text.clear()
+
                                         setResult(Activity.RESULT_OK)
                                         finish()
                                     } else {

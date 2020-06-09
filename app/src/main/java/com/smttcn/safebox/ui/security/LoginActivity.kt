@@ -1,29 +1,38 @@
 package com.smttcn.safebox.ui.security
 
 import android.app.Activity
-import android.content.*
+import android.content.DialogInterface
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.annotation.StringRes
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.setActionButtonEnabled
+import com.afollestad.materialdialogs.callbacks.onDismiss
+import com.afollestad.materialdialogs.input.getInputField
+import com.afollestad.materialdialogs.input.input
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.crypto.KeyUtil
+import com.smttcn.commons.helpers.*
 import com.smttcn.commons.helpers.Authenticator
-import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
-import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
-import com.smttcn.commons.helpers.REQUEST_CODE_NEW_PASSWORD
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.callbacks.onDismiss
-import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.database.AppDatabase
 import com.smttcn.safebox.helpers.SampleHelper
+import com.smttcn.safebox.ui.main.MainActivity
 
 
 class LoginActivity : BaseActivity() {
@@ -75,25 +84,37 @@ class LoginActivity : BaseActivity() {
         })
 
         LoginButton.setOnClickListener {
-            // togo: perform authenticaiton here
+            // perform authenticaiton here
             val authenticator: Authenticator = Authenticator()
             if (Password.length() >= MIN_PASSWORD_LENGTH) {
                 authenticator.authenticateAppPassword((Password.text.toString())) {
                     if (it == true) {
                         // Login successfully
                         MyApplication.setUS(Password.text.toString().toCharArray())
-                        onSuccessfulLogin()
                         Password.text.clear()
-
-                        if (!IsCalledFromMainActivity) {
-                            // not called from MainActivity, so start one
-                            val intent = Intent(this, MainActivity::class.java)
-                            startActivity(intent)
-                            finishAffinity()
+                        if (onSuccessfulLogin()) {
+                            if (!IsCalledFromMainActivity) {
+                                // not called from MainActivity, so start one
+                                val intent = Intent(this, MainActivity::class.java)
+                                startActivity(intent)
+                                finishAffinity()
+                            } else {
+                                // called from MainActivity, so finish and return
+                                finish()
+                            }
                         } else {
-                            // called from MainActivity, so finish and return
-                            finish()
+                            MaterialDialog(this).show {
+                                title(R.string.dlg_title_error)
+                                message(R.string.dlg_msg_initialization_error)
+                                positiveButton(R.string.btn_ok) {
+                                    finishAffinity()
+                                }
+                                cancelable(false)  // calls setCancelable on the underlying dialog
+                                cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+                                lifecycleOwner(this@LoginActivity)
+                            }
                         }
+
 
 //                        val Message = findViewById<TextView>(R.id.message)
 //                        Message.text = "Good good"
@@ -109,18 +130,60 @@ class LoginActivity : BaseActivity() {
         }
     }
 
-    private fun onSuccessfulLogin() {
+    private fun onSuccessfulLogin(): Boolean {
         // todo: may have to put spinner here for long processing time
+        var result: Boolean
         // set a global flag
         MyApplication.globalAppAuthenticated = "yes"
-        // handle share from sharesheet
-        handleShareFrom(MyApplication.getUS())
-        // get database secret and initialize the database
-        val keyUtil = KeyUtil()
-        val dbSecret = keyUtil.getAppDatabaseSecretWithAppPassword(MyApplication.getUS())
-        AppDatabase.setKey(dbSecret)
-        // do we need to crate some sample files?
-        SampleHelper().Initialze(MyApplication.getUS())
+        // Only proceed if we have finished all outstanding tasks from previous session
+        if (processUnfinishedTask()) {
+            // handle share from sharesheet
+            handleShareFrom(MyApplication.getUS())
+            // get database secret and initialize the database
+            val keyUtil = KeyUtil()
+            val dbSecret = keyUtil.getAppDatabaseSecretWithAppPassword(MyApplication.getUS())
+            AppDatabase.setKey(dbSecret)
+            // do we need to crate some sample files?
+            SampleHelper().Initialze(MyApplication.getUS())
+
+            result = true
+        } else {
+            result = false
+        }
+
+        return result
+    }
+
+    private fun processUnfinishedTask() : Boolean {
+        // we have to cater to any unfinished business from previous session
+        var result = true
+
+        // do we have unfinished reencrypting task?
+        val filePaths = MyApplication.getBaseConfig().appUnfinishedReencryptFiles
+        if (filePaths != null && filePaths.count() > 0) {
+            // prompt for previous password to complete unfinished task
+            MaterialDialog(this).show {
+                title(R.string.dlg_title_unfinished_task)
+                message(R.string.dlg_msg_unfinished_task_password_prompt)
+                input(
+                    hint = getString(R.string.dlg_msg_unfinished_task_previous_password_hint),
+                    inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD,
+                    waitForPositiveButton = false
+                ) { _, text ->
+                    setActionButtonEnabled(WhichButton.POSITIVE, text.length >= MIN_PASSWORD_LENGTH)
+                }
+                positiveButton(R.string.btn_ok) {
+                    FileManager.reencryptFiles(filePaths, it.getInputField().text.toString().toCharArray(), MyApplication.getUS())
+                }
+                negativeButton(R.string.btn_cancel) {
+                    result = false
+                }
+                lifecycleOwner(this@LoginActivity)
+            }
+
+        }
+
+        return result
     }
 
     private fun handleShareFrom(pwd: CharArray) {
