@@ -1,7 +1,6 @@
 package com.smttcn.commons.helpers
 
 import com.smttcn.commons.crypto.Hashing
-import com.smttcn.commons.crypto.KeyUtil
 import com.smttcn.safebox.MyApplication
 
 internal class Authenticator() {
@@ -24,7 +23,19 @@ internal class Authenticator() {
     }
 
     fun newAppPassword(password: String, callback: (success: Boolean) -> Unit) {
-        hashAndSavePassword("", password, callback)
+        hashAndSavePassword(password, callback)
+    }
+
+    fun removeAppPassword(currentPassword: String, callback: (success: Boolean) -> Unit) {
+        authenticateAppPassword(currentPassword) {
+            if (it == true) {
+                MyApplication.getBaseConfig().removePrefKey(APP_PASSWORD_HASH_01)
+                MyApplication.getBaseConfig().removePrefKey(APP_PASSWORD_HASH_02)
+                callback(true)
+            } else {
+                callback(false)
+            }
+        }
     }
 
     fun changeAppPassword(oldPassword: String, newPassword: String, callback: (success: Boolean) -> Unit) {
@@ -32,7 +43,7 @@ internal class Authenticator() {
         authenticateAppPassword(oldPassword) {
             if (it == true) {
                 // current password matched, so go ahead to hash and save the new password
-                hashAndSavePassword(oldPassword, newPassword, callback)
+                hashAndSavePassword(newPassword, callback)
             } else {
                 // current password not matched
                 callback(false)
@@ -40,7 +51,7 @@ internal class Authenticator() {
         }
     }
 
-    fun hashAndSavePassword(oldPassword : String, newPassword: String, callback: (success: Boolean) -> Unit) {
+    fun hashAndSavePassword(newPassword: String, callback: (success: Boolean) -> Unit) {
         // hash the password
         val hasher = Hashing()
         // verify the password before saving the hash
@@ -49,10 +60,6 @@ internal class Authenticator() {
         {
             MyApplication.getBaseConfig().appPasswordHashBackup = MyApplication.getBaseConfig().appPasswordHash
             MyApplication.getBaseConfig().appPasswordHash = hashedPasswordWithSalt
-            if (oldPassword.length >= MIN_PASSWORD_LENGTH) {
-                val keyUtil = KeyUtil()
-                keyUtil.reEncryptAndSaveAppDatabaseSecret(oldPassword.toCharArray(), newPassword.toCharArray())
-            }
             callback(true)
         } else {
             callback(false)

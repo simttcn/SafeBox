@@ -12,8 +12,8 @@ import java.io.File
 object ImageManager {
 
     // Todo: to get thumbnail image of various file types here
-    fun getThumbnailByteArrayFromEncryptedFile(file: File) : ByteArray? {
-        val decryptedFile = FileManager.decryptFileContentToByteArray(file, MyApplication.getUS())
+    fun getThumbnailByteArrayFromEncryptedFile(file: File, password: CharArray) : ByteArray? {
+        val decryptedFile = FileManager.decryptFileContentToByteArray(file, password)
 
         // Image file type
         if (decryptedFile != null) {

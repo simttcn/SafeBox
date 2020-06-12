@@ -10,7 +10,7 @@
 
     <!--  Activity Title  -->
     <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_password">Password</string>
+    <string name="title_activity_app_password">App Password</string>
     <string name="title_activity_debugconsole">Debug Console</string>
 
     <!--  Menu  -->
@@ -21,16 +21,16 @@
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_close">Close</string>
-    <string name="btn_change_password">Change Password</string>
+    <string name="btn_change_app_password">Change App Password</string>
 
     <!--  UI  -->
-    <string name="new_password">New Password</string>
-    <string name="enter_password">Enter Password</string>
-    <string name="enter_password_error">Password incorrect, please try again.</string>
-    <string name="enter_your_password">enter password</string>
-    <string name="enter_existing_password">enter existing password</string>
-    <string name="enter_new_password">enter new password</string>
-    <string name="confirm_new_password">confirm new password</string>
+    <string name="new_app_password">New App Password</string>
+    <string name="enter_app_password">Enter App Password</string>
+    <string name="enter_app_password_error">App password incorrect, please try again.</string>
+    <string name="enter_your_app_password">enter app password</string>
+    <string name="enter_existing_app_password">enter existing app password</string>
+    <string name="enter_new_app_password">enter new app password</string>
+    <string name="confirm_new_app_password">confirm new app password</string>
     <string name="reset">Reset</string>
     <string name="signin">Sign In</string>
     <string name="error">Error</string>
@@ -44,27 +44,17 @@
     <!-- Dialog Title -->
     <string name="dlg_title_success">Success</string>
     <string name="dlg_title_error">Error</string>
-    <string name="dlg_title_new_password">New Password</string>
-    <string name="dlg_title_change_password">Change Password</string>
-    <string name="dlg_title_reset_data_key">Reset Data Key</string>
-    <string name="dlg_title_unfinished_task">Unfinished Task</string>
+    <string name="dlg_title_new_app_password">New App Password</string>
+    <string name="dlg_title_change_app_password">Change App Password</string>
 
     <!-- Dialog Message -->
-    <string name="dlg_msg_new_password_success">New password successfully created, please proceed to login.</string>
-    <string name="dlg_msg_new_password_error">Unable to save the password, please launch the app and try again.</string>
-    <string name="dlg_msg_change_password_confirmation">Are you sure you want to change your password?\n\nChanging password will re-encrypt all your data and will take several minutes to complete.</string>
-    <string name="dlg_msg_change_password_success">Your password has been successfully changed.</string>
-    <string name="dlg_msg_change_password_cancel">Password change cancelled.</string>
-    <string name="dlg_msg_change_password_incorrect">You have entered an incorrect current password, please try again.</string>
-    <string name="dlg_msg_change_password_error">Error occurs when changing password, please try again.</string>
-    <string name="dlg_msg_reset_data_key_confirmation">Are you sure you want to reset the data key?\n\nResetting a large dataset may take minutes to complete and the app will have to be shutdown to complete the operation.</string>
-    <string name="dlg_msg_reset_data_key_success">Data key successfully reset and the app will be shutdown now. Please restart it manually.</string>
-    <string name="dlg_msg_reset_data_key_error">Failed to reset data key.</string>
-    <string name="dlg_msg_reset_data_key_hint">Enter your current password</string>
-    <string name="dlg_msg_unfinished_reencrypt_error">Error processing unfinished task from previous session, please restart the app and try again.</string>
+    <string name="dlg_msg_new_app_password_success">New app password successfully created,</string>
+    <string name="dlg_msg_new_app_password_error">Unable to save the app password, please launch the app and try again.</string>
+    <string name="dlg_msg_change_app_password_success">Your app password has been successfully changed.</string>
+    <string name="dlg_msg_change_app_password_cancel">App password change cancelled.</string>
+    <string name="dlg_msg_change_app_password_incorrect">You have entered an incorrect existing app password, please try again.</string>
+    <string name="dlg_msg_change_app_password_error">Error occurs when changing the app password, please try again.</string>
     <string name="dlg_msg_initialization_error">Error initializing app, please restart the app and try again.</string>
-    <string name="dlg_msg_unfinished_task_password_prompt">Please enter your previous password to complete the unfinished task of re-encrypting the files after password change.</string>
-    <string name="dlg_msg_unfinished_task_previous_password_hint">Enter your previous password</string>
 
     <!-- Dates -->
     <string name="january">January</string>
@@ -253,7 +243,7 @@
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="invalid_app_password">App password must be longer than 5 characters</string>
     <string name="login_failed">"Login failed"</string>
 
     <!-- Preference Titles -->
@@ -262,8 +252,8 @@
     <string name="sync_header">Sync</string>
 
     <!-- Security Preferences -->
-    <string name="change_password">Change Password</string>
-    <string name="reset_data_key">Reset Data Encryption Key</string>
+    <string name="enable_app_password">Enable App Password</string>
+    <string name="change_app_password">Change App Password</string>
 
     <!-- Messages Preferences -->
     <string name="signature_title">Your signature</string>

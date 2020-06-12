@@ -39,7 +39,7 @@ object FileManager {
             f.mkdir()
     }
 
-    public fun getFileDirItemsInDocumentRoot(folder: String = ""): List<FileDirItem> {
+    fun getFileDirItemsInDocumentRoot(folder: String = ""): List<FileDirItem> {
         val files = getFilesInDocumentRoot(folder)
         var items: MutableList<FileDirItem> = mutableListOf<FileDirItem>()
         for(file in files) {
@@ -117,9 +117,9 @@ object FileManager {
         return null
     }
 
-    fun deleteCache(context: Context) {
+    fun deleteCache() {
         try {
-            val cacheDir: File = context.getCacheDir()
+            val cacheDir: File = MyApplication.getAppContext().cacheDir
             val dir = File(cacheDir.canonicalPath)
             deleteDir(dir, true)
         } catch (e: java.lang.Exception) {
@@ -192,7 +192,7 @@ object FileManager {
 
         encryptedFilePath = encryptedFilePath + ".enc"
 
-        //todo: got to check inputStream vaidity
+        //todo later: got to check inputStream validity
         val bytes = inputStream!!.readBytes()
         inputStream.close()
         val map = Encryption().encryptWithFilename(filename, bytes, password)
@@ -282,39 +282,19 @@ object FileManager {
     }
 
     // re-encrypt files with new password
-    fun reencryptFiles(filePaths: ArrayList<String>, oldPwd: CharArray, newPwd: CharArray) : Boolean {
+    fun reencryptFiles(filePath: String, oldPwd: CharArray, newPwd: CharArray) : Boolean {
 
-        var tempFilePaths = filePaths.duplicate()
+        // Todo future: should decrypt to hashmap in memory then encrypt it back to file
+        // decrypt file with delete original
+        val decryptedFilePath = decryptFile(File(filePath), oldPwd, deleteOriginal = true)
+        // encrypt file with delete original
+        val encryptedFilePath = encryptFile(File(decryptedFilePath), newPwd, true)
 
-        // Todo: last to test unfinished re-encryption task
-        // save unfinished file list to sharedpreferences
-        MyApplication.getBaseConfig().appUnfinishedReencryptFiles = filePaths
-
-        for (filePath in filePaths) {
-            // Todo: should decrypt to hashmap in memory then encrypt it back to file
-            // decrypt file with delete original
-            val decryptedFilePath = decryptFile(File(filePath), oldPwd, deleteOriginal = true)
-            // encrypt file with delete original
-            val encryptedFilePath = encryptFile(File(decryptedFilePath), newPwd, true)
-
-            // update unfinished file list in sharedpreferences
-            if (isEncryptedFile(File(encryptedFilePath))) {
-                tempFilePaths.remove(filePath)
-                MyApplication.getBaseConfig().appUnfinishedReencryptFiles = tempFilePaths
-            }
+        if (isEncryptedFile(File(encryptedFilePath))) {
+            return true
+        } else {
+            return false
         }
-
-        return tempFilePaths.count() == 0
-
-    }
-
-    // to re-encrypt all files found in document root folder
-    fun reencryptAllFiles(oldPwd: CharArray, newPwd: CharArray) : Boolean {
-        val filePaths = getFilesInDocumentRoot("", true).map {
-                                            it.canonicalPath
-                                        } as ArrayList<String>
-
-        return reencryptFiles(filePaths, oldPwd, newPwd)
 
     }
 

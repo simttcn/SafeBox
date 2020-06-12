@@ -13,6 +13,8 @@ import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.afollestad.materialdialogs.MaterialDialog
 import com.smttcn.commons.Manager.FileManager
+import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
+import com.smttcn.commons.helpers.INTENT_TO_CREATE_APP_PASSWORD
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.R
@@ -24,11 +26,13 @@ class PasswordActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val authenticator = Authenticator()
-        isToCreatePassword = !authenticator.isAppPasswordHashExist()
+        // get param from bundle
+        val bundle = intent.extras
+        val param1 = bundle?.getString(INTENT_TO_CREATE_APP_PASSWORD)
+        if (param1.equals("yes")) isToCreatePassword = true
 
         // Password exists but not authenticated, then quit the app immediately
-        if (!isToCreatePassword && !MainActivity.isAuthenticated()) finishAndRemoveTask()
+        if (!isToCreatePassword && !MyApplication.isAuthenticated()) finishAndRemoveTask()
 
         initActivity()
         initActivityUI()
@@ -116,24 +120,13 @@ class PasswordActivity : BaseActivity() {
                                     NewPassword.text.toString()) {
 
                                     if (it == true) {
-                                        // success, store password to MyApplication
-                                        MyApplication.setUS(NewPassword.text.toString().toCharArray())
-
-                                        // Todo: show a progression bar while re-encrypting all files
-                                        // Todo: Last, doing test
-                                        // we need to re-encrypt all the file upon password change
-                                        FileManager.reencryptAllFiles(
-                                            CurrentPassword.text.toString().toCharArray(),
-                                            NewPassword.text.toString().toCharArray()
-                                        )
-
                                         CurrentPassword.text.clear()
                                         NewPassword.text.clear()
 
                                         setResult(Activity.RESULT_OK)
                                         finish()
                                     } else {
-                                        showChangePasswordDialog(R.string.dlg_msg_change_password_error) {
+                                        showChangePasswordDialog(R.string.dlg_msg_change_app_password_error) {
                                             CurrentPassword.selectAll()
                                             showKeyboard(CurrentPassword)
                                         }
@@ -145,14 +138,14 @@ class PasswordActivity : BaseActivity() {
 
                             } else {
                                 // incorrect app password
-                                showChangePasswordDialog(R.string.dlg_msg_change_password_incorrect) {
+                                showChangePasswordDialog(R.string.dlg_msg_change_app_password_incorrect) {
                                     CurrentPassword.selectAll()
                                     showKeyboard(CurrentPassword)
                                 }
                             }
                         }
                     } else {
-                        showChangePasswordDialog(R.string.dlg_msg_change_password_incorrect) {
+                        showChangePasswordDialog(R.string.dlg_msg_change_app_password_incorrect) {
                             CurrentPassword.selectAll()
                             showKeyboard(CurrentPassword)
                         }
@@ -169,7 +162,7 @@ class PasswordActivity : BaseActivity() {
 
     private fun showChangePasswordDialog(stringID: Int, callback: () -> Unit){
         MaterialDialog(this).show {
-            title(R.string.dlg_title_change_password)
+            title(R.string.dlg_title_change_app_password)
             message(stringID)
             positiveButton(R.string.btn_ok)
             cancelable(false)  // calls setCancelable on the underlying dialog

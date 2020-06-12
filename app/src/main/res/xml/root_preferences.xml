@@ -20,14 +20,15 @@
     <PreferenceCategory app:title="@string/security_header"
         app:iconSpaceReserved="false">
 
-        <Preference
-            app:key="changepassword"
-            app:title="@string/change_password"
-            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            app:key="enableapppassword"
+            app:title="@string/enable_app_password"
+            app:iconSpaceReserved="false"/>
 
         <Preference
-            app:key="resetdatakey"
-            app:title="@string/reset_data_key"
+            app:key="changeapppassword"
+            app:title="@string/change_app_password"
+            app:enabled="false"
             app:iconSpaceReserved="false" />
 
     </PreferenceCategory>

@@ -33,7 +33,7 @@
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/enter_your_password"
+            android:hint="@string/enter_your_app_password"
             android:imeActionLabel="@string/signin"
             android:imeOptions="actionDone"
             android:inputType="textPassword"

@@ -21,7 +21,7 @@ import java.io.FileInputStream
 abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null
     var isAskingPermissions = false
-    var isLoginActivity = false
+    var authenticationException = false
     var isToCreatePassword = false
     private var sessionDepth = 0
     private val GENERIC_PERM_HANDLER = 100
@@ -48,9 +48,10 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     override fun onResume() {
         super.onResume()
 
-        if (!isLoginActivity
+        if (!authenticationException
             && !isToCreatePassword
-            && !MainActivity.isAuthenticated()) {
+            && MyApplication.getBaseConfig().enableAppPassword == true
+            && !MyApplication.isAuthenticated()) {
             performAuthentication()
         }
     }
@@ -84,7 +85,7 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
 
     fun performAuthentication() {
         val intent = Intent(this, LoginActivity::class.java)
-        intent.putExtra(INTENT_CALL_FROM_MAINACTIVITY, "yes")
+        //intent.putExtra(INTENT_CALL_FROM_MAINACTIVITY, "yes")
         startActivity(intent)
         //finishAffinity()
     }

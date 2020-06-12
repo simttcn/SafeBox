@@ -2,6 +2,7 @@ package com.smttcn.safebox.ui.settings
 
 import android.os.Bundle
 import com.smttcn.commons.activities.BaseActivity
+import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.R
 
@@ -9,7 +10,7 @@ class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!MainActivity.isAuthenticated()) finish()
+        if (!MyApplication.isAuthenticated()) finish()
         initActivity()
         initActivityUI()
     }

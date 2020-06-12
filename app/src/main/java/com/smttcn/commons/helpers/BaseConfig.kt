@@ -30,6 +30,10 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
         get() = prefs.getInt(LAST_VERSION, 0)
         set(lastVersion) = prefs.edit().putInt(LAST_VERSION, lastVersion).apply()
 
+    var enableAppPassword: Boolean
+        get() = prefs.getBoolean("enableapppassword", false)!!
+        set(value) = prefs.edit().putBoolean("enableapppassword", value).apply()
+
     var appPasswordHash: String
         get() = prefs.getString(APP_PASSWORD_HASH_01, "")!!
         set(passwordHash) = prefs.edit().putString(APP_PASSWORD_HASH_01, passwordHash).apply()
@@ -37,7 +41,7 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
     var appPasswordHashBackup: String
         get() = prefs.getString(APP_PASSWORD_HASH_02, "")!!
         set(passwordHash) = prefs.edit().putString(APP_PASSWORD_HASH_02, passwordHash).apply()
-
+    /*
     var appDatabaseSecretHashMap: HashMap<String, ByteArray>
         get() {
             return  HashMap<String, ByteArray>().fromBase64String(prefs.getString(APP_DATABASE_SECRET_ENCRYPTED_01, "")!!)
@@ -73,36 +77,36 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
             prefs.edit().putString(APP_UNFINISHED_REENCRYPT_FILES, Gson().toJson(files)).apply()
         }
 
+    var appPasswordHashEncrypted: HashMap<String, ByteArray>
+        get() {
+            val outputMap = HashMap<String, ByteArray>()
+            try {
+                val jsonString = prefs.getString(APP_PASSWORD_HASH, "")!!
+                val jsonObject = JSONObject(jsonString)
+                val keysItr = jsonObject.keys()
+                while (keysItr.hasNext()) {
+                    val key = keysItr.next()
+                    val value = jsonObject.getString(key)
+                    outputMap[key] = value.toByteArrayEx()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
 
-//    var appPasswordHashEncrypted: HashMap<String, ByteArray>
-//        get() {
-//            val outputMap = HashMap<String, ByteArray>()
-//            try {
-//                val jsonString = prefs.getString(APP_PASSWORD_HASH, "")!!
-//                val jsonObject = JSONObject(jsonString)
-//                val keysItr = jsonObject.keys()
-//                while (keysItr.hasNext()) {
-//                    val key = keysItr.next()
-//                    val value = jsonObject.getString(key)
-//                    outputMap[key] = value.toByteArrayEx()
-//                }
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//            }
-//
-//            return outputMap
-//        }
-//        set(appPasswordHashMap) {
-//            val inputMap : HashMap<Any?, Any?> = HashMap<Any?, Any?>(appPasswordHashMap)
-//
-//            appPasswordHashMap.forEach(){
-//              inputMap[it.key] = Arrays.toString(it.value)
-//            }
-//
-//            val jsonObject = JSONObject(inputMap)
-//            val jsonString = jsonObject.toString()
-//            prefs.edit().putString(APP_PASSWORD_HASH, jsonString).apply()
-//        }
+            return outputMap
+        }
+        set(appPasswordHashMap) {
+            val inputMap : HashMap<Any?, Any?> = HashMap<Any?, Any?>(appPasswordHashMap)
+
+            appPasswordHashMap.forEach(){
+              inputMap[it.key] = Arrays.toString(it.value)
+            }
+
+            val jsonObject = JSONObject(inputMap)
+            val jsonString = jsonObject.toString()
+            prefs.edit().putString(APP_PASSWORD_HASH, jsonString).apply()
+        }
+    */
 
     var sorting: Int
         get() = prefs.getInt(SORT_ORDER, context.resources.getInteger(R.integer.default_sorting))
@@ -138,6 +142,11 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
     var primaryColor: Int
         get() = prefs.getInt(PRIMARY_COLOR, ContextCompat.getColor(context, R.color.colorPrimary))
         set(primaryColor) = prefs.edit().putInt(PRIMARY_COLOR, primaryColor).apply()
+
+    public fun removePrefKey(key: String) {
+        prefs.edit().remove(key)
+        prefs.edit().commit()
+    }
 
     private fun getDefaultDateFormat(): String {
         val format = DateFormat.getDateFormat(context)

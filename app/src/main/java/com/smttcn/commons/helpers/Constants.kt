@@ -1,9 +1,9 @@
 package com.smttcn.commons.helpers
 
-import android.graphics.Color
 import android.os.Build
 import android.os.Looper
-import java.util.*
+
+const val TEMP_PASSWORD = "123456" //todo: temp password from testing
 
 const val APP_NAME = "app_name"
 const val APP_LICENSES = "app_licenses"
@@ -17,13 +17,7 @@ const val APP_ENCRYPT_VAR1 = "var1" //iv
 const val APP_ENCRYPT_VAR2 = "var2" //salt
 const val APP_ENCRYPT_VAR3 = "var3" //encrypted
 const val APP_PASSWORD_HASH_01 = "key_00"
-const val APP_PASSWORD_HASH_02 = "key_04"
-const val APP_DATABASE_SECRET_ENCRYPTED_01 = "key_01"
-const val APP_DATABASE_SECRET_ENCRYPTED_02 = "key_02"
-const val APP_DATABASE_SECRET_ENCRYPTED_03 = "key_03"
-const val APP_UNFINISHED_REENCRYPT_FILES = "unfinished_reencrypt_files"
-const val KEY_STORE = "AndroidKeyStore"
-const val KEY_STORE_ALIAS = "smttcn_safebox_key_00"
+const val APP_PASSWORD_HASH_02 = "key_01"
 const val KEY_HASH_ITERATION_COUNT = 10000
 const val MIN_PASSWORD_LENGTH = 6
 
@@ -33,11 +27,12 @@ const val SIZE_THUMBNAIL_WIDTH = 48
 const val SIZE_THUMBNAIL_HEIGHT = 48
 
 // activity for result request code
-const val REQUEST_CODE_NEW_PASSWORD = 100
-const val REQUEST_CODE_CHANGE_PASSWORD = 110
+const val REQUEST_CODE_NEW_APP_PASSWORD = 100
+const val REQUEST_CODE_CHANGE_APP_PASSWORD = 110
 
 // Intent request string
 const val INTENT_CALL_FROM_MAINACTIVITY = "call_from_mainactivity"
+const val INTENT_TO_CREATE_APP_PASSWORD = "to_create_app_password"
 
 // date and time
 const val USE_24_HOUR_FORMAT = "use_24_hour_format"

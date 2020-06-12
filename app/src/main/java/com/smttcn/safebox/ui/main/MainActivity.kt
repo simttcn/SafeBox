@@ -1,7 +1,9 @@
 package com.smttcn.safebox.ui.main
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -21,32 +23,24 @@ import com.smttcn.commons.extensions.getDrawableCompat
 import com.smttcn.commons.extensions.getFilenameFromPath
 import com.smttcn.commons.extensions.toast
 import com.smttcn.commons.helpers.INTERVAL_BACK_BUTTON_QUIT_IN_MS
+import com.smttcn.commons.helpers.TEMP_PASSWORD
+import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
-import com.smttcn.safebox.database.DbItem
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
-import com.smttcn.safebox.viewmodel.DbItemViewModel
-import com.stfalcon.imageviewer.StfalconImageViewer
+import com.smttcn.safebox.viewmodel.FileItemViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class MainActivity : BaseActivity() {
 
-    private lateinit var dbItemViewModel: DbItemViewModel
+    private lateinit var fileItemViewModel: FileItemViewModel
+    private var IsShareFromOtherApp = false
 
     var BackButtonPressedOnce = false
     var LastPressedBackTime = System.currentTimeMillis()
-
-    companion object {
-        fun isAuthenticated(): Boolean {
-            return MyApplication.globalAppAuthenticated.equals("yes")
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,11 +60,16 @@ class MainActivity : BaseActivity() {
 
     private fun initialize() {
         MyApplication.setMainContext(this)
+
+        IsShareFromOtherApp = if (intent?.action == Intent.ACTION_SEND) true else false
+        if (IsShareFromOtherApp) {
+            handleShareFrom()
+        }
     }
 
     private fun initializeUI() {
         val recyclerView = findViewById<RecyclerView>(R.id.itemListRecyclerView)
-        val adapter = DbItemAdapter(this)
+        val adapter = FileItemAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -78,12 +77,32 @@ class MainActivity : BaseActivity() {
             onRecyclerItemClicked(view, item)
         }
 
-        dbItemViewModel = ViewModelProviders.of(this).get(DbItemViewModel::class.java)
+        fileItemViewModel = ViewModelProviders.of(this).get(FileItemViewModel::class.java)
 
-        dbItemViewModel.allDbItems.observe(this, Observer { item ->
-            // Update the cached copy of the dbItems in the adapter.
-            item?.let { adapter.setDbItems(it) }
+        fileItemViewModel.allFileItems.observe(this, Observer { item ->
+            // Update the cached copy of the fileItems in the adapter.
+            item?.let { adapter.setFileItems(it) }
         })
+    }
+
+    private fun handleShareFrom(): Boolean {
+        var result: Boolean = true
+
+        var encryptedFilepath = encryptSharedFile(TEMP_PASSWORD.toCharArray())
+        if (!FileManager.isFileExist(encryptedFilepath)
+            || !FileManager.isEncryptedFile(File(encryptedFilepath)))
+            result = false
+
+        return result
+    }
+
+    private fun encryptSharedFile(pwd: CharArray) : String {
+        //if (intent.type?.startsWith("image/") == true) {
+        (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
+            return FileManager.encryptFileFromUriToFolder(contentResolver, pwd, it)
+        }
+        //}
+        return ""
     }
 
     override fun onBackPressed() {
@@ -129,23 +148,24 @@ class MainActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun onRecyclerItemClicked(view: View, item : DbItem) {
-        // Todo: to open various type of files
+    private fun onRecyclerItemClicked(view: View, item : FileDirItem) {
+        // Todo: to ask for password and them open it
 
-        val targetfile = item.fullPathWithFilename
-        if (targetfile.length > 0) {
-            val imagePaths = listOf(targetfile)
-            StfalconImageViewer.Builder<String>(this, imagePaths, ::loadImage)
-                .withTransitionFrom(view.item_background)
-                .show()
-        }
+        toast(item.filename + " clicked")
+//        val targetfile = item.path
+//        if (targetfile.length > 0) {
+//            val imagePaths = listOf(targetfile)
+//            StfalconImageViewer.Builder<String>(this, imagePaths, password, ::loadImage)
+//                .withTransitionFrom(view.item_background)
+//                .show()
+//        }
     }
 
-    private fun loadImage(imageView: ImageView, imagePath: String) {
+    private fun loadImage(imageView: ImageView, imagePath: String, password: CharArray) {
         val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadein)
         imageView.startAnimation(aniFade)
         imageView.setImageDrawable(getDrawableCompat(R.drawable.ic_image_gray_24dp))
-        val decryptedFileByteArray = FileManager.decryptFileContentToByteArray(File(imagePath), MyApplication.getUS())
+        val decryptedFileByteArray = FileManager.decryptFileContentToByteArray(File(imagePath), password)
         if (decryptedFileByteArray != null) {
             imageView.setImageBitmap(ImageManager.toBitmap(decryptedFileByteArray))
         }
@@ -154,6 +174,10 @@ class MainActivity : BaseActivity() {
 
     // todo: to further define the share routine to share all type of files
     private fun shareItem() {
+
+        //todo: choose to share file decrypted or as it is
+        var password : CharArray = TEMP_PASSWORD.toCharArray()
+
         val files = FileManager.getFilesInDocumentRoot()
 
         if (files.isEmpty()) return
@@ -165,7 +189,7 @@ class MainActivity : BaseActivity() {
 
         val targetpath = FileManager.getFolderInCacheFolder("temp_file_share", true)
         if (targetfile.length() > 0 && targetpath != null) {
-            decryptedFilepath = FileManager.decryptFile(targetfile, MyApplication.getUS(), targetpath.canonicalPath, false)
+            decryptedFilepath = FileManager.decryptFile(targetfile, password, targetpath.canonicalPath, false)
         }
 
         if (decryptedFilepath.isNotEmpty()) {
@@ -189,18 +213,18 @@ class MainActivity : BaseActivity() {
     fun refreshDbItemList() {
         // Todo: how to do manual refresh of database?
         //AppDatabase.refresh()
-        val dt: String = SimpleDateFormat("hhmmss_SSS").format(Date())
-        val dbItem = DbItem(
-            fileName = "filename_" + dt,
-            hashedFileName = "hashed_" + dt,
-            isFolder = true,
-            fullPathWithFilename = "",
-            salt = "",
-            size = 0,
-            thumbnail = null
-        )
-
-        dbItemViewModel.insert(dbItem)
+//        val dt: String = SimpleDateFormat("hhmmss_SSS").format(Date())
+//        val fileItem = FileDirItem(
+//            fileName = "filename_" + dt,
+//            hashedFileName = "hashed_" + dt,
+//            isFolder = true,
+//            fullPathWithFilename = "",
+//            salt = "",
+//            size = 0,
+//            thumbnail = null
+//        )
+//
+//        fileItemViewModel.insert(dbItem)
     }
 
     fun showProgressBar(show: Boolean) {
