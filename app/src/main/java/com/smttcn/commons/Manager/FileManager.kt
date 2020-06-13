@@ -24,12 +24,12 @@ object FileManager {
 
     @Suppress("UNUSED_PARAMETER")
     var documentRoot: String
-        get() { return MyApplication.getAppContext().filesDir.toString().removeSuffix("/") }
+        get() { return MyApplication.applicationContext.filesDir.toString().removeSuffix("/") }
         private set(value) {}
 
     @Suppress("UNUSED_PARAMETER")
     var documentDataRoot: String
-        get() { return MyApplication.getAppContext().filesDir.canonicalPath.withTrailingCharacter('/') + DATA_FOLDER }
+        get() { return MyApplication.applicationContext.filesDir.canonicalPath.withTrailingCharacter('/') + DATA_FOLDER }
         private set(value) {}
 
     init {
@@ -103,7 +103,7 @@ object FileManager {
     }
 
     fun getFolderInCacheFolder(dir: String = "", toCreate: Boolean = false): File? {
-        val f = File(MyApplication.getAppContext().cacheDir.canonicalPath.withTrailingCharacter('/') + dir)
+        val f = File(MyApplication.applicationContext.cacheDir.canonicalPath.withTrailingCharacter('/') + dir)
 
         if (f.exists() && f.isDirectory()) {
             return f
@@ -119,7 +119,7 @@ object FileManager {
 
     fun deleteCache() {
         try {
-            val cacheDir: File = MyApplication.getAppContext().cacheDir
+            val cacheDir: File = MyApplication.applicationContext.cacheDir
             val dir = File(cacheDir.canonicalPath)
             deleteDir(dir, true)
         } catch (e: java.lang.Exception) {

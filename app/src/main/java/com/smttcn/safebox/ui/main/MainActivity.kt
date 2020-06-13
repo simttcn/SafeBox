@@ -59,7 +59,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initialize() {
-        MyApplication.setMainContext(this)
+        MyApplication.mainActivityContext = this
 
         IsShareFromOtherApp = if (intent?.action == Intent.ACTION_SEND) true else false
         if (IsShareFromOtherApp) {

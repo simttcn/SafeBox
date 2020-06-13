@@ -16,7 +16,7 @@ import java.util.*
 open class BaseConfig(val inPrefs: SharedPreferences) {
 
     val prefs = inPrefs
-    val context = MyApplication.getAppContext()
+    val context = MyApplication.applicationContext
 
     companion object {
         fun newInstance(prefs: SharedPreferences) = BaseConfig(prefs)
@@ -30,8 +30,8 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
         get() = prefs.getInt(LAST_VERSION, 0)
         set(lastVersion) = prefs.edit().putInt(LAST_VERSION, lastVersion).apply()
 
-    var enableAppPassword: Boolean
-        get() = prefs.getBoolean("enableapppassword", false)!!
+    var appPasswordEnabled: Boolean
+        get() = prefs.getBoolean("enableapppassword", false)
         set(value) = prefs.edit().putBoolean("enableapppassword", value).apply()
 
     var appPasswordHash: String

@@ -19,7 +19,7 @@ class LoginActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        authenticationException = true
+        authenticationExempted = true
 
         setContentView(R.layout.activity_login)
         initializeUI()
@@ -52,7 +52,7 @@ class LoginActivity : BaseActivity() {
                     if (it == true) {
                         // Login successfully
                         Password.text.clear()
-                        MyApplication.globalAppAuthenticated = "yes"
+                        MyApplication.authenticated = true
                         // finish and return
                         finish()
                     } else {

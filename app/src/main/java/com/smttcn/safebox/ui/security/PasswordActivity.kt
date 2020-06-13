@@ -32,7 +32,7 @@ class PasswordActivity : BaseActivity() {
         if (param1.equals("yes")) isToCreatePassword = true
 
         // Password exists but not authenticated, then quit the app immediately
-        if (!isToCreatePassword && !MyApplication.isAuthenticated()) finishAndRemoveTask()
+        if (!isToCreatePassword && !MyApplication.authenticated) finishAndRemoveTask()
 
         initActivity()
         initActivityUI()
@@ -53,19 +53,13 @@ class PasswordActivity : BaseActivity() {
         val NewPassword = findViewById<EditText>(R.id.new_password)
         val ConfirmPassword = findViewById<EditText>(R.id.confirm_password)
         val ConfirmButton = findViewById<Button>(R.id.confirm)
+        val CancelButton = findViewById<Button>(R.id.cancel)
 
         if (!isToCreatePassword) {
             // user want to change the app password
             val CurrentPassword = findViewById<EditText>(R.id.existing_password)
-            val CancelButton = findViewById<Button>(R.id.cancel)
 
-            CancelButton.visibility = if (!isToCreatePassword) View.VISIBLE else View.GONE
             CurrentPassword.visibility = if (!isToCreatePassword) View.VISIBLE else View.GONE
-
-            CancelButton.setOnClickListener {
-                setResult(Activity.RESULT_CANCELED)
-                finish()
-            }
 
             showKeyboard(CurrentPassword)
         }
@@ -87,6 +81,11 @@ class PasswordActivity : BaseActivity() {
             }
 
         })
+
+        CancelButton.setOnClickListener {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+        }
 
         ConfirmButton.setOnClickListener {
             if (isNewPasswordValid(NewPassword.text.toString(), ConfirmPassword.text.toString())){

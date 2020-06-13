@@ -6,12 +6,12 @@ import com.smttcn.safebox.MyApplication
 internal class Authenticator() {
 
     fun isAppPasswordHashExist(): Boolean {
-        return MyApplication.getBaseConfig().appPasswordHash.length > 20
+        return MyApplication.baseConfig.appPasswordHash.length > 20
     }
 
 
     fun authenticateAppPassword(password: String, callback: (success: Boolean) -> Unit) {
-        val hashed_password = MyApplication.getBaseConfig().appPasswordHash
+        val hashed_password = MyApplication.baseConfig.appPasswordHash
 
         val hasher = Hashing()
 
@@ -29,8 +29,8 @@ internal class Authenticator() {
     fun removeAppPassword(currentPassword: String, callback: (success: Boolean) -> Unit) {
         authenticateAppPassword(currentPassword) {
             if (it == true) {
-                MyApplication.getBaseConfig().removePrefKey(APP_PASSWORD_HASH_01)
-                MyApplication.getBaseConfig().removePrefKey(APP_PASSWORD_HASH_02)
+                MyApplication.baseConfig.removePrefKey(APP_PASSWORD_HASH_01)
+                MyApplication.baseConfig.removePrefKey(APP_PASSWORD_HASH_02)
                 callback(true)
             } else {
                 callback(false)
@@ -58,8 +58,8 @@ internal class Authenticator() {
         val hashedPasswordWithSalt = hasher.hashWithSaltWithVerification(newPassword)
         if (hashedPasswordWithSalt != null)
         {
-            MyApplication.getBaseConfig().appPasswordHashBackup = MyApplication.getBaseConfig().appPasswordHash
-            MyApplication.getBaseConfig().appPasswordHash = hashedPasswordWithSalt
+            MyApplication.baseConfig.appPasswordHashBackup = MyApplication.baseConfig.appPasswordHash
+            MyApplication.baseConfig.appPasswordHash = hashedPasswordWithSalt
             callback(true)
         } else {
             callback(false)

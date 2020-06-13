@@ -10,7 +10,7 @@ class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!MyApplication.isAuthenticated()) finish()
+        if (!MyApplication.authenticated) finish()
         initActivity()
         initActivityUI()
     }

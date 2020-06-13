@@ -5,10 +5,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.smttcn.commons.extensions.*
-import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.ui.security.LoginActivity
-import com.smttcn.safebox.ui.main.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import java.io.File
@@ -21,7 +19,7 @@ import java.io.FileInputStream
 abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     var actionOnPermission: ((granted: Boolean) -> Unit)? = null
     var isAskingPermissions = false
-    var authenticationException = false
+    var authenticationExempted = false
     var isToCreatePassword = false
     private var sessionDepth = 0
     private val GENERIC_PERM_HANDLER = 100
@@ -48,10 +46,11 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
     override fun onResume() {
         super.onResume()
 
-        if (!authenticationException
+        // app requires authentication and not in one of these several activities/states
+        // which allows anonymous access, so redirect to login screen
+        if (!authenticationExempted
             && !isToCreatePassword
-            && MyApplication.getBaseConfig().enableAppPassword == true
-            && !MyApplication.isAuthenticated()) {
+            && !MyApplication.authenticated) {
             performAuthentication()
         }
     }

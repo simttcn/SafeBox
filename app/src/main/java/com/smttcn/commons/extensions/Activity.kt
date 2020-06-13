@@ -27,11 +27,11 @@ import com.smttcn.safebox.MyApplication
 import java.io.*
 
 fun Activity.appLaunched(appId: String) {
-    MyApplication.getBaseConfig().appId = appId
-    if (MyApplication.getBaseConfig().appRunCount == 0) {
+    MyApplication.baseConfig.appId = appId
+    if (MyApplication.baseConfig.appRunCount == 0) {
         // first run
     }
-    MyApplication.getBaseConfig().appRunCount++
+    MyApplication.baseConfig.appRunCount++
 }
 
 fun Activity.launchViewIntent(id: Int) = launchViewIntent(getString(id))

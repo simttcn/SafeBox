@@ -40,7 +40,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         innt.data = _file.toUri()
         innt.type = _file.getMimeType()
 
-        val pm : PackageManager = MyApplication.getAppContext().packageManager
+        val pm : PackageManager = MyApplication.applicationContext.packageManager
         val matches: List<ResolveInfo> = pm.queryIntentActivities(innt, 0)
         for (match in matches) {
             thumbnailDrawable = match.loadIcon(pm)

@@ -55,13 +55,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun toggleEnableAppPasswordActivity(preference: SwitchPreferenceCompat?) {
         if (preference!!.isChecked){
-            changeAppPassword!!.isEnabled = true
-            //todo: ask user for a new app password
             redirectToNewPasswordActivity()
 
         } else {
             changeAppPassword!!.isEnabled = false
-            //todo: ask for current app password before removing the app password
+            //todo plan: ask for current app password before removing the app password
             Authenticator().removeAppPassword("111111") {
 
             }
@@ -108,8 +106,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             // Make sure the request was successful
             if (resultCode == Activity.RESULT_OK) {
 
+                changeAppPassword!!.isEnabled = true
+
                 // The user set a password, so automatically log user it
-                MyApplication.globalAppAuthenticated = "yes"
+                MyApplication.authenticated = true
                 MaterialDialog(myContext).show {
                     title(R.string.dlg_title_success)
                     message(R.string.dlg_msg_new_app_password_success)
@@ -118,15 +118,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
                 }
 
-            } else {
+            } else if (resultCode == Activity.RESULT_CANCELED){
 
-                // password not set, so turn off the app password feature
+                // User cancelled password creation
                 enabledAppPassword!!.isChecked = false
+                changeAppPassword!!.isEnabled = false
 
             }
 
         }
-
     }
 
 }

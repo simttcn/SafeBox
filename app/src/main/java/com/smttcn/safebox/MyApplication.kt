@@ -3,7 +3,6 @@ package com.smttcn.safebox
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.helpers.BaseConfig
@@ -12,39 +11,44 @@ import com.smttcn.commons.helpers.PREFS_KEY
 class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
     companion object {
-        var globalAppAuthenticated: String = "no"
-        lateinit var mainActivityContext: Context
         private var instance: MyApplication? = null
-        private var baseConfig: BaseConfig? = null
+        private var _authenticated: Boolean = false
+        private var _mainActivityContext: Context? = null
+        private var _baseConfig: BaseConfig? = null
 
-        fun getMainContext(): Context {
-            return mainActivityContext
-        }
+        var mainActivityContext: Context
+            get() =_mainActivityContext!!
+            set(value) { _mainActivityContext = value }
 
-        fun setMainContext(context: Context): Unit {
-            mainActivityContext = context
+        var applicationContext: Context
+            get() = instance!!.applicationContext
+            private set(value) {}
 
-        }
-
-        fun getAppContext() : Context = instance!!.applicationContext
-
-        fun getBaseConfig() : BaseConfig {
-            if (baseConfig != null)
-                return baseConfig!!
-            else {
-                if (instance != null) {
-                    val prefs = instance!!.applicationContext.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
-                    baseConfig = BaseConfig.newInstance(prefs)
+        var baseConfig: BaseConfig
+            get() {
+                return if (_baseConfig != null)
+                    _baseConfig!!
+                else {
+                    if (instance != null) {
+                        val prefs = instance!!.applicationContext.getSharedPreferences(
+                            PREFS_KEY,
+                            Context.MODE_PRIVATE
+                        )
+                        _baseConfig = BaseConfig.newInstance(prefs)
+                    }
+                    _baseConfig!!
                 }
-                return baseConfig!!
             }
-        }
+            private set(value) {}
 
-        fun isAuthenticated(): Boolean {
-            return getBaseConfig().enableAppPassword == false || globalAppAuthenticated.equals("yes")
-        }
+        var authenticated: Boolean
+            get() {
+                return baseConfig.appPasswordEnabled == false || _authenticated
+            }
+            set(value) { _authenticated = value }
+
         fun lockApp() {
-            globalAppAuthenticated = "no"
+            _authenticated = false
             FileManager.deleteCache()
         }
     }
