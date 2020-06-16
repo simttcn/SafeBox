@@ -99,6 +99,7 @@ dependencies {
     // UI
     def materialVersion = "1.0.0"
     implementation "com.google.android.material:material:$materialVersion"
+//    implementation "androidx.recyclerview:recyclerview:1.2.0-alpha03"
 
 
 //    // Room components

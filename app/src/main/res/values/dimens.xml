@@ -7,7 +7,7 @@
 
     <dimen name="itemlist_thumbnail_height">48dp</dimen>
     <dimen name="itemlist_thumbnail_width">48dp</dimen>
-    <dimen name="itemlist_textsize">26sp</dimen>
+    <dimen name="itemlist_textsize">16sp</dimen>
     <dimen name="itemlist_filename_padding_horizontal">8dp</dimen>
     <dimen name="itemlist_filename_padding_vertical">4dp</dimen>
     <dimen name="itemlist_padding_horizontal">4dp</dimen>
@@ -16,5 +16,8 @@
     <!-- Custom view -->
     <dimen name="customTitle">14sp</dimen>
     <dimen name="customEntry">16sp</dimen>
+
+    <!-- default activity -->
+    <dimen name="activity_font_size">16sp</dimen>
 
 </resources>

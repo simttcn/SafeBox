@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.OpenableColumns
+import androidx.lifecycle.MutableLiveData
 import com.smttcn.commons.crypto.Encryption
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.APP_ENCRYPT_VAR0

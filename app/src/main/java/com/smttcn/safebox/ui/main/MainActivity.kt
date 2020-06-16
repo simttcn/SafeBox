@@ -1,5 +1,6 @@
 package com.smttcn.safebox.ui.main
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.snackbar.Snackbar
 import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.Manager.ImageManager
@@ -22,12 +24,12 @@ import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.getDrawableCompat
 import com.smttcn.commons.extensions.getFilenameFromPath
 import com.smttcn.commons.extensions.toast
-import com.smttcn.commons.helpers.INTERVAL_BACK_BUTTON_QUIT_IN_MS
-import com.smttcn.commons.helpers.TEMP_PASSWORD
+import com.smttcn.commons.helpers.*
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
+import com.smttcn.safebox.ui.security.EncryptingActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.FileItemViewModel
 import kotlinx.android.synthetic.main.activity_main.*
@@ -37,6 +39,7 @@ import java.io.File
 class MainActivity : BaseActivity() {
 
     private lateinit var fileItemViewModel: FileItemViewModel
+    private lateinit var recyclerViewAdapter: FileItemAdapter
     private var IsShareFromOtherApp = false
 
     var BackButtonPressedOnce = false
@@ -62,18 +65,20 @@ class MainActivity : BaseActivity() {
         MyApplication.mainActivityContext = this
 
         IsShareFromOtherApp = if (intent?.action == Intent.ACTION_SEND) true else false
+
         if (IsShareFromOtherApp) {
-            handleShareFrom()
+            IsShareFromOtherApp = false
+            handleShareFromOtherApp()
         }
     }
 
     private fun initializeUI() {
         val recyclerView = findViewById<RecyclerView>(R.id.itemListRecyclerView)
-        val adapter = FileItemAdapter(this)
-        recyclerView.adapter = adapter
+        recyclerViewAdapter = FileItemAdapter(this)
+        recyclerView.adapter = recyclerViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter.onItemClick = { view, item ->
+        recyclerViewAdapter.onItemClick = { view, item ->
             onRecyclerItemClicked(view, item)
         }
 
@@ -81,28 +86,20 @@ class MainActivity : BaseActivity() {
 
         fileItemViewModel.allFileItems.observe(this, Observer { item ->
             // Update the cached copy of the fileItems in the adapter.
-            item?.let { adapter.setFileItems(it) }
+            item?.let { recyclerViewAdapter.setFileItems(it) }
         })
     }
 
-    private fun handleShareFrom(): Boolean {
+    private fun handleShareFromOtherApp(): Boolean {
         var result: Boolean = true
 
-        var encryptedFilepath = encryptSharedFile(TEMP_PASSWORD.toCharArray())
-        if (!FileManager.isFileExist(encryptedFilepath)
-            || !FileManager.isEncryptedFile(File(encryptedFilepath)))
-            result = false
+        val newIntent = Intent(this, EncryptingActivity::class.java)
+        (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
+            newIntent.putExtra(INTENT_SHARE_FILE_URI, it)
+        }
+        startActivityForResult(newIntent, REQUEST_CODE_TO_ENCRYPT_FILE)
 
         return result
-    }
-
-    private fun encryptSharedFile(pwd: CharArray) : String {
-        //if (intent.type?.startsWith("image/") == true) {
-        (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
-            return FileManager.encryptFileFromUriToFolder(contentResolver, pwd, it)
-        }
-        //}
-        return ""
     }
 
     override fun onBackPressed() {
@@ -132,7 +129,7 @@ class MainActivity : BaseActivity() {
                 return true
             }
             R.id.menu_refresh -> {
-                refreshDbItemList()
+                refreshFileItemList()
                 return true
             }
             R.id.menu_settings -> {
@@ -210,21 +207,8 @@ class MainActivity : BaseActivity() {
 
     }
 
-    fun refreshDbItemList() {
-        // Todo: how to do manual refresh of database?
-        //AppDatabase.refresh()
-//        val dt: String = SimpleDateFormat("hhmmss_SSS").format(Date())
-//        val fileItem = FileDirItem(
-//            fileName = "filename_" + dt,
-//            hashedFileName = "hashed_" + dt,
-//            isFolder = true,
-//            fullPathWithFilename = "",
-//            salt = "",
-//            size = 0,
-//            thumbnail = null
-//        )
-//
-//        fileItemViewModel.insert(dbItem)
+    fun refreshFileItemList() {
+        fileItemViewModel.refresh()
     }
 
     fun showProgressBar(show: Boolean) {
@@ -238,4 +222,36 @@ class MainActivity : BaseActivity() {
     }
 
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, resultData)
+        // Check which request we're responding to
+        if (requestCode == REQUEST_CODE_TO_ENCRYPT_FILE) {
+
+            if (resultCode == Activity.RESULT_OK) {
+
+                refreshFileItemList()
+
+                // file encrypted
+                MaterialDialog(this).show {
+                    title(R.string.enc_title_encrypting_file)
+                    message(R.string.enc_msg_encrypting_success)
+                    positiveButton(R.string.btn_ok)
+                    cancelable(false)  // calls setCancelable on the underlying dialog
+                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+                }
+
+            } else if (resultCode == Activity.RESULT_CANCELED){
+
+                // User cancelled encrypting file
+                MaterialDialog(this).show {
+                    title(R.string.enc_title_encrypting_file)
+                    message(R.string.enc_msg_encrypting_cancelled)
+                    positiveButton(R.string.btn_ok)
+                    cancelable(false)  // calls setCancelable on the underlying dialog
+                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+                }
+
+            }
+        }
+    }
 }

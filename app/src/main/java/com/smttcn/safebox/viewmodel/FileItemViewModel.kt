@@ -9,28 +9,31 @@ import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import kotlinx.coroutines.launch
+import java.io.File
+import java.util.*
 
 // Class extends AndroidViewModel and requires application as a parameter.
 class FileItemViewModel(application: Application) : AndroidViewModel(application) {
 
-    var app : Application
-    lateinit var allFileItems: LiveData<List<FileDirItem>>
+    private var app : Application
+    lateinit var allFileItems: MutableLiveData<List<FileDirItem>>
 
     init {
         app = application
         initViewModel()
     }
 
-    fun reload() {
-        initViewModel()
+    private fun initViewModel() {
+        allFileItems = MutableLiveData(refreshDocFolder())
     }
 
-    private fun initViewModel() {
-        var allItems : MutableLiveData<List<FileDirItem>>
+    private fun refreshDocFolder() : List<FileDirItem> {
+        return FileManager.getFileDirItemsInDocumentRoot()
+    }
 
-        allItems = MutableLiveData<List<FileDirItem>>(FileManager.getFileDirItemsInDocumentRoot())
-
-        allFileItems = allItems
+    fun refresh() = viewModelScope.launch {
+        // note: Important!!! Use setValue() to update value and dispatch change notification to the observer
+        allFileItems.setValue(refreshDocFolder())
     }
 
 }

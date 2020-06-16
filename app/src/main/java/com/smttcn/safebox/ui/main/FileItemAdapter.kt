@@ -14,10 +14,9 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var fileItems = emptyList<FileDirItem>() // Cached copy of FileDirItems
-    var onItemClick: ((View, FileDirItem) -> Unit)? = null // to point to the onItemClick method in MainActivity
-    val currentContext = context
+    private val currentContext = context
 
-    override fun getItemCount() = fileItems.size
+    var onItemClick: ((View, FileDirItem) -> Unit)? = null // to point to the onItemClick method in MainActivity
 
     inner class FileItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -27,16 +26,31 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
                 onItemClick?.invoke(it, fileItems[adapterPosition])
             }
         }
+
+        fun bindItem(item: FileDirItem) {
+            if (item.thumbnailDrawable != null)
+                itemView.item_thumbnail.setImageDrawable(item.thumbnailDrawable)
+            else
+                itemView.item_thumbnail.setImageResource(R.drawable.ic_image_gray_24dp)
+
+            itemView.item_name.text = item.filename
+        }
+
+
+    }
+
+    override fun getItemCount(): Int {
+        return fileItems.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileItemViewHolder {
-        val inflatedView = inflater.inflate(R.layout.recyclerview_item, parent, false)
-        return FileItemViewHolder(inflatedView)
+        var holder = FileItemViewHolder(inflater.inflate(R.layout.recyclerview_item, parent, false))
+        return holder
     }
 
     override fun onBindViewHolder(holder: FileItemViewHolder, position: Int) {
-        val current = fileItems[position]
-        holder.bindItem(currentContext, current)
+        val current = fileItems.get(position)
+        holder.bindItem(current)
     }
 
     internal fun setFileItems(items: List<FileDirItem>) {
@@ -44,14 +58,4 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
         notifyDataSetChanged()
     }
 
-}
-
-@Suppress("UNUSED_PARAMETER")
-fun FileItemAdapter.FileItemViewHolder.bindItem(context: Context, item: FileDirItem) {
-    if (item.thumbnailDrawable != null)
-        itemView.item_thumbnail.setImageDrawable(item.thumbnailDrawable)
-    else
-        itemView.item_thumbnail.setImageResource(R.drawable.ic_image_gray_24dp)
-
-    itemView.item_name.text = item.filename
 }
