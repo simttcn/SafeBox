@@ -11,6 +11,7 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -21,14 +22,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.Manager.ImageManager
 import com.smttcn.commons.activities.BaseActivity
-import com.smttcn.commons.extensions.getDrawableCompat
-import com.smttcn.commons.extensions.getFilenameFromPath
-import com.smttcn.commons.extensions.toast
+import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
+import com.smttcn.safebox.ui.security.DecryptingActivity
 import com.smttcn.safebox.ui.security.EncryptingActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.FileItemViewModel
@@ -41,6 +41,7 @@ class MainActivity : BaseActivity() {
     private lateinit var fileItemViewModel: FileItemViewModel
     private lateinit var recyclerViewAdapter: FileItemAdapter
     private var IsShareFromOtherApp = false
+    private lateinit var toolbarMenu: Menu
 
     var BackButtonPressedOnce = false
     var LastPressedBackTime = System.currentTimeMillis()
@@ -78,8 +79,8 @@ class MainActivity : BaseActivity() {
         recyclerView.adapter = recyclerViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        recyclerViewAdapter.onItemClick = { view, item ->
-            onRecyclerItemClicked(view, item)
+        recyclerViewAdapter.onItemClick = { view, item, prevIdx, currIdx ->
+            onRecyclerItemClicked(view, item, prevIdx, currIdx)
         }
 
         fileItemViewModel = ViewModelProviders.of(this).get(FileItemViewModel::class.java)
@@ -117,6 +118,8 @@ class MainActivity : BaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
+        toolbarMenu = menu
+
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -145,10 +148,20 @@ class MainActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun onRecyclerItemClicked(view: View, item : FileDirItem) {
-        // Todo: to ask for password and them open it
+    @Suppress("UNUSED_PARAMETER")
+    private fun onRecyclerItemClicked(view: View, item : FileDirItem, prevIdx: Int, currIdx: Int) {
+        // Todo future: to decide whether should allow user to open just by taping on it.
 
+        view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
         toast(item.filename + " clicked")
+
+        // update toolbar icon status
+        if (recyclerViewAdapter.getSelectedItemCount() > 0) {
+            toolbarMenu.findItem(R.id.menu_share).setEnabled(true);
+        } else {
+            toolbarMenu.findItem(R.id.menu_share).setEnabled(false);
+        }
+
 //        val targetfile = item.path
 //        if (targetfile.length > 0) {
 //            val imagePaths = listOf(targetfile)
@@ -169,37 +182,35 @@ class MainActivity : BaseActivity() {
 
     }
 
-    // todo: to further define the share routine to share all type of files
     private fun shareItem() {
 
-        //todo: choose to share file decrypted or as it is
-        var password : CharArray = TEMP_PASSWORD.toCharArray()
+        if (recyclerViewAdapter.getSelectedItemCount() < 1) return
 
-        val files = FileManager.getFilesInDocumentRoot()
+        var selectedItem = recyclerViewAdapter.getSelectedItem()
 
-        if (files.isEmpty()) return
+        if (selectedItem != null) {
+            // pass the selected file to decrypting activity for processing
+            val newIntent = Intent(this, DecryptingActivity::class.java)
+            newIntent.putExtra(INTENT_SHARE_FILE_PATH, selectedItem.path)
+            startActivityForResult(newIntent, REQUEST_CODE_TO_DECRYPT_FILE)
 
-        var decryptedFilepath: String = ""
-        val filename = files[0].name.getFilenameFromPath()
-        val filepath = FileManager.toFullPathInDocumentRoot(filename)
-        val targetfile = File(filepath)
-
-        val targetpath = FileManager.getFolderInCacheFolder("temp_file_share", true)
-        if (targetfile.length() > 0 && targetpath != null) {
-            decryptedFilepath = FileManager.decryptFile(targetfile, password, targetpath.canonicalPath, false)
         }
 
-        if (decryptedFilepath.isNotEmpty()) {
-            val AUTHORITY = "com.simttcn.safebox.fileprovider"
+    }
 
-            val file = File(decryptedFilepath)
+    fun sendShareItent(filepath: String) {
+
+        if (filepath.isNotEmpty()) {
+            val AUTHORITY = "com.smttcn.safebox.fileprovider"
+
+            val file = File(filepath)
             val contentUri = FileProvider.getUriForFile(applicationContext, AUTHORITY, file)
             // create new Intent
             val sharingIntent = Intent(Intent.ACTION_SEND)
             // set flag to give temporary permission to external app to use your FileProvider
             sharingIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             // I am opening a PDF file so I give it a valid MIME type
-            sharingIntent.setDataAndType(contentUri, "image/jpeg");
+            sharingIntent.setDataAndType(contentUri, filepath.getMimeType());
             sharingIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
             // start sharing activity sheet
             startActivity(Intent.createChooser(sharingIntent, "Share Image"));
@@ -232,26 +243,40 @@ class MainActivity : BaseActivity() {
                 refreshFileItemList()
 
                 // file encrypted
-                MaterialDialog(this).show {
-                    title(R.string.enc_title_encrypting_file)
-                    message(R.string.enc_msg_encrypting_success)
-                    positiveButton(R.string.btn_ok)
-                    cancelable(false)  // calls setCancelable on the underlying dialog
-                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-                }
+                showMessageDialog(this,
+                    R.string.enc_title_encrypting_file,
+                    R.string.enc_msg_encrypting_success){}
 
             } else if (resultCode == Activity.RESULT_CANCELED){
-
                 // User cancelled encrypting file
-                MaterialDialog(this).show {
-                    title(R.string.enc_title_encrypting_file)
-                    message(R.string.enc_msg_encrypting_cancelled)
-                    positiveButton(R.string.btn_ok)
-                    cancelable(false)  // calls setCancelable on the underlying dialog
-                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+                showMessageDialog(this,
+                    R.string.enc_title_encrypting_file,
+                    R.string.enc_msg_encrypting_cancelled){}
+
+            }
+        } else if (requestCode == REQUEST_CODE_TO_DECRYPT_FILE) {
+
+            if (resultCode == Activity.RESULT_OK) {
+
+                if (resultData != null) {
+                    var filePath = resultData.getStringExtra(INTENT_SHARE_FILE_PATH)
+                    sendShareItent((filePath))
+                } else {
+
                 }
+
+            } else if (resultCode == INTENT_RESULT_FAILED) {
+                // failed to decrypt file, possibly wrong password
+                showMessageDialog(this,
+                    R.string.enc_title_decrypting_file,
+                    R.string.enc_enter_decrypting_password_error){}
+
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // user cancel share operation
 
             }
         }
     }
+
+
 }

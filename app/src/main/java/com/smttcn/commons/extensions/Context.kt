@@ -32,6 +32,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.loader.content.CursorLoader
+import com.afollestad.materialdialogs.MaterialDialog
 import com.smttcn.safebox.R
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
@@ -64,6 +65,18 @@ private fun doToast(context: Context, message: String, length: Int) {
         }
     } else {
         Toast.makeText(context, message, length).show()
+    }
+}
+
+fun showMessageDialog(context: Context, TitleID: Int, MessageID: Int, callback: () -> Unit){
+    MaterialDialog(context).show {
+        title(TitleID)
+        message(MessageID)
+        positiveButton(R.string.btn_ok)
+        cancelable(false)  // calls setCancelable on the underlying dialog
+        cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+    }.positiveButton {
+        callback()
     }
 }
 

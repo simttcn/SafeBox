@@ -3,8 +3,6 @@ package com.smttcn.commons.helpers
 import android.os.Build
 import android.os.Looper
 
-const val TEMP_PASSWORD = "123456" //todo: temp password from testing
-
 const val APP_NAME = "app_name"
 const val APP_LICENSES = "app_licenses"
 const val APP_FAQ = "app_faq"
@@ -36,6 +34,8 @@ const val REQUEST_CODE_TO_DECRYPT_FILE = 130
 const val INTENT_CALL_FROM_MAINACTIVITY = "call_from_mainactivity"
 const val INTENT_TO_CREATE_APP_PASSWORD = "to_create_app_password"
 const val INTENT_SHARE_FILE_URI = "share_file_uri"
+const val INTENT_SHARE_FILE_PATH = "share_file_path"
+const val INTENT_RESULT_FAILED = 99999
 
 // date and time
 const val USE_24_HOUR_FORMAT = "use_24_hour_format"

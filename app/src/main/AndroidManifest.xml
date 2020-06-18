@@ -47,12 +47,16 @@
             android:name=".ui.security.EncryptingActivity"
             android:label="@string/enc_encrypting_password"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.security.DecryptingActivity"
+            android:label="@string/enc_decrypting_password"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.settings.SettingsActivity" />
         <activity android:name=".ui.debug.DebugconsoleActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.simttcn.safebox.fileprovider"
+            android:authorities="com.smttcn.safebox.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

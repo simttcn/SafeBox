@@ -20,11 +20,10 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
             get() =_mainActivityContext!!
             set(value) { _mainActivityContext = value }
 
-        var applicationContext: Context
+        val applicationContext: Context
             get() = instance!!.applicationContext
-            private set(value) {}
 
-        var baseConfig: BaseConfig
+        val baseConfig: BaseConfig
             get() {
                 return if (_baseConfig != null)
                     _baseConfig!!
@@ -39,7 +38,6 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
                     _baseConfig!!
                 }
             }
-            private set(value) {}
 
         var authenticated: Boolean
             get() {
@@ -49,6 +47,9 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
         fun lockApp() {
             _authenticated = false
+        }
+
+        fun cleanUp() {
             FileManager.deleteCache()
         }
     }

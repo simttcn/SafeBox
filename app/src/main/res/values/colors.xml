@@ -2,8 +2,9 @@
 <resources>
     <color name="colorWhite">#FFFFFF</color>
 
+    <color name="colorPrimaryLight">#1DBFAE</color>
     <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimaryDark">#014A40</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorBackground">@color/colorWhite</color>
     <color name="colorText">#202020</color>
@@ -12,6 +13,9 @@
     <color name="colorNavItemBackgroundUncheck">@color/colorPrimary</color>
     <color name="colorNavItemTextColorCheck">@color/colorPrimary</color>
     <color name="colorNavItemTextColorUncheck">@color/colorWhite</color>
+
+    <color name="colorItemBackgroundSelected">#6ADDD1</color>
+    <color name="colorItemBackgroundNormal">@color/colorWhite</color>
 
     <color name="black_overlay">#66000000</color>
 

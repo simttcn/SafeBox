@@ -286,6 +286,7 @@ fun String.getMimeType(): String {
         put("dxr", "application/x-director")
         put("eml", "message/rfc822")
         put("emz", "application/octet-stream")
+        put("enc", "application/safebox")
         put("eot", "application/vnd.ms-fontobject")
         put("eps", "application/postscript")
         put("etl", "application/etl")

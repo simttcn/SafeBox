@@ -43,12 +43,12 @@
     <string name="enc_enter_a_password">Enter a password</string>
     <string name="enc_confirm_your_password">Confirm your password</string>
     <string name="enc_decrypting_password">Decrypting Password</string>
-    <string name="enc_enter_decrypting_password_error">Decrypting password incorrect, please try again.</string>
+    <string name="enc_enter_decrypting_password_error">Decrypting failed, possibly incorrect password, please try again.</string>
     <string name="enc_msg_encrypting_password">Please enter a password to encrypt this file.</string>
     <string name="enc_msg_decrypting_password">Please enter the password to decrypt this file</string>
-    <string name="enc_warning_encrypting_password">Warning: if you forget this password, your encrypt file will be unrecoverable and as good as gone. so please choose your password carefully and remember it.</string>
+    <string name="enc_warning_encrypting_password">Warning: if you forget this password, your encrypted file will be unrecoverable and as good as gone unless you have a backup somewhere else. so please choose your password carefully.</string>
     <string name="btn_encrypt_file">Encrypt file</string>
-    <string name="btn_decrypt_file">Decrypt file</string>
+    <string name="btn_decrypt_file">Decrypt and share</string>
     <string name="enc_title_encrypting_file">Encrypting File</string>
     <string name="enc_title_decrypting_file">Decrypting File</string>
     <string name="enc_msg_encrypting_success">File succesfully encrypted</string>

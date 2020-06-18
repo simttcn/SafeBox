@@ -13,6 +13,7 @@ import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.afollestad.materialdialogs.MaterialDialog
 import com.smttcn.commons.Manager.FileManager
+import com.smttcn.commons.extensions.showMessageDialog
 import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.commons.helpers.INTENT_TO_CREATE_APP_PASSWORD
 import com.smttcn.safebox.MyApplication
@@ -125,7 +126,10 @@ class PasswordActivity : BaseActivity() {
                                         setResult(Activity.RESULT_OK)
                                         finish()
                                     } else {
-                                        showChangePasswordDialog(R.string.dlg_msg_change_app_password_error) {
+                                        showMessageDialog(this,
+                                            R.string.dlg_title_change_app_password,
+                                            R.string.dlg_msg_change_app_password_error)
+                                        {
                                             CurrentPassword.selectAll()
                                             showKeyboard(CurrentPassword)
                                         }
@@ -144,7 +148,10 @@ class PasswordActivity : BaseActivity() {
                             }
                         }
                     } else {
-                        showChangePasswordDialog(R.string.dlg_msg_change_app_password_incorrect) {
+                        showMessageDialog(this,
+                            R.string.dlg_title_change_app_password,
+                            R.string.dlg_msg_change_app_password_incorrect)
+                        {
                             CurrentPassword.selectAll()
                             showKeyboard(CurrentPassword)
                         }

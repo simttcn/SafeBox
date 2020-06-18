@@ -106,18 +106,6 @@ class EncryptingActivity: BaseActivity() {
 
     }
 
-    private fun showMessageDialog(stringID: Int, callback: () -> Unit){
-        MaterialDialog(this).show {
-            title(R.string.dlg_title_change_app_password)
-            message(stringID)
-            positiveButton(R.string.btn_ok)
-            cancelable(false)  // calls setCancelable on the underlying dialog
-            cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-        }.positiveButton {
-            callback()
-        }
-    }
-
     private fun toEnableOkButton(encryptingPassword: String, confirmPassword: String) {
         val okButton = findViewById<Button>(R.id.ok)
         okButton.isEnabled = isEncryptingPasswordValid(encryptingPassword, confirmPassword)

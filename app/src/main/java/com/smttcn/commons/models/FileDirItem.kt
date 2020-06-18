@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import androidx.core.net.toUri
+import com.google.gson.Gson
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import com.smttcn.safebox.MyApplication
@@ -28,6 +29,8 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
     var thumbnailDrawable: Drawable? = null
     var fileIntentLabel: String = ""
 
+    var isSelected: Boolean = false
+
     init {
         path = _file.canonicalPath
         filename = _file.name
@@ -36,6 +39,8 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         size = _file.length()
         modified = _file.lastModified()
         mimeType = _file.getMimeType()
+
+        isSelected = false
 
         val innt = Intent(Intent.ACTION_VIEW)
         innt.data = _file.toUri()
@@ -100,4 +105,9 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
     fun getDirectChildrenCount(countHiddenItems: Boolean) = File(path).getDirectChildrenCount(countHiddenItems)
 
     fun getParentPath() = path.getParentPath()
+
+    fun deepcopy(): FileDirItem {
+        val JSON = Gson().toJson(this)
+        return Gson().fromJson(JSON, FileDirItem::class.java)
+    }
 }

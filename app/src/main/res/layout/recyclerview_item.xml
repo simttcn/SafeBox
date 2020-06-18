@@ -8,7 +8,8 @@
     android:paddingTop="@dimen/itemlist_padding_vertical"
     android:paddingEnd="@dimen/itemlist_padding_horizontal"
     android:paddingRight="@dimen/itemlist_padding_horizontal"
-    android:paddingBottom="@dimen/itemlist_padding_vertical">
+    android:paddingBottom="@dimen/itemlist_padding_vertical"
+    android:background="@color/colorWhite">
 
     <ImageView
         android:id="@+id/item_background"
@@ -29,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="@dimen/itemlist_thumbnail_width"
-        android:background="@android:color/white"
+        android:background="@android:color/transparent"
         android:paddingStart="@dimen/itemlist_filename_padding_horizontal"
         android:paddingLeft="@dimen/itemlist_filename_padding_horizontal"
         android:paddingTop="@dimen/itemlist_filename_padding_vertical"
