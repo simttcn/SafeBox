@@ -37,6 +37,17 @@
         android:paddingEnd="@dimen/itemlist_filename_padding_horizontal"
         android:paddingRight="@dimen/itemlist_filename_padding_horizontal"
         android:paddingBottom="@dimen/itemlist_filename_padding_vertical"
+        android:layout_marginEnd="@dimen/popupmenu_width"
         android:text="@string/itemlist_default_text"
         android:textSize="@dimen/itemlist_textsize" />
+
+    <ImageButton
+        android:id="@+id/popup_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_action_more_vert_gray_24dp"
+        android:contentDescription="@string/menu_more" />
+
 </FrameLayout>

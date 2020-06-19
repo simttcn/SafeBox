@@ -15,6 +15,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
         private var _authenticated: Boolean = false
         private var _mainActivityContext: Context? = null
         private var _baseConfig: BaseConfig? = null
+        private var _isSharingItem: Boolean = false
 
         var mainActivityContext: Context
             get() =_mainActivityContext!!
@@ -45,13 +46,22 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
             }
             set(value) { _authenticated = value }
 
+        var isSharingItem: Boolean
+            get() = _isSharingItem
+            set(value) {_isSharingItem = value}
+
         fun lockApp() {
             _authenticated = false
+
+            if (_isSharingItem) {
+                // in the process of sharing item so do not clear cache
+                // reset the flag so we will clear the cache next time
+                _isSharingItem = false
+            } else {
+                FileManager.deleteCache()
+            }
         }
 
-        fun cleanUp() {
-            FileManager.deleteCache()
-        }
     }
 
     var activityReferences: Int = 0

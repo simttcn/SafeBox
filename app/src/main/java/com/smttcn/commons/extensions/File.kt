@@ -1,7 +1,9 @@
 package com.smttcn.commons.extensions
 
+import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.helpers.*
 import com.smttcn.commons.models.FileDirItem
+import com.smttcn.safebox.R
 import java.io.File
 
 fun File.isMediaFile() = absolutePath.isImageFast() || absolutePath.isVideoFast() || absolutePath.isGif() || absolutePath.isRawFast() || absolutePath.isSvg()
@@ -76,6 +78,11 @@ private fun getDirectoryFileCount(dir: File, countHiddenItems: Boolean, includeD
 fun File.getDirectChildrenCount(countHiddenItems: Boolean) = listFiles()?.filter { if (countHiddenItems) true else !it.isHidden }?.size ?: 0
 
 fun File.toFileDirItem() = FileDirItem(this)
+
+fun File.copyToFolder(targetFolder: File): File {
+    val targetFile = File(targetFolder!!.canonicalPath.appendPath(this.name))
+    return this.copyTo(targetFile)
+}
 
 fun File.containsNoMedia() = isDirectory && File(this, NOMEDIA).exists()
 

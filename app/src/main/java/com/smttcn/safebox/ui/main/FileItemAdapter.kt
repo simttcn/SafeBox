@@ -2,6 +2,7 @@ package com.smttcn.safebox.ui.main
 
 import android.content.Context
 import android.graphics.Color
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,12 +15,13 @@ import kotlinx.android.synthetic.main.recyclerview_item.view.*
 class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adapter<FileItemAdapter.FileItemViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var fileItems = emptyList<FileDirItem>() // Cached copy of FileDirItem
+    private lateinit var fileItems: MutableList<FileDirItem> // Cached copy of FileDirItem
     private val currentContext = context
     private var currSelectedItemIndex = -1
     private var prevSelectedItemIndex = -1
 
     var onItemClick: ((View, FileDirItem, Int, Int) -> Unit)? = null // to point to the onItemClick method in MainActivity
+    var onItemPopupMenuClick: ((View, FileDirItem, Int) -> Unit)? = null // to point to the onItemClick method in MainActivity
 
     inner class FileItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -29,12 +31,15 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
                 prevSelectedItemIndex = currSelectedItemIndex
                 currSelectedItemIndex = absoluteAdapterPosition
 
+                /*
+                // disable item selection because we perform action via context menu now
                 if (prevSelectedItemIndex >= 0 && prevSelectedItemIndex != currSelectedItemIndex) {
                     fileItems[prevSelectedItemIndex].isSelected = false
-                    notifyItemChanged(prevSelectedItemIndex)
                 }
-
                 fileItems[currSelectedItemIndex].isSelected = !fileItems[currSelectedItemIndex].isSelected
+                */
+
+                notifyItemChanged(prevSelectedItemIndex)
                 notifyItemChanged(currSelectedItemIndex)
 
                 // invoke the onItemClick method in MainActivity
@@ -58,7 +63,6 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
             }
         }
 
-
     }
 
     override fun getItemCount(): Int {
@@ -71,8 +75,13 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: FileItemViewHolder, position: Int) {
-        val current = fileItems.get(position)
-        holder.bindItem(current)
+        val currentItem = fileItems.get(position)
+        holder.itemView.popup_menu.setOnClickListener {
+
+            onItemPopupMenuClick?.invoke(holder.itemView, currentItem, position)
+
+        }
+        holder.bindItem(currentItem)
     }
 
     fun getSelectedItem(): FileDirItem? {
@@ -94,8 +103,13 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
         return count
     }
 
-    internal fun setFileItems(items: List<FileDirItem>) {
+    internal fun setFileItems(items: MutableList<FileDirItem>) {
         this.fileItems = items
+        notifyDataSetChanged()
+    }
+
+    internal fun deleteFileItem(position: Int) {
+        this.fileItems.removeAt(position)
         notifyDataSetChanged()
     }
 

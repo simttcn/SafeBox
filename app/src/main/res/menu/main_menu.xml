@@ -4,13 +4,6 @@
     tools:context="com.smttcn.myapplication.MainActivity">
 
     <item
-        android:id="@+id/menu_share"
-        android:orderInCategory="90"
-        android:title="@string/menu_refresh"
-        android:icon="@drawable/icon_share_light"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/menu_refresh"
         android:orderInCategory="90"
         android:title="@string/menu_refresh"
@@ -21,12 +14,14 @@
         android:id="@+id/menu_settings"
         android:orderInCategory="100"
         android:title="@string/menu_settings"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_settings_white_24dp"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_debug_console"
         android:orderInCategory="101"
         android:title="Debug Console"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_debug_white_24dp"
+        app:showAsAction="always" />
 
 </menu>

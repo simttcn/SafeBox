@@ -16,6 +16,7 @@
     <!--  Menu  -->
     <string name="menu_refresh">Refresh</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_more">More...</string>
 
     <!-- Button -->
     <string name="btn_ok">OK</string>
@@ -37,6 +38,11 @@
     <string name="enter_existing_app_password">enter existing app password</string>
     <string name="enter_new_app_password">enter new app password</string>
     <string name="confirm_new_app_password">confirm new app password</string>
+
+    <!--  UI - recyclerview item option menu  -->
+    <string name="menu_share_item_decrypted">Decrypt and share</string>
+    <string name="menu_share_item_encrypted">Share as encrypted</string>
+    <string name="menu_delete_item">Share as encrypted</string>
 
     <!--  UI - encrypting/decrypting activity  -->
     <string name="enc_encrypting_password">Encrypting Password</string>

@@ -8,12 +8,10 @@ import android.provider.OpenableColumns
 import androidx.lifecycle.MutableLiveData
 import com.smttcn.commons.crypto.Encryption
 import com.smttcn.commons.extensions.*
-import com.smttcn.commons.helpers.APP_ENCRYPT_VAR0
-import com.smttcn.commons.helpers.APP_ENCRYPT_VAR2
-import com.smttcn.commons.helpers.APP_ENCRYPT_VAR1
-import com.smttcn.commons.helpers.APP_ENCRYPT_VAR3
+import com.smttcn.commons.helpers.*
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
+import com.smttcn.safebox.R
 import java.io.*
 import java.util.HashMap
 
@@ -156,6 +154,21 @@ object FileManager {
     fun isFileExist(file: String, isHidden: Boolean = false) : Boolean {
         val f = File(file)
         return f.exists() && f.isHidden() == isHidden
+    }
+
+    fun copyFileToTempShareFolder(sourceFilePath: String): String {
+        var sourceFile = File(sourceFilePath)
+
+        if (sourceFile.exists()) {
+            val targetFolder = getFolderInCacheFolder(TEMP_FILE_SHARE_FOLDER_NAME, true)
+            if (targetFolder != null) {
+                var copiedFile = sourceFile.copyToFolder(targetFolder)
+
+                if (copiedFile.exists())
+                    return copiedFile.canonicalPath
+            }
+        }
+        return ""
     }
 
     fun copyFileFromUriToFolder(contentResolver: ContentResolver, uri: Uri, folder: String = "") {

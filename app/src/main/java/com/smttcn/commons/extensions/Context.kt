@@ -68,10 +68,22 @@ private fun doToast(context: Context, message: String, length: Int) {
     }
 }
 
-fun showMessageDialog(context: Context, TitleID: Int, MessageID: Int, callback: () -> Unit){
+fun showMessageDialog(context: Context, title: String, message: String, callback: () -> Unit){
     MaterialDialog(context).show {
-        title(TitleID)
-        message(MessageID)
+        title(text = title)
+        message(text = message)
+        positiveButton(R.string.btn_ok)
+        cancelable(false)  // calls setCancelable on the underlying dialog
+        cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+    }.positiveButton {
+        callback()
+    }
+}
+
+fun showMessageDialog(context: Context, titleID: Int, messageID: Int, callback: () -> Unit){
+    MaterialDialog(context).show {
+        title(titleID)
+        message(messageID)
         positiveButton(R.string.btn_ok)
         cancelable(false)  // calls setCancelable on the underlying dialog
         cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog

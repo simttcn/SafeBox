@@ -5,11 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.view.animation.AnimationUtils
+import android.widget.AdapterView
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -33,6 +33,7 @@ import com.smttcn.safebox.ui.security.EncryptingActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.FileItemViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import java.io.File
 
 
@@ -83,11 +84,15 @@ class MainActivity : BaseActivity() {
             onRecyclerItemClicked(view, item, prevIdx, currIdx)
         }
 
+        recyclerViewAdapter.onItemPopupMenuClick = { view, item, position ->
+            onRecyclerItemPopupMenuClicked(view, item, position)
+        }
+
         fileItemViewModel = ViewModelProviders.of(this).get(FileItemViewModel::class.java)
 
         fileItemViewModel.allFileItems.observe(this, Observer { item ->
             // Update the cached copy of the fileItems in the adapter.
-            item?.let { recyclerViewAdapter.setFileItems(it) }
+            item?.let { recyclerViewAdapter.setFileItems(it as MutableList<FileDirItem>) }
         })
     }
 
@@ -127,10 +132,6 @@ class MainActivity : BaseActivity() {
         val id = item.itemId
 
         when(id) {
-            R.id.menu_share -> {
-                shareItem()
-                return true
-            }
             R.id.menu_refresh -> {
                 refreshFileItemList()
                 return true
@@ -150,16 +151,16 @@ class MainActivity : BaseActivity() {
 
     @Suppress("UNUSED_PARAMETER")
     private fun onRecyclerItemClicked(view: View, item : FileDirItem, prevIdx: Int, currIdx: Int) {
-        // Todo future: to decide whether should allow user to open just by taping on it.
+        // Todo: to decide whether should allow user to open just by taping on it.
 
         view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
         toast(item.filename + " clicked")
 
         // update toolbar icon status
         if (recyclerViewAdapter.getSelectedItemCount() > 0) {
-            toolbarMenu.findItem(R.id.menu_share).setEnabled(true);
+            // item selected
         } else {
-            toolbarMenu.findItem(R.id.menu_share).setEnabled(false);
+            // no item selected
         }
 
 //        val targetfile = item.path
@@ -169,6 +170,42 @@ class MainActivity : BaseActivity() {
 //                .withTransitionFrom(view.item_background)
 //                .show()
 //        }
+    }
+
+    private fun onRecyclerItemPopupMenuClicked(view: View, item : FileDirItem, position: Int) {
+        var popupMenu = PopupMenu(this, view, Gravity.BOTTOM + Gravity.RIGHT)
+        popupMenu.menuInflater.inflate(R.menu.filediritem_popup_menu, popupMenu.menu)
+
+        popupMenu.setOnMenuItemClickListener {
+            // todo next: process optionmenu clicked
+            when (it.itemId) {
+                R.id.popupmenu_share_encrypt -> {
+                    // copy the file to be shared to the designated share folder
+                    //showMessageDialog(this, R.id.popupmenu_share_encrypt.toString(), item.filename){}
+                    val shareFilePath = FileManager.copyFileToTempShareFolder(item.path)
+                    if (shareFilePath.length > 0) {
+                        sendShareItent(shareFilePath)
+                    }
+                    true
+                }
+                R.id.popupmenu_share_decrypt -> {
+                    // redirect to another activity fro decrypting before sharing
+                    //showMessageDialog(this, R.id.popupmenu_share_decrypt.toString(), item.filename){}
+                    shareItemDecrypted(item)
+                    true
+                }
+                R.id.popupmenu_delete_item -> {
+                    recyclerViewAdapter.deleteFileItem(position)
+                    showMessageDialog(this, R.id.popupmenu_delete_item.toString(), item.filename){}
+                    true
+                }
+                else -> false
+            }
+
+        }
+
+        popupMenu.show()
+
     }
 
     private fun loadImage(imageView: ImageView, imagePath: String, password: CharArray) {
@@ -182,25 +219,19 @@ class MainActivity : BaseActivity() {
 
     }
 
-    private fun shareItem() {
-
-        if (recyclerViewAdapter.getSelectedItemCount() < 1) return
-
-        var selectedItem = recyclerViewAdapter.getSelectedItem()
-
-        if (selectedItem != null) {
+    private fun shareItemDecrypted(item: FileDirItem) {
             // pass the selected file to decrypting activity for processing
             val newIntent = Intent(this, DecryptingActivity::class.java)
-            newIntent.putExtra(INTENT_SHARE_FILE_PATH, selectedItem.path)
+            newIntent.putExtra(INTENT_SHARE_FILE_PATH, item.path)
             startActivityForResult(newIntent, REQUEST_CODE_TO_DECRYPT_FILE)
-
-        }
-
     }
 
-    fun sendShareItent(filepath: String) {
+    private fun sendShareItent(filepath: String) {
 
         if (filepath.isNotEmpty()) {
+
+            MyApplication.isSharingItem = true
+
             val AUTHORITY = "com.smttcn.safebox.fileprovider"
 
             val file = File(filepath)

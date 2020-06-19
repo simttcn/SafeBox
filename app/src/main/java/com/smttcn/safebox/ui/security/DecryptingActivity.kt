@@ -24,7 +24,6 @@ import java.io.File
 
 class DecryptingActivity: BaseActivity() {
 
-    private var decryptBeforeShare = false
     private var encryptedFileToShare = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,43 +66,24 @@ class DecryptingActivity: BaseActivity() {
         }
 
         okButton.setOnClickListener {
-            decryptBeforeShare = false
-            if (decryptBeforeShare){
+            var encryptedSuccess = false
 
-                var encryptedSuccess = false
+            var decryptedFilePath = decryptFileForSharing(DecryptingPassword.text.toString().toCharArray(), encryptedFileToShare)
 
-                var decryptedFilePath = decryptFileForSharing(DecryptingPassword.text.toString().toCharArray(), encryptedFileToShare)
+            if (FileManager.isFileExist(decryptedFilePath))
+                encryptedSuccess = true
 
-                if (FileManager.isFileExist(decryptedFilePath))
-                    encryptedSuccess = true
-
-                if (encryptedSuccess) {
-                    // succesfully decrypted file
-                    var intent = Intent()
-                    intent.putExtra(INTENT_SHARE_FILE_PATH, decryptedFilePath)
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
-                } else {
-                    // fail to encrypt file
-                    setResult(INTENT_RESULT_FAILED)
-                    finish()
-                }
-
-            } else {
-
-                // user choose not to decrypt before sharing, so return as it is.
-                // so we have to copy the original file to the configure temp folder for sharing
-                val sourceFile = File(encryptedFileToShare)
-                val targetPath = FileManager.getFolderInCacheFolder("temp_file_share", true)
-                val targetFile = File(targetPath!!.canonicalPath.appendPath(sourceFile.name))
-                sourceFile.copyTo(targetFile)
+            if (encryptedSuccess) {
+                // succesfully decrypted file
                 var intent = Intent()
-                intent.putExtra(INTENT_SHARE_FILE_PATH, targetFile.canonicalPath)
+                intent.putExtra(INTENT_SHARE_FILE_PATH, decryptedFilePath)
                 setResult(Activity.RESULT_OK, intent)
                 finish()
-
+            } else {
+                // fail to encrypt file
+                setResult(INTENT_RESULT_FAILED)
+                finish()
             }
-
         }
 
         showKeyboard(DecryptingPassword)
@@ -118,7 +98,7 @@ class DecryptingActivity: BaseActivity() {
         if (!targetfile.exists())
             return decryptedFilepath
 
-        val targetpath = FileManager.getFolderInCacheFolder("temp_file_share", true)
+        val targetpath = FileManager.getFolderInCacheFolder(TEMP_FILE_SHARE_FOLDER_NAME, true)
         if (targetfile.length() > 0 && targetpath != null) {
             decryptedFilepath = FileManager.decryptFile(targetfile, pwd, targetpath.canonicalPath, false)
         }

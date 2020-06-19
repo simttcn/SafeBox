@@ -45,7 +45,6 @@ class LoginActivity : BaseActivity() {
         })
 
         LoginButton.setOnClickListener {
-            MyApplication.cleanUp()
             // perform authenticaiton here
             val authenticator: Authenticator = Authenticator()
             if (Password.length() >= MIN_PASSWORD_LENGTH) {
