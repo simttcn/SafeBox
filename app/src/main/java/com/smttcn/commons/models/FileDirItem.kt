@@ -25,6 +25,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
     var children: Int = 0
     var size: Long = 0L
     var modified: Long = 0L
+    var ext: String = ""
     var mimeType: String = ""
     var thumbnailDrawable: Drawable? = null
     var fileIntentLabel: String = ""
@@ -40,12 +41,16 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         modified = _file.lastModified()
         mimeType = _file.getMimeType()
 
+        var originalFilename = _file.name.removeSuffix("." + ENCRYPTED_FILE_EXT)
+        ext = originalFilename.substring(originalFilename.lastIndexOf(".")+1)
+
         isSelected = false
 
         val innt = Intent(Intent.ACTION_VIEW)
         innt.data = _file.toUri()
-        innt.type = _file.getMimeType()
+        innt.type = _file.getMimeTypeOfEncryptedFile()
 
+        // todo future: to get the proper icon for the file type
         val pm : PackageManager = MyApplication.applicationContext.packageManager
         val matches: List<ResolveInfo> = pm.queryIntentActivities(innt, 0)
         for (match in matches) {

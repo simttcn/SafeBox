@@ -1,13 +1,14 @@
 package com.smttcn.safebox.ui.main
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.InputType
 import android.view.*
 import android.view.animation.AnimationUtils
-import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.Toast
@@ -18,6 +19,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.input
 import com.google.android.material.snackbar.Snackbar
 import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.Manager.ImageManager
@@ -28,12 +30,10 @@ import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
-import com.smttcn.safebox.ui.security.DecryptingActivity
 import com.smttcn.safebox.ui.security.EncryptingActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.FileItemViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import java.io.File
 
 
@@ -43,6 +43,7 @@ class MainActivity : BaseActivity() {
     private lateinit var recyclerViewAdapter: FileItemAdapter
     private var IsShareFromOtherApp = false
     private lateinit var toolbarMenu: Menu
+    private lateinit var myContext: Context
 
     var BackButtonPressedOnce = false
     var LastPressedBackTime = System.currentTimeMillis()
@@ -65,6 +66,7 @@ class MainActivity : BaseActivity() {
 
     private fun initialize() {
         MyApplication.mainActivityContext = this
+        myContext = this
 
         IsShareFromOtherApp = if (intent?.action == Intent.ACTION_SEND) true else false
 
@@ -177,11 +179,10 @@ class MainActivity : BaseActivity() {
         popupMenu.menuInflater.inflate(R.menu.filediritem_popup_menu, popupMenu.menu)
 
         popupMenu.setOnMenuItemClickListener {
-            // todo next: process optionmenu clicked
+            // todo next: delete item process
             when (it.itemId) {
                 R.id.popupmenu_share_encrypt -> {
                     // copy the file to be shared to the designated share folder
-                    //showMessageDialog(this, R.id.popupmenu_share_encrypt.toString(), item.filename){}
                     val shareFilePath = FileManager.copyFileToTempShareFolder(item.path)
                     if (shareFilePath.length > 0) {
                         sendShareItent(shareFilePath)
@@ -189,8 +190,6 @@ class MainActivity : BaseActivity() {
                     true
                 }
                 R.id.popupmenu_share_decrypt -> {
-                    // redirect to another activity fro decrypting before sharing
-                    //showMessageDialog(this, R.id.popupmenu_share_decrypt.toString(), item.filename){}
                     shareItemDecrypted(item)
                     true
                 }
@@ -219,11 +218,49 @@ class MainActivity : BaseActivity() {
 
     }
 
-    private fun shareItemDecrypted(item: FileDirItem) {
-            // pass the selected file to decrypting activity for processing
-            val newIntent = Intent(this, DecryptingActivity::class.java)
-            newIntent.putExtra(INTENT_SHARE_FILE_PATH, item.path)
-            startActivityForResult(newIntent, REQUEST_CODE_TO_DECRYPT_FILE)
+    private fun shareItemDecrypted(file: FileDirItem) {
+        // ask for the decrypting password for this file
+        MaterialDialog(this).show {
+            title(R.string.enc_encrypting_password)
+            message(R.string.enc_msg_decrypting_password)
+            input(
+                inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
+            ) { _, text ->
+
+                var decryptedFilePath = decryptFileForSharing(text.toString().toCharArray(), file.path)
+
+                if (FileManager.isFileExist(decryptedFilePath)){
+                    // succesfully decrypted file
+                    sendShareItent((decryptedFilePath))
+                } else {
+                    // fail to encrypt file
+                    showMessageDialog(myContext,
+                        R.string.error,
+                        R.string.enc_enter_decrypting_password_error){}
+                }
+            }
+            positiveButton(R.string.btn_ok)
+            negativeButton(R.string.btn_cancel)
+            cancelable(false)  // calls setCancelable on the underlying dialog
+            cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+        }
+    }
+
+    fun decryptFileForSharing(pwd: CharArray, filepath: String): String {
+
+        var decryptedFilepath: String = ""
+        val targetfile = File(filepath)
+
+        if (!targetfile.exists())
+            return decryptedFilepath
+
+        val targetpath = FileManager.getFolderInCacheFolder(TEMP_FILE_SHARE_FOLDER_NAME, true)
+        if (targetfile.length() > 0 && targetpath != null) {
+            decryptedFilepath = FileManager.decryptFile(targetfile, pwd, targetpath.canonicalPath, false)
+        }
+
+        return decryptedFilepath
+
     }
 
     private fun sendShareItent(filepath: String) {
@@ -283,27 +320,6 @@ class MainActivity : BaseActivity() {
                 showMessageDialog(this,
                     R.string.enc_title_encrypting_file,
                     R.string.enc_msg_encrypting_cancelled){}
-
-            }
-        } else if (requestCode == REQUEST_CODE_TO_DECRYPT_FILE) {
-
-            if (resultCode == Activity.RESULT_OK) {
-
-                if (resultData != null) {
-                    var filePath = resultData.getStringExtra(INTENT_SHARE_FILE_PATH)
-                    sendShareItent((filePath))
-                } else {
-
-                }
-
-            } else if (resultCode == INTENT_RESULT_FAILED) {
-                // failed to decrypt file, possibly wrong password
-                showMessageDialog(this,
-                    R.string.enc_title_decrypting_file,
-                    R.string.enc_enter_decrypting_password_error){}
-
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                // user cancel share operation
 
             }
         }

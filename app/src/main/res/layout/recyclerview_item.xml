@@ -13,7 +13,6 @@
 
     <ImageView
         android:id="@+id/item_background"
-        android:foreground="@drawable/ic_image_gray_24dp"
         android:layout_width="@dimen/itemlist_thumbnail_width"
         android:layout_height="@dimen/itemlist_thumbnail_height"
         android:contentDescription="@string/itemlist_thumbnail" />

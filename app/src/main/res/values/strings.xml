@@ -40,9 +40,9 @@
     <string name="confirm_new_app_password">confirm new app password</string>
 
     <!--  UI - recyclerview item option menu  -->
-    <string name="menu_share_item_decrypted">Decrypt and share</string>
-    <string name="menu_share_item_encrypted">Share as encrypted</string>
-    <string name="menu_delete_item">Share as encrypted</string>
+    <string name="menu_share_item_encrypted">Share</string>
+    <string name="menu_share_item_decrypted">Decrypt and share...</string>
+    <string name="menu_delete_item">Delete...</string>
 
     <!--  UI - encrypting/decrypting activity  -->
     <string name="enc_encrypting_password">Encrypting Password</string>

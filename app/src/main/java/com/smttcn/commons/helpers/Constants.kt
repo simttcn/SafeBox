@@ -19,6 +19,7 @@ const val APP_PASSWORD_HASH_02 = "key_01"
 const val KEY_HASH_ITERATION_COUNT = 10000
 const val MIN_PASSWORD_LENGTH = 6
 const val TEMP_FILE_SHARE_FOLDER_NAME =  "temp_file_share"
+const val ENCRYPTED_FILE_EXT = "enc"
 
 const val INTERVAL_BACK_BUTTON_QUIT_IN_MS = 3000
 

@@ -19,6 +19,7 @@ fun File.isVideoSlow() = absolutePath.isVideoFast() || getMimeType().startsWith(
 fun File.isAudioSlow() = absolutePath.isAudioFast() || getMimeType().startsWith("audio")
 
 fun File.getMimeType() = absolutePath.getMimeType()
+fun File.getMimeTypeOfEncryptedFile() = absolutePath.getMimeTypeOfEncryptedFile()
 
 fun File.getProperSize(countHiddenItems: Boolean): Long {
     return if (isDirectory) {

@@ -18,7 +18,6 @@ import java.util.HashMap
 
 object FileManager {
 
-    const val ENCRYPT_EXT = "enc"
     const val DATA_FOLDER = "data"
 
     @Suppress("UNUSED_PARAMETER")
@@ -204,7 +203,7 @@ object FileManager {
         else
             encryptedFilePath =  FileManager.toFullPathInDocumentRoot(filename)
 
-        encryptedFilePath = encryptedFilePath + ".enc"
+        encryptedFilePath = encryptedFilePath.addExtension(ENCRYPTED_FILE_EXT)
 
         //todo later: got to check inputStream validity
         val bytes = inputStream!!.readBytes()
@@ -333,7 +332,7 @@ object FileManager {
         if (file.isDirectory()) return ""
 
         val originalFilename = file.name
-        val encryptedFilePath = file.canonicalPath.addExtension(ENCRYPT_EXT)
+        val encryptedFilePath = file.canonicalPath.addExtension(ENCRYPTED_FILE_EXT)
 
         try {
             val inputStream = file.inputStream()
