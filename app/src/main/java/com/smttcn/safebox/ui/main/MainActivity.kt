@@ -179,7 +179,6 @@ class MainActivity : BaseActivity() {
         popupMenu.menuInflater.inflate(R.menu.filediritem_popup_menu, popupMenu.menu)
 
         popupMenu.setOnMenuItemClickListener {
-            // todo next: delete item process
             when (it.itemId) {
                 R.id.popupmenu_share_encrypt -> {
                     // copy the file to be shared to the designated share folder

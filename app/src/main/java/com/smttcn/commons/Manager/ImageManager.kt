@@ -11,19 +11,6 @@ import java.io.File
 
 object ImageManager {
 
-    // Todo: to get thumbnail image of various file types here
-    fun getThumbnailByteArrayFromEncryptedFile(file: File, password: CharArray) : ByteArray? {
-        val decryptedFile = FileManager.decryptFileContentToByteArray(file, password)
-
-        // Image file type
-        if (decryptedFile != null) {
-            val result = resizeToByteArray(decryptedFile, SIZE_THUMBNAIL_WIDTH, SIZE_THUMBNAIL_HEIGHT)
-            return result
-        }
-
-        return null
-    }
-
     fun toBitmap(img: ByteArray) : Bitmap {
         // Get the bitmap from byte array since, the bitmap has the the resize function
         return BitmapFactory.decodeByteArray(img, 0, img.size)

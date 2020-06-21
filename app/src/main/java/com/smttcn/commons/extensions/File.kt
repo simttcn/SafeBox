@@ -1,5 +1,6 @@
 package com.smttcn.commons.extensions
 
+import android.webkit.MimeTypeMap
 import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.helpers.*
 import com.smttcn.commons.models.FileDirItem
@@ -101,4 +102,19 @@ fun File.doesThisOrParentHaveNoMedia(): Boolean {
     return false
 }
 
+fun File.getFileTypeDrawableId(): Int {
+    val ext = "." + name.getFilenameExtensionOfEncryptedFile()
 
+    if (photoExtensions.contains(ext)) return R.drawable.ic_image_file_50
+    if (videoExtensions.contains(ext)) return R.drawable.ic_video_file_50
+    if (audioExtensions.contains(ext)) return R.drawable.ic_audio_file_50
+    if (rawExtensions.contains(ext)) return R.drawable.ic_raw_50
+    if (officeWorldExtensions.contains(ext)) return R.drawable.ic_document_50
+    if (officeExcelExtensions.contains(ext)) return R.drawable.ic_document_50
+    if (officePowerPointExtensions.contains(ext)) return R.drawable.ic_document_50
+    if (officePdfExtensions.contains(ext)) return R.drawable.ic_pdf_50
+    if (officeTextExtensions.contains(ext)) return R.drawable.ic_txt_50
+    if (archiveExtensions.contains(ext)) return R.drawable.ic_archive_50
+
+    return R.drawable.ic_document_50
+}

@@ -96,6 +96,12 @@ val photoExtensions: Array<String> get() = arrayOf(".jpg", ".png", ".jpeg", ".bm
 val videoExtensions: Array<String> get() = arrayOf(".mp4", ".mkv", ".webm", ".avi", ".3gp", ".mov", ".m4v", ".3gpp")
 val audioExtensions: Array<String> get() = arrayOf(".mp3", ".wav", ".wma", ".ogg", ".m4a", ".opus", ".flac", ".aac")
 val rawExtensions: Array<String> get() = arrayOf(".dng", ".orf", ".nef", ".arw", ".rw2", ".cr2", ".cr3")
+val archiveExtensions: Array<String> get() = arrayOf(".7z",".apk",".arj",".bz2",".cab",".dmg",".gz",".iso",".jar",".rar",".tar",".zip")
+val officeWorldExtensions: Array<String> get() = arrayOf(".doc",".docx",".docm")
+val officeExcelExtensions: Array<String> get() = arrayOf(".xls",".xlsx",".xlsm")
+val officePowerPointExtensions: Array<String> get() = arrayOf(".ppt",".pptx")
+val officePdfExtensions: Array<String> get() = arrayOf(".pdf")
+val officeTextExtensions: Array<String> get() = arrayOf(".txt")
 
 const val DATE_FORMAT_ONE = "dd.MM.yyyy"
 const val DATE_FORMAT_TWO = "dd/MM/yyyy"

@@ -55,8 +55,9 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
         }
 
         fun bindItem(item: FileDirItem) {
-            if (item.thumbnailDrawable != null)
-                itemView.item_thumbnail.setImageDrawable(item.thumbnailDrawable)
+            var thumbnail = item.getThumbnailDrawable()
+            if (thumbnail != null)
+                itemView.item_thumbnail.setImageDrawable(thumbnail)
             else
                 itemView.item_thumbnail.setImageResource(R.drawable.ic_file_gray_24dp)
 

@@ -1,12 +1,12 @@
 package com.smttcn.commons.models
 
+import android.R
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import androidx.core.net.toUri
 import com.google.gson.Gson
-import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import com.smttcn.safebox.MyApplication
@@ -26,7 +26,6 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
     var size: Long = 0L
     var modified: Long = 0L
     var mimeType: String = ""
-    var thumbnailDrawable: Drawable? = null
     var fileIntentLabel: String = ""
 
     var isSelected: Boolean = false
@@ -40,20 +39,8 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         modified = _file.lastModified()
         mimeType = _file.getMimeType()
 
-
         isSelected = false
 
-        val innt = Intent(Intent.ACTION_VIEW)
-        innt.data = _file.toUri()
-        innt.type = _file.getMimeTypeOfEncryptedFile()
-
-        // todo future: to get the proper icon for the file type
-        val pm : PackageManager = MyApplication.applicationContext.packageManager
-        val matches: List<ResolveInfo> = pm.queryIntentActivities(innt, 0)
-        for (match in matches) {
-            thumbnailDrawable = match.loadIcon(pm)
-            fileIntentLabel = match.loadLabel(pm) as String
-        }
     }
 
     override fun toString() = "FileDirItem(fullPathWithFilename=$path, filename=$filename, isDirectory=$isDirectory, children=$children, size=$size, modified=$modified)"
@@ -98,6 +85,11 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         }
     }
 
+    fun getThumbnailDrawable(): Drawable? {
+        var file = File(path)
+        val drawable = MyApplication.mainActivityContext.getDrawable(file.getFileTypeDrawableId())
+        return drawable
+    }
     fun getOriginalFilename(): String {
         return filename.removeSuffix("." + ENCRYPTED_FILE_EXT)
     }

@@ -304,7 +304,7 @@ object FileManager {
     // re-encrypt files with new password
     fun reencryptFiles(filePath: String, oldPwd: CharArray, newPwd: CharArray) : Boolean {
 
-        // Todo future: should decrypt to hashmap in memory then encrypt it back to file
+        // Todo future: should decrypt to hashmap in memory and then encrypt it back to file
         // decrypt file with delete original
         val decryptedFilePath = decryptFile(File(filePath), oldPwd, deleteOriginal = true)
         // encrypt file with delete original
