@@ -6,11 +6,11 @@ import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import androidx.core.net.toUri
 import com.google.gson.Gson
+import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import com.smttcn.safebox.MyApplication
 import java.io.File
-import java.util.*
 
 
 open class FileDirItem(_file: File) : Comparable<FileDirItem> {
@@ -25,7 +25,6 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
     var children: Int = 0
     var size: Long = 0L
     var modified: Long = 0L
-    var ext: String = ""
     var mimeType: String = ""
     var thumbnailDrawable: Drawable? = null
     var fileIntentLabel: String = ""
@@ -41,8 +40,6 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         modified = _file.lastModified()
         mimeType = _file.getMimeType()
 
-        var originalFilename = _file.name.removeSuffix("." + ENCRYPTED_FILE_EXT)
-        ext = originalFilename.substring(originalFilename.lastIndexOf(".")+1)
 
         isSelected = false
 
@@ -90,7 +87,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
 
                 }
                 else -> {
-                    result = getExtension().toLowerCase().compareTo(other.getExtension().toLowerCase())
+                    result = getExt().toLowerCase().compareTo(other.getExt().toLowerCase())
                 }
             }
 
@@ -101,7 +98,23 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         }
     }
 
-    fun getExtension() = if (isDirectory) filename else path.substringAfterLast('.', "")
+    fun getOriginalFilename(): String {
+        return filename.removeSuffix("." + ENCRYPTED_FILE_EXT)
+    }
+
+    fun getOriginalExt(): String {
+        if (!isDirectory)
+            return filename.getFilenameExtensionOfEncryptedFile()
+        else
+            return ""
+    }
+
+    fun getExt(): String {
+        if (!isDirectory)
+            return filename.getFilenameExtension()
+        else
+            return ""
+    }
 
     fun getProperSize(countHidden: Boolean) = File(path).getProperSize(countHidden)
 
@@ -115,4 +128,5 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         val JSON = Gson().toJson(this)
         return Gson().fromJson(JSON, FileDirItem::class.java)
     }
+
 }

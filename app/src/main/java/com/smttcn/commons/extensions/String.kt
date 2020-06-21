@@ -42,9 +42,8 @@ fun String.getFilenameFromPath() : String {
 fun String.getFilenameExtension() = substring(lastIndexOf(".") + 1)
 
 fun String.getFilenameExtensionOfEncryptedFile(): String{
-    //var filename = this.removeSuffix("." + ENCRYPTED_FILE_EXT)
-    //return filename.substring(lastIndexOf(".") + 1)
-    return "jpg"
+    var originalFilename = this.removeSuffix("." + ENCRYPTED_FILE_EXT)
+    return originalFilename.substring(originalFilename.lastIndexOf(".")+1)
 }
 
 fun String.isAValidFilename(): Boolean {

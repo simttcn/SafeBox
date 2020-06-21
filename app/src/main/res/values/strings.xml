@@ -22,6 +22,7 @@
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_close">Close</string>
+    <string name="btn_delete">Delete</string>
     <string name="btn_change_app_password">Change App Password</string>
 
     <!--  UI - common elements  -->
@@ -43,6 +44,10 @@
     <string name="menu_share_item_encrypted">Share</string>
     <string name="menu_share_item_decrypted">Decrypt and share...</string>
     <string name="menu_delete_item">Delete...</string>
+
+    <!--  UI - recyclerview item delete dialog  -->
+    <string name="dlg_title_delete_item">Delete Item</string>
+    <string name="dlg_msg_delete_item">Do you really want to permanently delete the following item?</string>
 
     <!--  UI - encrypting/decrypting activity  -->
     <string name="enc_encrypting_password">Encrypting Password</string>

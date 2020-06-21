@@ -195,7 +195,7 @@ class MainActivity : BaseActivity() {
                 }
                 R.id.popupmenu_delete_item -> {
                     recyclerViewAdapter.deleteFileItem(position)
-                    showMessageDialog(this, R.id.popupmenu_delete_item.toString(), item.filename){}
+                    //showMessageDialog(this, R.id.popupmenu_delete_item.toString(), item.filename){}
                     true
                 }
                 else -> false

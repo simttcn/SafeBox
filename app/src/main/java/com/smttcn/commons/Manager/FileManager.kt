@@ -137,12 +137,11 @@ object FileManager {
                 }
             }
             dir.delete()
-        } else if (dir != null && dir.isFile) {
-            dir.delete()
         } else {
             false
         }
     }
+
     //--------------------------------------------------------------------
     // File operations
     fun isFileExistInDocumentRoot(file: String, isHidden: Boolean = false) : Boolean {
@@ -244,6 +243,14 @@ object FileManager {
         }
 
         return result
+    }
+
+    fun deleteFile(file: File?): Boolean {
+        return if (file != null && file.isFile) {
+            return file.delete()
+        } else {
+            return false
+        }
     }
 
     //--------------------------------------------------------------------
