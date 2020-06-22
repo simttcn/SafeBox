@@ -117,26 +117,19 @@ object FileManager {
 
     fun deleteCache() {
         try {
-            val cacheDir: File = MyApplication.applicationContext.cacheDir
-            val dir = File(cacheDir.canonicalPath)
-            deleteDir(dir, true)
+            val cacheShareDir = getFolderInCacheFolder(TEMP_FILE_SHARE_FOLDER_NAME)
+            deleteDir(cacheShareDir, true)
         } catch (e: java.lang.Exception) {
             //e.printStackTrace()
         }
     }
 
-    fun deleteDir(dir: File?, deleteNotEmpty: Boolean = false): Boolean {
+    fun deleteDir(dir: File?, deleteRecursively: Boolean = false): Boolean {
         return if (dir != null && dir.isDirectory) {
-            val children = dir.list()
-            if (children != null && children.count() > 0 && deleteNotEmpty) {
-                for (i in children.indices) {
-                    val success = deleteDir(File(dir, children[i]!!), deleteNotEmpty)
-                    if (!success) {
-                        return false
-                    }
-                }
-            }
-            dir.delete()
+            if (deleteRecursively)
+                dir.deleteRecursively()
+            else
+                dir.delete()
         } else {
             false
         }

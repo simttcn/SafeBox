@@ -29,6 +29,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
     var fileIntentLabel: String = ""
 
     var isSelected: Boolean = false
+    var isOptionMenuActive: Boolean = false
 
     init {
         path = _file.canonicalPath
@@ -40,6 +41,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         mimeType = _file.getMimeType()
 
         isSelected = false
+        isOptionMenuActive = false
 
     }
 

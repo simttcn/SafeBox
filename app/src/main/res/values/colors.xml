@@ -16,6 +16,7 @@
 
     <color name="colorItemBackgroundSelected">#6ADDD1</color>
     <color name="colorItemBackgroundNormal">@color/colorWhite</color>
+    <color name="colorItemBackgroundOptionMenuActive">#D8FFFA</color>
 
     <color name="black_overlay">#66000000</color>
 

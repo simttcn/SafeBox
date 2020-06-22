@@ -83,7 +83,7 @@ fun File.toFileDirItem() = FileDirItem(this)
 
 fun File.copyToFolder(targetFolder: File): File {
     val targetFile = File(targetFolder!!.canonicalPath.appendPath(this.name))
-    return this.copyTo(targetFile)
+    return this.copyTo(targetFile, overwrite = true)
 }
 
 fun File.containsNoMedia() = isDirectory && File(this, NOMEDIA).exists()

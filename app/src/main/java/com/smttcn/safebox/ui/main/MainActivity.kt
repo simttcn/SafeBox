@@ -87,7 +87,7 @@ class MainActivity : BaseActivity() {
         }
 
         recyclerViewAdapter.onItemPopupMenuClick = { view, item, position ->
-            onRecyclerItemPopupMenuClicked(view, item, position)
+            onRecyclerViewItemPopupMenuClicked(view, item, position)
         }
 
         fileItemViewModel = ViewModelProviders.of(this).get(FileItemViewModel::class.java)
@@ -174,7 +174,7 @@ class MainActivity : BaseActivity() {
 //        }
     }
 
-    private fun onRecyclerItemPopupMenuClicked(view: View, item : FileDirItem, position: Int) {
+    private fun onRecyclerViewItemPopupMenuClicked(view: View, item : FileDirItem, position: Int) {
         var popupMenu = PopupMenu(this, view, Gravity.BOTTOM + Gravity.RIGHT)
         popupMenu.menuInflater.inflate(R.menu.filediritem_popup_menu, popupMenu.menu)
 
@@ -200,6 +200,16 @@ class MainActivity : BaseActivity() {
                 else -> false
             }
 
+        }
+
+        item.isOptionMenuActive = true
+        //view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorItemBackgroundOptionMenuActive))
+        recyclerViewAdapter.notifyItemChanged(position)
+
+        popupMenu.setOnDismissListener {
+            item.isOptionMenuActive = false
+            //view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorItemBackgroundNormal))
+            recyclerViewAdapter.notifyItemChanged(position)
         }
 
         popupMenu.show()

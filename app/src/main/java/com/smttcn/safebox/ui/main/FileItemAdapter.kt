@@ -61,11 +61,13 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
             else
                 itemView.item_thumbnail.setImageResource(R.drawable.ic_file_gray_24dp)
 
-            itemView.item_name.text = item.filename
+            itemView.item_name.text = item.getOriginalFilename() //item.filename
 
             if (item.isSelected) {
                 itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundSelected))
-            } else {
+            } else if (item.isOptionMenuActive) {
+                itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundOptionMenuActive))
+            }else {
                 itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundNormal))
             }
         }
@@ -83,6 +85,7 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
 
     override fun onBindViewHolder(holder: FileItemViewHolder, position: Int) {
         val currentItem = fileItems.get(position)
+
         holder.itemView.popup_menu.setOnClickListener {
 
             onItemPopupMenuClick?.invoke(holder.itemView, currentItem, position)
