@@ -3,10 +3,10 @@
 
     <string name="no_app_found">No app for opening this type of file is installed</string>
     <string name="an_error_occurred">An error occurred</string>
-    <string name="no_reminder">No reminder</string>
-    <string name="at_start">At start</string>
-    <string name="use_24_hour_time_format">Use 24-hour time format</string>
-    <string name="open_with">Open with</string>
+<!--    <string name="no_reminder">No reminder</string>-->
+<!--    <string name="at_start">At start</string>-->
+<!--    <string name="use_24_hour_time_format">Use 24-hour time format</string>-->
+<!--    <string name="open_with">Open with</string>-->
 
     <!--  Activity Title  -->
     <string name="title_activity_settings">Settings</string>
@@ -21,18 +21,20 @@
     <!-- Button -->
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
-    <string name="btn_close">Close</string>
+<!--    <string name="btn_close">Close</string>-->
     <string name="btn_delete">Delete</string>
-    <string name="btn_change_app_password">Change App Password</string>
+<!--    <string name="btn_change_app_password">Change App Password</string>-->
 
     <!--  UI - common elements  -->
-    <string name="reset">Reset</string>
+<!--    <string name="reset">Reset</string>-->
     <string name="sign_in">Sign In</string>
+    <string name="next">Next</string>
+    <string name="done">Done</string>
     <string name="error">Error</string>
     <string name="press_back_again_to_quit">Press back button again to quit this app.</string>
 
     <!--  UI - login and password activity  -->
-    <string name="new_app_password">New App Password</string>
+<!--    <string name="new_app_password">New App Password</string>-->
     <string name="enter_app_password">Enter App Password</string>
     <string name="enter_app_password_error">App password incorrect, please try again.</string>
     <string name="enter_your_app_password">enter app password</string>
@@ -41,19 +43,22 @@
     <string name="confirm_new_app_password">confirm new app password</string>
 
     <!--  UI - recyclerview item option menu  -->
+    <string name="menu_view_item">View</string>
     <string name="menu_share_item_encrypted">Share</string>
-    <string name="menu_share_item_decrypted">Decrypt and share...</string>
-    <string name="menu_delete_item">Delete...</string>
+    <string name="menu_share_item_decrypted">Decrypt and share</string>
+    <string name="menu_change_encrypting_password">Change encrypting password...</string>
+    <string name="menu_delete_item">Delete</string>
 
     <!--  UI - recyclerview item delete dialog  -->
     <string name="dlg_title_delete_item">Delete Item</string>
     <string name="dlg_msg_delete_item">Do you really want to permanently delete the following item?</string>
 
-    <!--  UI - encrypting/decrypting activity  -->
+    <!--  UI - share item menu  -->
+    <string name="enc_enter_password">Enter Password</string>
     <string name="enc_encrypting_password">Encrypting Password</string>
-    <string name="enc_enter_a_password">Enter a password</string>
+<!--    <string name="enc_enter_a_password">Enter a password</string>-->
     <string name="enc_confirm_your_password">Confirm your password</string>
-    <string name="enc_decrypting_password">Decrypting Password</string>
+<!--    <string name="enc_decrypting_password">Decrypting Password</string>-->
     <string name="enc_enter_decrypting_password_error">Decrypting failed, possibly incorrect password, please try again.</string>
     <string name="enc_msg_encrypting_password">Please enter a password to encrypt this file.</string>
     <string name="enc_msg_decrypting_password">Please enter the password to decrypt this file</string>
@@ -61,13 +66,21 @@
     <string name="btn_encrypt_file">Encrypt file</string>
     <string name="btn_decrypt_file">Decrypt and share</string>
     <string name="enc_title_encrypting_file">Encrypting File</string>
-    <string name="enc_title_decrypting_file">Decrypting File</string>
+<!--    <string name="enc_title_decrypting_file">Decrypting File</string>-->
     <string name="enc_msg_encrypting_success">File succesfully encrypted</string>
     <string name="enc_msg_encrypting_cancelled">File encryption cancelled</string>
     <string name="enc_msg_encrypting_failed">Error encrypting the file</string>
-    <string name="enc_msg_decrypting_success">File succesfully decrypted</string>
-    <string name="enc_msg_decrypting_cancelled">File decryption cancelled</string>
-    <string name="enc_msg_decrypting_failed">Error decrypting the file</string>
+<!--    <string name="enc_msg_decrypting_success">File succesfully decrypted</string>-->
+<!--    <string name="enc_msg_decrypting_cancelled">File decryption cancelled</string>-->
+<!--    <string name="enc_msg_decrypting_failed">Error decrypting the file</string>-->
+
+    <!--  UI - change encrypting password  -->
+    <string name="dlg_title_change_encrypting_password">Change Encrypting Password</string>
+    <string name="dlg_hint_enter_original_password">Enter the original password</string>
+    <string name="dlg_hint_enter_new_password">Enter the new password</string>
+    <string name="dlg_hint_confirm_new_password">Confirm new password</string>
+    <string name="dlg_msg_change_encrypting_password_success">File encrypting password successfuly changed</string>
+    <string name="dlg_msg_change_encrypting_password_failed">Failed to change the encrypting password, please try again later.</string>
 
     <!-- Recyclerview item list -->
     <string name="itemlist_thumbnail">Thumbnail</string>

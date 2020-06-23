@@ -67,7 +67,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             MaterialDialog(myContext).show {
                 input(
                     hintRes = R.string.enter_existing_app_password,
-                    inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
+                    inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 ) { _, text ->
 
                     Authenticator().removeAppPassword(text.toString()) {
@@ -153,14 +153,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 enabledAppPassword!!.isChecked = false
                 changeAppPassword!!.isEnabled = false
 
-                // User cancelled password change
-                MaterialDialog(myContext).show {
-                    title(R.string.dlg_title_new_app_password)
-                    message(R.string.dlg_msg_new_app_password_cancel)
-                    positiveButton(R.string.btn_ok)
-                    cancelable(false)  // calls setCancelable on the underlying dialog
-                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-                }
+//                // User cancelled password change
+//                MaterialDialog(myContext).show {
+//                    title(R.string.dlg_title_new_app_password)
+//                    message(R.string.dlg_msg_new_app_password_cancel)
+//                    positiveButton(R.string.btn_ok)
+//                    cancelable(false)  // calls setCancelable on the underlying dialog
+//                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+//                }
             }
 
         }

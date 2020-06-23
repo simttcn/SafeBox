@@ -13,6 +13,7 @@ import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.afollestad.materialdialogs.MaterialDialog
 import com.smttcn.commons.Manager.FileManager
+import com.smttcn.commons.extensions.isNewPasswordConfinedToPolicy
 import com.smttcn.commons.extensions.showMessageDialog
 import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.commons.helpers.INTENT_TO_CREATE_APP_PASSWORD
@@ -89,7 +90,7 @@ class PasswordActivity : BaseActivity() {
         }
 
         ConfirmButton.setOnClickListener {
-            if (isNewPasswordValid(NewPassword.text.toString(), ConfirmPassword.text.toString())){
+            if (isNewPasswordConfinedToPolicy(NewPassword.text.toString(), ConfirmPassword.text.toString())){
 
                 val authenticator: Authenticator = Authenticator()
 
@@ -180,15 +181,7 @@ class PasswordActivity : BaseActivity() {
 
     private fun toEnableConfirmButton(newPassword: String, confirmPassword: String) {
         val confirmButton = findViewById<Button>(R.id.confirm)
-        confirmButton.isEnabled = isNewPasswordValid(newPassword, confirmPassword)
+        confirmButton.isEnabled = isNewPasswordConfinedToPolicy(newPassword, confirmPassword)
     }
-
-
-    private fun isNewPasswordValid(newPassword: String, confirmPassword: String) : Boolean {
-        return (newPassword.length >= MIN_PASSWORD_LENGTH
-                && confirmPassword.length >= MIN_PASSWORD_LENGTH
-                && newPassword.equals(confirmPassword, false))
-    }
-
 
 }

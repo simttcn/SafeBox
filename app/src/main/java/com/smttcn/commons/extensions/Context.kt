@@ -100,6 +100,16 @@ fun Context.showErrorToast(exception: Exception, length: Int = Toast.LENGTH_LONG
     showErrorToast(exception.toString(), length)
 }
 
+fun Context.isPasswordConfinedToPolicy(password: String): Boolean {
+    return (password.length >= MIN_PASSWORD_LENGTH)
+}
+
+fun Context.isNewPasswordConfinedToPolicy(newPassword: String, confirmPassword: String): Boolean {
+    return (newPassword.length >= MIN_PASSWORD_LENGTH
+            && confirmPassword.length >= MIN_PASSWORD_LENGTH
+            && newPassword.equals(confirmPassword, false))
+}
+
 fun Context.hasPermission(permId: Int) = ContextCompat.checkSelfPermission(this, getPermissionString(permId)) == PackageManager.PERMISSION_GRANTED
 
 fun Context.getPermissionString(id: Int) = when (id) {

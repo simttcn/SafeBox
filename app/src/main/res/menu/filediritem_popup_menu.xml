@@ -4,6 +4,12 @@
     tools:context="com.smttcn.myapplication.MainActivity">
 
     <item
+        android:id="@+id/popupmenu_view"
+        android:orderInCategory="10"
+        android:title="@string/menu_view_item"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/popupmenu_share_encrypt"
         android:orderInCategory="10"
         android:title="@string/menu_share_item_encrypted"
@@ -13,6 +19,12 @@
         android:id="@+id/popupmenu_share_decrypt"
         android:orderInCategory="20"
         android:title="@string/menu_share_item_decrypted"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/popupmenu_change_encrypting_password"
+        android:orderInCategory="20"
+        android:title="@string/menu_change_encrypting_password"
         app:showAsAction="always" />
 
     <item

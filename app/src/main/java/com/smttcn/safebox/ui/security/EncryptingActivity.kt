@@ -15,6 +15,7 @@ import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.showKeyboard
 import com.smttcn.commons.helpers.Authenticator
+import com.smttcn.commons.helpers.INTENT_RESULT_FAILED
 import com.smttcn.commons.helpers.INTENT_SHARE_FILE_URI
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.smttcn.safebox.R
@@ -88,7 +89,7 @@ class EncryptingActivity: BaseActivity() {
 
                 } else {
                     // fail to encrypt file
-                    setResult(Activity.RESULT_CANCELED)
+                    setResult(INTENT_RESULT_FAILED)
                     finish()
 
                 }

@@ -126,7 +126,7 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
         MaterialDialog(currentContext).show {
             title(R.string.dlg_title_delete_item)
             message(null, currentContext.getString(R.string.dlg_msg_delete_item) + "\n\n" + item.filename)
-            positiveButton(R.string.btn_ok) {
+            positiveButton(R.string.btn_delete) {
 
                 if (FileManager.deleteFile(File(item.path))) {
                     fileItems.removeAt(position)
