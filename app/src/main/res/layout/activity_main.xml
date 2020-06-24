@@ -27,36 +27,13 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <RelativeLayout
-        android:id="@+id/progressBarContainer"
-        android:visibility="visible"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appbar">
-
-        <androidx.core.widget.ContentLoadingProgressBar
-            android:id="@+id/itemListRecyclerViewProgressBar"
-            style="?android:attr/progressBarStyleLarge"
-            android:indeterminate="true"
-            android:paddingLeft="50dp"
-            android:paddingRight="50dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"/>
-
-    </RelativeLayout>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/itemListRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@android:color/white"
         android:scrollbars="vertical"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -73,5 +50,49 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_add_black_24dp" />
+
+    <RelativeLayout
+        android:id="@+id/progressBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#72000000"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp">
+
+
+        <TextView
+            android:id="@+id/progressBarText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/please_wait"
+            android:gravity="center_horizontal"
+            android:textSize="@dimen/dialog_alert_font_size"
+            android:textColor="@color/colorWhite"
+            />
+
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/itemListRecyclerViewProgressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,6 +8,7 @@ import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import com.afollestad.materialdialogs.MaterialDialog
@@ -19,6 +20,7 @@ import com.smttcn.commons.helpers.INTENT_RESULT_FAILED
 import com.smttcn.commons.helpers.INTENT_SHARE_FILE_URI
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.smttcn.safebox.R
+import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
 class EncryptingActivity: BaseActivity() {
@@ -117,5 +119,21 @@ class EncryptingActivity: BaseActivity() {
                 && confirmPassword.length >= MIN_PASSWORD_LENGTH
                 && encryptingPassword.equals(confirmPassword, false))
     }
+
+    fun showProgressBar(show: Boolean) {
+        if (show) {
+            getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+            progressBarContainer.visibility = View.VISIBLE
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+            progressBarContainer.visibility = View.GONE
+        }
+    }
+
+
 
 }

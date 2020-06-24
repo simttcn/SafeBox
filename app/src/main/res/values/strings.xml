@@ -31,6 +31,7 @@
     <string name="next">Next</string>
     <string name="done">Done</string>
     <string name="error">Error</string>
+    <string name="please_wait">Please wait...</string>
     <string name="press_back_again_to_quit">Press back button again to quit this app.</string>
 
     <!--  UI - login and password activity  -->

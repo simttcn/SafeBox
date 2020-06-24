@@ -24,5 +24,5 @@
 
     <!-- default activity -->
     <dimen name="activity_font_size">16sp</dimen>
-
+    <dimen name="dialog_alert_font_size">20sp</dimen>
 </resources>

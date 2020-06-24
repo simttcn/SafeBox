@@ -101,4 +101,27 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <RelativeLayout
+        android:id="@+id/progressBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#72000000"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/itemListRecyclerViewProgressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminate="true"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp" />
+
+    </RelativeLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
