@@ -19,10 +19,12 @@
     <dimen name="popupmenu_width">30dp</dimen>
 
     <!-- Custom view -->
+    <dimen name="customViewHeight">14sp</dimen>
     <dimen name="customTitle">14sp</dimen>
     <dimen name="customEntry">16sp</dimen>
+    <dimen name="progressSpinnerHeight">64sp</dimen>
 
     <!-- default activity -->
     <dimen name="activity_font_size">16sp</dimen>
-    <dimen name="dialog_alert_font_size">20sp</dimen>
+    <dimen name="dialog_alert_font_size">16sp</dimen>
 </resources>

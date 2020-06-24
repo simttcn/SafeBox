@@ -31,6 +31,7 @@ import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.google.android.material.snackbar.Snackbar
@@ -42,6 +43,7 @@ import com.smttcn.commons.helpers.*
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
+import com.smttcn.safebox.helpers.ImageViewerHelpers
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
 import com.smttcn.safebox.ui.security.EncryptingActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
@@ -72,6 +74,8 @@ class MainActivity : BaseActivity() {
     var BackButtonPressedOnce = false
     var LastPressedBackTime = System.currentTimeMillis()
 
+
+    //-------------------------------------------------------------------------------------------
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -88,6 +92,8 @@ class MainActivity : BaseActivity() {
         showProgressBar(false)
     }
 
+
+    //-------------------------------------------------------------------------------------------
     private fun initialize() {
         MyApplication.mainActivityContext = this
         myContext = this
@@ -100,6 +106,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
+
+    //-------------------------------------------------------------------------------------------
     private fun initializeUI() {
         val recyclerView = findViewById<RecyclerView>(R.id.itemListRecyclerView)
         recyclerViewAdapter = FileItemAdapter(this)
@@ -122,7 +130,9 @@ class MainActivity : BaseActivity() {
         })
     }
 
+
     // todo next: to handle the .enc file properly
+    //-------------------------------------------------------------------------------------------
     private fun handleShareFromOtherApp(): Boolean {
         var result: Boolean = true
 
@@ -135,6 +145,8 @@ class MainActivity : BaseActivity() {
         return result
     }
 
+
+    //-------------------------------------------------------------------------------------------
     override fun onBackPressed() {
         val millisecondsSinceLastPressedBack = System.currentTimeMillis() - LastPressedBackTime
         if (!BackButtonPressedOnce || millisecondsSinceLastPressedBack > INTERVAL_BACK_BUTTON_QUIT_IN_MS) {
@@ -148,6 +160,8 @@ class MainActivity : BaseActivity() {
         super.onBackPressed()
     }
 
+
+    //-------------------------------------------------------------------------------------------
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         toolbarMenu = menu
@@ -155,6 +169,8 @@ class MainActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+
+    //-------------------------------------------------------------------------------------------
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
@@ -187,13 +203,10 @@ class MainActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+
     @Suppress("UNUSED_PARAMETER")
-    private fun onRecyclerViewItemClicked(
-        view: View,
-        item: FileDirItem,
-        prevIdx: Int,
-        currIdx: Int
-    ) {
+    //-------------------------------------------------------------------------------------------
+    private fun onRecyclerViewItemClicked( view: View, item: FileDirItem, prevIdx: Int, currIdx: Int) {
         // Todo: to decide whether should allow user to open just by taping on it.
 
         view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
@@ -215,6 +228,8 @@ class MainActivity : BaseActivity() {
 //        }
     }
 
+
+    //-------------------------------------------------------------------------------------------
     private fun onRecyclerViewItemPopupMenuClicked(view: View, item: FileDirItem, position: Int) {
         var popupMenu = PopupMenu(this, view, Gravity.BOTTOM + Gravity.RIGHT)
         popupMenu.menuInflater.inflate(R.menu.filediritem_popup_menu, popupMenu.menu)
@@ -271,61 +286,23 @@ class MainActivity : BaseActivity() {
 
     }
 
+
     // todo next: let people view the contetnt of supported file
+    //-------------------------------------------------------------------------------------------
     private fun viewItem(item: FileDirItem, view: View) {
-        // ask for the decrypting password for this file
-        MaterialDialog(this).show {
-            title(R.string.enc_enter_password)
-            message(R.string.enc_msg_decrypting_password)
-            input(
-                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            ) { _, text ->
+        // todo next: have to decide on which view helper to handle the file
 
-                showProgressBar(true)
-                val decryptedFileByteArray = FileManager.decryptFileContentToByteArray(
-                    File(item.path),
-                    text.toString().toCharArray()
-                )
-                showProgressBar(false)
+        if (item.getOriginalFilename().isImageSlow()) {
 
-                if (decryptedFileByteArray != null) {
-                    val imagePaths = listOf(decryptedFileByteArray)
-                    StfalconImageViewer.Builder<ByteArray>(
-                        this@MainActivity,
-                        imagePaths,
-                        ::loadImage
-                    )
-                        .withTransitionFrom(view.item_background)
-                        .show()
+            var helper = ImageViewerHelpers(this, view, item)
+            helper.view()
 
-                } else {
-                    // fail to encrypt file
-                    showMessageDialog(
-                        myContext,
-                        R.string.error,
-                        R.string.enc_enter_decrypting_password_error
-                    ) {}
-                }
-
-            }
-            positiveButton(R.string.btn_decrypt_file)
-            negativeButton(R.string.btn_cancel)
-            cancelable(false)  // calls setCancelable on the underlying dialog
-            cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-        }
-    }
-
-    private fun loadImage(imageView: ImageView, imageByteArray: ByteArray) {
-        val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadein)
-        imageView.startAnimation(aniFade)
-        imageView.setImageDrawable(getDrawableCompat(R.drawable.ic_image_gray_24dp))
-
-        if (imageByteArray != null) {
-            imageView.setImageBitmap(ImageManager.toBitmap(imageByteArray))
         }
 
     }
 
+
+    //-------------------------------------------------------------------------------------------
     private fun shareItemDecrypted(file: FileDirItem) {
         // ask for the decrypting password for this file
         MaterialDialog(this).show {
@@ -359,7 +336,9 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun decryptFileForSharing(pwd: CharArray, filepath: String): String {
+
+    //-------------------------------------------------------------------------------------------
+    private fun decryptFileForSharing(pwd: CharArray, filepath: String): String {
 
         var decryptedFilepath: String = ""
         val targetfile = File(filepath)
@@ -377,6 +356,8 @@ class MainActivity : BaseActivity() {
 
     }
 
+
+    //-------------------------------------------------------------------------------------------
     private fun sendShareItent(filepath: String) {
 
         if (filepath.isNotEmpty()) {
@@ -400,7 +381,9 @@ class MainActivity : BaseActivity() {
 
     }
 
+
     //let user change the file's encrypting password
+    //-------------------------------------------------------------------------------------------
     private fun changeEncryptingPassword(item: FileDirItem) {
         // ask for the original password for this file
         val dialog = MaterialDialog(this).show {
@@ -443,7 +426,7 @@ class MainActivity : BaseActivity() {
         })
 
         btnOk.setOnClickListener {
-            // todo next: display a progress activity when re-encrypting file.
+            // display a progress activity when re-encrypting file.
             GlobalScope.launch(Dispatchers.Main) {
 
                 btnOk.isEnabled = false
@@ -458,7 +441,6 @@ class MainActivity : BaseActivity() {
                     val oldPassword = originalPasswordInput.text.toString()
                     val newPassword = newPasswordInput.text.toString()
 
-                    // todo next: have to put the following block into a non-blocking thread in order for the UI to refresh
                     var success = false
 
                     if (isPasswordConfinedToPolicy(oldPassword) && isPasswordConfinedToPolicy(newPassword))
@@ -478,7 +460,7 @@ class MainActivity : BaseActivity() {
                                 R.string.dlg_title_error,
                                 R.string.dlg_msg_change_encrypting_password_failed
                             ) {}
-                        
+
                         dialog.dismiss()
                     }
                 }
@@ -488,11 +470,15 @@ class MainActivity : BaseActivity() {
 
     }
 
-    fun refreshFileItemList() {
+
+    //-------------------------------------------------------------------------------------------
+    private fun refreshFileItemList() {
         fileItemViewModel.refresh()
     }
 
-    fun showProgressBar(show: Boolean) {
+
+    //-------------------------------------------------------------------------------------------
+    private fun showProgressBar(show: Boolean) {
         if (show) {
             getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
@@ -509,6 +495,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
+
+    //-------------------------------------------------------------------------------------------
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
         // Check which request we're responding to
