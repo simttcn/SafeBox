@@ -2,7 +2,7 @@ package com.smttcn.safebox.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.smttcn.commons.Manager.FileManager
+import com.smttcn.commons.manager.FileManager
 
 class DebugViewModel(application: Application) : AndroidViewModel(application){
 

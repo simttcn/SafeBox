@@ -30,13 +30,15 @@ const val SIZE_THUMBNAIL_HEIGHT = 48
 const val REQUEST_CODE_NEW_APP_PASSWORD = 100
 const val REQUEST_CODE_CHANGE_APP_PASSWORD = 110
 const val REQUEST_CODE_TO_ENCRYPT_FILE = 120
-const val REQUEST_CODE_TO_DECRYPT_FILE = 130
+const val REQUEST_CODE_TO_IMPORTDECRYPT_FILE = 130
 
 // Intent request string
 const val INTENT_CALL_FROM_MAINACTIVITY = "call_from_mainactivity"
 const val INTENT_TO_CREATE_APP_PASSWORD = "to_create_app_password"
 const val INTENT_SHARE_FILE_URI = "share_file_uri"
 const val INTENT_SHARE_FILE_PATH = "share_file_path"
+const val INTENT_RESULT_IMPORTED = 99970
+const val INTENT_RESULT_DECRYPTED = 99980
 const val INTENT_RESULT_FAILED = 99999
 
 // date and time

@@ -44,8 +44,12 @@
             android:label="@string/title_activity_app_password"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.security.EncryptingActivity"
-            android:label="@string/enc_encrypting_password"
+            android:name=".ui.main.EncryptingActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.main.ImportingActivity"
+            android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.settings.SettingsActivity" />
         <activity android:name=".ui.debug.DebugconsoleActivity" />

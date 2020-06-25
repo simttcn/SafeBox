@@ -7,17 +7,13 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.provider.Contacts
-import android.provider.Contacts.*
 import android.text.Editable
 import android.text.InputType
 import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.view.*
-import android.view.animation.AnimationUtils
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -31,35 +27,27 @@ import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
-import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.google.android.material.snackbar.Snackbar
-import com.smttcn.commons.Manager.FileManager
-import com.smttcn.commons.Manager.ImageManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
+import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.helpers.ImageViewerHelpers
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
-import com.smttcn.safebox.ui.security.EncryptingActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.FileItemViewModel
-import com.stfalcon.imageviewer.StfalconImageViewer
-import kotlinx.android.synthetic.main.activity_debugconsole.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 import kotlin.concurrent.schedule
-import kotlin.coroutines.CoroutineContext
 
 
 class MainActivity : BaseActivity() {
@@ -75,7 +63,6 @@ class MainActivity : BaseActivity() {
     var LastPressedBackTime = System.currentTimeMillis()
 
 
-    //-------------------------------------------------------------------------------------------
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -93,7 +80,6 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //-------------------------------------------------------------------------------------------
     private fun initialize() {
         MyApplication.mainActivityContext = this
         myContext = this
@@ -107,7 +93,6 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //-------------------------------------------------------------------------------------------
     private fun initializeUI() {
         val recyclerView = findViewById<RecyclerView>(R.id.itemListRecyclerView)
         recyclerViewAdapter = FileItemAdapter(this)
@@ -131,22 +116,37 @@ class MainActivity : BaseActivity() {
     }
 
 
-    // todo next: to handle the .enc file properly
-    //-------------------------------------------------------------------------------------------
     private fun handleShareFromOtherApp(): Boolean {
         var result: Boolean = true
 
-        val newIntent = Intent(this, EncryptingActivity::class.java)
-        (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let {
-            newIntent.putExtra(INTENT_SHARE_FILE_URI, it)
+        val uri = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri
+
+        if (uri != null) {
+            val (filename, size) = FileManager.getFilenameAndSizeFromUri(contentResolver, uri)
+
+            toast(filename)
+
+            if (filename.getFilenameExtension() == ENCRYPTED_FILE_EXT) {
+                // todo next: have to check if the shared file is a supported encrypted file
+                // FileManager.isEncryptedFileUri(uri: Uri)
+
+                // It is an encrypted file, so ask user if they want to save it in the library or decrypt it
+                val importIntent = Intent(this, ImportingActivity::class.java)
+                importIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
+                startActivityForResult(importIntent, REQUEST_CODE_TO_IMPORTDECRYPT_FILE)
+
+            } else {
+                val encryptingIntent = Intent(this, EncryptingActivity::class.java)
+                encryptingIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
+                startActivityForResult(encryptingIntent, REQUEST_CODE_TO_ENCRYPT_FILE)
+            }
+
         }
-        startActivityForResult(newIntent, REQUEST_CODE_TO_ENCRYPT_FILE)
 
         return result
     }
 
 
-    //-------------------------------------------------------------------------------------------
     override fun onBackPressed() {
         val millisecondsSinceLastPressedBack = System.currentTimeMillis() - LastPressedBackTime
         if (!BackButtonPressedOnce || millisecondsSinceLastPressedBack > INTERVAL_BACK_BUTTON_QUIT_IN_MS) {
@@ -161,7 +161,6 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //-------------------------------------------------------------------------------------------
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         toolbarMenu = menu
@@ -170,7 +169,6 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //-------------------------------------------------------------------------------------------
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
@@ -205,8 +203,7 @@ class MainActivity : BaseActivity() {
 
 
     @Suppress("UNUSED_PARAMETER")
-    //-------------------------------------------------------------------------------------------
-    private fun onRecyclerViewItemClicked( view: View, item: FileDirItem, prevIdx: Int, currIdx: Int) {
+    private fun onRecyclerViewItemClicked(view: View, item: FileDirItem, prevIdx: Int, currIdx: Int) {
         // Todo: to decide whether should allow user to open just by taping on it.
 
         view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
@@ -229,7 +226,6 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //-------------------------------------------------------------------------------------------
     private fun onRecyclerViewItemPopupMenuClicked(view: View, item: FileDirItem, position: Int) {
         var popupMenu = PopupMenu(this, view, Gravity.BOTTOM + Gravity.RIGHT)
         popupMenu.menuInflater.inflate(R.menu.filediritem_popup_menu, popupMenu.menu)
@@ -287,10 +283,9 @@ class MainActivity : BaseActivity() {
     }
 
 
-    // todo next: let people view the contetnt of supported file
-    //-------------------------------------------------------------------------------------------
+    // let people view the contetnt of supported file
     private fun viewItem(item: FileDirItem, view: View) {
-        // todo next: have to decide on which view helper to handle the file
+        // todo next: have to decide on which viewer helper to handle the file
 
         if (item.getOriginalFilename().isImageSlow()) {
 
@@ -302,7 +297,6 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //-------------------------------------------------------------------------------------------
     private fun shareItemDecrypted(file: FileDirItem) {
         // ask for the decrypting password for this file
         MaterialDialog(this).show {
@@ -337,7 +331,6 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //-------------------------------------------------------------------------------------------
     private fun decryptFileForSharing(pwd: CharArray, filepath: String): String {
 
         var decryptedFilepath: String = ""
@@ -357,7 +350,6 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //-------------------------------------------------------------------------------------------
     private fun sendShareItent(filepath: String) {
 
         if (filepath.isNotEmpty()) {
@@ -382,8 +374,6 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //let user change the file's encrypting password
-    //-------------------------------------------------------------------------------------------
     private fun changeEncryptingPassword(item: FileDirItem) {
         // ask for the original password for this file
         val dialog = MaterialDialog(this).show {
@@ -396,22 +386,29 @@ class MainActivity : BaseActivity() {
             lifecycleOwner(this@MainActivity)
         }
 
-        val originalPasswordInput: EditText = dialog.getCustomView().findViewById(R.id.original_password)
+        val originalPasswordInput: EditText =
+            dialog.getCustomView().findViewById(R.id.original_password)
         val newPasswordInput: EditText = dialog.getCustomView().findViewById(R.id.new_password)
-        val confirmPasswordInput: EditText = dialog.getCustomView().findViewById(R.id.confirm_password)
-        val progressBarContainer: View = dialog.getCustomView().findViewById(R.id.progressBarContainer)
+        val confirmPasswordInput: EditText =
+            dialog.getCustomView().findViewById(R.id.confirm_password)
+        val progressBarContainer: View =
+            dialog.getCustomView().findViewById(R.id.progressBarContainer)
         var btnOk = dialog.getActionButton(WhichButton.POSITIVE)
         var btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
 
         progressBarContainer.visibility = View.GONE
         btnCancel.isEnabled = true
         btnOk.isEnabled = false
+        showKeyboard(originalPasswordInput)
 
         newPasswordInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                btnOk.isEnabled = isNewPasswordConfinedToPolicy(newPasswordInput.text.toString(), confirmPasswordInput.text.toString())
+                btnOk.isEnabled = isNewPasswordConfinedToPolicy(
+                    newPasswordInput.text.toString(),
+                    confirmPasswordInput.text.toString()
+                )
             }
 
         })
@@ -420,7 +417,10 @@ class MainActivity : BaseActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                btnOk.isEnabled = isNewPasswordConfinedToPolicy(newPasswordInput.text.toString(),  confirmPasswordInput.text.toString())
+                btnOk.isEnabled = isNewPasswordConfinedToPolicy(
+                    newPasswordInput.text.toString(),
+                    confirmPasswordInput.text.toString()
+                )
             }
 
         })
@@ -443,8 +443,15 @@ class MainActivity : BaseActivity() {
 
                     var success = false
 
-                    if (isPasswordConfinedToPolicy(oldPassword) && isPasswordConfinedToPolicy(newPassword))
-                        success = FileManager.reencryptFiles(item.path, oldPassword.toCharArray(), newPassword.toCharArray())
+                    if (isPasswordConfinedToPolicy(oldPassword) && isPasswordConfinedToPolicy(
+                            newPassword
+                        )
+                    )
+                        success = FileManager.reencryptFiles(
+                            item.path,
+                            oldPassword.toCharArray(),
+                            newPassword.toCharArray()
+                        )
 
                     GlobalScope.launch(Dispatchers.Main) {
                         progressBarContainer.visibility = View.GONE
@@ -471,13 +478,11 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //-------------------------------------------------------------------------------------------
     private fun refreshFileItemList() {
         fileItemViewModel.refresh()
     }
 
 
-    //-------------------------------------------------------------------------------------------
     private fun showProgressBar(show: Boolean) {
         if (show) {
             getWindow().setFlags(
@@ -496,7 +501,6 @@ class MainActivity : BaseActivity() {
     }
 
 
-    //-------------------------------------------------------------------------------------------
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
         // Check which request we're responding to
@@ -527,6 +531,40 @@ class MainActivity : BaseActivity() {
                     this,
                     R.string.enc_title_encrypting_file,
                     R.string.enc_msg_encrypting_cancelled
+                ) {}
+
+            }
+
+        } else if (requestCode == REQUEST_CODE_TO_IMPORTDECRYPT_FILE) {
+
+            if (resultCode == INTENT_RESULT_IMPORTED) {
+                // file imported
+                refreshFileItemList()
+
+                showMessageDialog(
+                    this,
+                    R.string.imp_title_import_decrypt,
+                    R.string.imp_msg_import_success
+                ) {}
+
+            } else if (resultCode == INTENT_RESULT_DECRYPTED) {
+                // successfully decrypted and shared the file
+                // so nothing to do here
+
+            } else if (resultCode == INTENT_RESULT_FAILED) {
+                // import/decrypt operation failed
+                showMessageDialog(
+                    this,
+                    R.string.imp_title_import_decrypt,
+                    R.string.imp_msg_import_failed
+                ) {}
+
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // User cancelled import/decrypt operation
+                showMessageDialog(
+                    this,
+                    R.string.imp_title_import_decrypt,
+                    R.string.operation_cancelled
                 ) {}
 
             }

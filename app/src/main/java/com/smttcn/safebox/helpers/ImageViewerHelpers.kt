@@ -12,13 +12,11 @@ import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
-import com.smttcn.commons.Manager.FileManager
-import com.smttcn.commons.Manager.ImageManager
-import com.smttcn.commons.extensions.getDrawableCompat
-import com.smttcn.commons.extensions.isImageSlow
-import com.smttcn.commons.extensions.isPasswordConfinedToPolicy
-import com.smttcn.commons.extensions.showMessageDialog
+import com.smttcn.commons.extensions.*
+import com.smttcn.commons.manager.FileManager
+import com.smttcn.commons.manager.ImageManager
 import com.smttcn.commons.models.FileDirItem
+import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.recyclerview_item.view.*
@@ -30,14 +28,13 @@ import java.io.File
 class ImageViewerHelpers(context: Context, view: View, file: FileDirItem): BaseViewerHelpers(context, view, file) {
 
 
-    //-------------------------------------------------------------------------------------------
     override fun view() {
 
         // ask for the decrypting password for this file
         val dialog = MaterialDialog(_parentContext).show {
             title(R.string.enc_enter_password)
             customView(R.layout.enter_password_view, scrollable = true, horizontalPadding = true)
-            positiveButton(R.string.btn_decrypt_file)
+            positiveButton(R.string.btn_ok)
             negativeButton(R.string.btn_cancel)
             cancelable(false)  // calls setCancelable on the underlying dialog
             cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
@@ -51,6 +48,7 @@ class ImageViewerHelpers(context: Context, view: View, file: FileDirItem): BaseV
         progressBarContainer.visibility = View.GONE
         btnCancel.isEnabled = true
         btnOk.isEnabled = false
+        _parentContext.showKeyboard(passwordInput)
 
         passwordInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -113,6 +111,7 @@ class ImageViewerHelpers(context: Context, view: View, file: FileDirItem): BaseV
         }
     }
 
+
     override fun isSupported(): Boolean {
         if (_file.getOriginalFilename().isImageSlow())
             return true
@@ -121,13 +120,12 @@ class ImageViewerHelpers(context: Context, view: View, file: FileDirItem): BaseV
     }
 
 
-    //-------------------------------------------------------------------------------------------
     private fun loadImage(imageView: ImageView, imageByteArray: ByteArray) {
         val aniFade = AnimationUtils.loadAnimation(_parentContext.applicationContext, R.anim.fadein)
         imageView.startAnimation(aniFade)
         imageView.setImageDrawable(_parentContext.getDrawableCompat(R.drawable.ic_image_gray_24dp))
 
-        if (imageByteArray != null) {
+        if (imageByteArray.size > 0) {
             imageView.setImageBitmap(ImageManager.toBitmap(imageByteArray))
         }
 

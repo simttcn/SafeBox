@@ -9,7 +9,8 @@
     <color name="colorAccent">#D81B60</color>
     <color name="colorBackground">@color/colorWhite</color>
     <color name="colorText">#202020</color>
-    <color name="colorErrorText">#FF0000</color>
+    <color name="colorWarning">#FF0000</color>
+    <color name="colorError">#FF0000</color>
     <color name="colorNavItemBackgroundCheck">@color/colorWhite</color>
     <color name="colorNavItemBackgroundUncheck">@color/colorPrimary</color>
     <color name="colorNavItemTextColorCheck">@color/colorPrimary</color>

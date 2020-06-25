@@ -29,6 +29,8 @@ internal class Authenticator() {
     fun removeAppPassword(currentPassword: String, callback: (success: Boolean) -> Unit) {
         authenticateAppPassword(currentPassword) {
             if (it == true) {
+                MyApplication.baseConfig.appPasswordHash = ""
+                MyApplication.baseConfig.appPasswordHashBackup = ""
                 MyApplication.baseConfig.removePrefKey(APP_PASSWORD_HASH_01)
                 MyApplication.baseConfig.removePrefKey(APP_PASSWORD_HASH_02)
                 callback(true)

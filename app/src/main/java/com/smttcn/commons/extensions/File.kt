@@ -1,7 +1,5 @@
 package com.smttcn.commons.extensions
 
-import android.webkit.MimeTypeMap
-import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.helpers.*
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
@@ -82,7 +80,7 @@ fun File.getDirectChildrenCount(countHiddenItems: Boolean) = listFiles()?.filter
 fun File.toFileDirItem() = FileDirItem(this)
 
 fun File.copyToFolder(targetFolder: File): File {
-    val targetFile = File(targetFolder!!.canonicalPath.appendPath(this.name))
+    val targetFile = File(targetFolder.canonicalPath.appendPath(this.name))
     return this.copyTo(targetFile, overwrite = true)
 }
 

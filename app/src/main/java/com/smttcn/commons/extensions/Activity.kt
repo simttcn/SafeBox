@@ -48,24 +48,24 @@ fun Activity.launchViewIntent(url: String) {
     }
 }
 
-fun Activity.hideKeyboard() {
-    val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputMethodManager.hideSoftInputFromWindow((currentFocus ?: View(this)).windowToken, 0)
-    window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-    currentFocus?.clearFocus()
-}
-
-fun Activity.showKeyboard(et: EditText) {
-    et.requestFocus()
-    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
-}
-
-fun Activity.hideKeyboard(view: View) {
-    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-}
-
+//fun Activity.hideKeyboard() {
+//    val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//    inputMethodManager.hideSoftInputFromWindow((currentFocus ?: View(this)).windowToken, 0)
+//    window!!.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+//    currentFocus?.clearFocus()
+//}
+//
+//fun Activity.showKeyboard(et: EditText) {
+//    et.requestFocus()
+//    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//    imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
+//}
+//
+//fun Activity.hideKeyboard(view: View) {
+//    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+//    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+//}
+//
 fun Activity.isSimilarByteArray(data1: ByteArray, data2: ByteArray) : Boolean {
     return data1.toString(Charsets.UTF_8).equals(data2.toString(Charsets.UTF_8))
 }

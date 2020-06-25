@@ -1,7 +1,6 @@
-package com.smttcn.safebox.ui.security
+package com.smttcn.safebox.ui.main
 
 import android.app.Activity
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -11,11 +10,9 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
-import com.afollestad.materialdialogs.MaterialDialog
-import com.smttcn.commons.Manager.FileManager
+import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.showKeyboard
-import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.INTENT_RESULT_FAILED
 import com.smttcn.commons.helpers.INTENT_SHARE_FILE_URI
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
@@ -45,8 +42,8 @@ class EncryptingActivity: BaseActivity() {
     private fun initActivityUI() {
         val EncryptingPassword = findViewById<EditText>(R.id.encrypting_password)
         val ConfirmPassword = findViewById<EditText>(R.id.confirm_password)
-        val okButton = findViewById<Button>(R.id.ok)
-        val CancelButton = findViewById<Button>(R.id.cancel)
+        val btnOk = findViewById<Button>(R.id.ok)
+        val btnCancel = findViewById<Button>(R.id.cancel)
 
         EncryptingPassword.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -66,13 +63,13 @@ class EncryptingActivity: BaseActivity() {
 
         })
 
-        CancelButton.setOnClickListener {
+        btnCancel.setOnClickListener {
             // user cancel
             setResult(Activity.RESULT_CANCELED)
             finish()
         }
 
-        okButton.setOnClickListener {
+        btnOk.setOnClickListener {
             if (isEncryptingPasswordValid(EncryptingPassword.text.toString(), ConfirmPassword.text.toString())){
 
                 var encryptedSuccess = false

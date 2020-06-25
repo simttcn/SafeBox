@@ -12,13 +12,10 @@ import com.smttcn.commons.extensions.showKeyboard
 import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.afollestad.materialdialogs.MaterialDialog
-import com.smttcn.commons.Manager.FileManager
 import com.smttcn.commons.extensions.isNewPasswordConfinedToPolicy
 import com.smttcn.commons.extensions.showMessageDialog
-import com.smttcn.commons.helpers.INTENT_CALL_FROM_MAINACTIVITY
 import com.smttcn.commons.helpers.INTENT_TO_CREATE_APP_PASSWORD
 import com.smttcn.safebox.MyApplication
-import com.smttcn.safebox.ui.main.MainActivity
 import com.smttcn.safebox.R
 
 

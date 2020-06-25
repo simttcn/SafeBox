@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">SafeBox</string>
 
-    <string name="no_app_found">No app for opening this type of file is installed</string>
+    <string name="no_app_found">No app for opening this type of file is installed.</string>
     <string name="an_error_occurred">An error occurred</string>
 <!--    <string name="no_reminder">No reminder</string>-->
 <!--    <string name="at_start">At start</string>-->
@@ -16,7 +16,7 @@
     <!--  Menu  -->
     <string name="menu_refresh">Refresh</string>
     <string name="menu_settings">Settings</string>
-    <string name="menu_more">More...</string>
+    <string name="menu_more">More…</string>
 
     <!-- Button -->
     <string name="btn_ok">OK</string>
@@ -31,17 +31,19 @@
     <string name="next">Next</string>
     <string name="done">Done</string>
     <string name="error">Error</string>
+    <string name="warning">Warning</string>
     <string name="please_wait">Please wait...</string>
-    <string name="encrypting_file">Encrypting file...</string>
-    <string name="decrypting_file">Decrypting file...</string>
+    <string name="encrypting_file">Encrypting file…</string>
+    <string name="decrypting_file">Decrypting file…</string>
     <string name="press_back_again_to_quit">Press back button again to quit this app.</string>
+    <string name="operation_cancelled">Operation cancelled.</string>
 
     <!--  UI - login and password activity  -->
 <!--    <string name="new_app_password">New App Password</string>-->
     <string name="enter_app_password">Enter App Password</string>
     <string name="enter_app_password_error">App password incorrect, please try again.</string>
     <string name="enter_your_app_password">enter app password</string>
-    <string name="enter_existing_app_password">enter existing app password</string>
+    <string name="enter_existing_app_password">Enter existing app password</string>
     <string name="enter_new_app_password">enter new app password</string>
     <string name="confirm_new_app_password">confirm new app password</string>
 
@@ -49,40 +51,47 @@
     <string name="menu_view_item">View</string>
     <string name="menu_share_item_encrypted">Share</string>
     <string name="menu_share_item_decrypted">Decrypt and share</string>
-    <string name="menu_change_encrypting_password">Change encrypting password...</string>
+    <string name="menu_change_encrypting_password">Change encrypting password…</string>
     <string name="menu_delete_item">Delete</string>
 
     <!--  UI - recyclerview item delete dialog  -->
     <string name="dlg_title_delete_item">Delete Item</string>
-    <string name="dlg_msg_delete_item">Do you really want to permanently delete the following item?</string>
+    <string name="dlg_msg_delete_item">Do you really want to permanently delete the following item?\n\n Deleted file are NOT recoverable.</string>
 
     <!--  UI - share item menu  -->
     <string name="enc_enter_password">Enter Password</string>
     <string name="enc_encrypting_password">Encrypting Password</string>
 <!--    <string name="enc_enter_a_password">Enter a password</string>-->
     <string name="enc_confirm_your_password">Confirm your password</string>
-<!--    <string name="enc_decrypting_password">Decrypting Password</string>-->
+    <string name="enc_decrypting_password">Decrypting Password</string>
     <string name="enc_enter_decrypting_password_error">Decrypting failed, possibly incorrect password, please try again.</string>
     <string name="enc_msg_encrypting_password">Please enter a password to encrypt this file.</string>
-    <string name="enc_msg_decrypting_password">Please enter the password to decrypt this file</string>
+    <string name="enc_msg_decrypting_password">Please enter the password to decrypt this file.</string>
     <string name="enc_warning_encrypting_password">Warning: if you forget this password, your encrypted file will be unrecoverable and as good as gone unless you have a backup somewhere else. so please choose your password carefully.</string>
     <string name="btn_encrypt_file">Encrypt file</string>
     <string name="btn_decrypt_file">Decrypt and share</string>
     <string name="enc_title_encrypting_file">Encrypting File</string>
 <!--    <string name="enc_title_decrypting_file">Decrypting File</string>-->
-    <string name="enc_msg_encrypting_success">File succesfully encrypted</string>
-    <string name="enc_msg_encrypting_cancelled">File encryption cancelled</string>
-    <string name="enc_msg_encrypting_failed">Error encrypting the file</string>
+    <string name="enc_msg_encrypting_success">File succesfully encrypted.</string>
+    <string name="enc_msg_encrypting_cancelled">File encryption cancelled.</string>
+    <string name="enc_msg_encrypting_failed">Error encrypting the file.</string>
 <!--    <string name="enc_msg_decrypting_success">File succesfully decrypted</string>-->
 <!--    <string name="enc_msg_decrypting_cancelled">File decryption cancelled</string>-->
 <!--    <string name="enc_msg_decrypting_failed">Error decrypting the file</string>-->
+
+    <!-- UI - import / decrypt and open in -->
+    <string name="imp_title_import_decrypt">Import/Decrypt</string>
+    <string name="imp_radio_save_in_library">Save in library</string>
+    <string name="imp_radio_decrypt_and_open_in">Decrypt and open in…</string>
+    <string name="imp_msg_import_failed">Failed to import/decrypt the file.</string>
+    <string name="imp_msg_import_success">File successfully imported.</string>
 
     <!--  UI - change encrypting password  -->
     <string name="dlg_title_change_encrypting_password">Change Encrypting Password</string>
     <string name="dlg_hint_enter_original_password">Enter the original password</string>
     <string name="dlg_hint_enter_new_password">Enter the new password</string>
     <string name="dlg_hint_confirm_new_password">Confirm new password</string>
-    <string name="dlg_msg_change_encrypting_password_success">File encrypting password successfuly changed</string>
+    <string name="dlg_msg_change_encrypting_password_success">File encrypting password successfuly changed.</string>
     <string name="dlg_msg_change_encrypting_password_failed">Failed to change the encrypting password, please try again later.</string>
 
     <!-- Recyclerview item list -->

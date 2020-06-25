@@ -1,12 +1,8 @@
-package com.smttcn.commons.Manager
+package com.smttcn.commons.manager
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.smttcn.commons.helpers.SIZE_THUMBNAIL_HEIGHT
-import com.smttcn.commons.helpers.SIZE_THUMBNAIL_WIDTH
-import com.smttcn.safebox.MyApplication
 import java.io.ByteArrayOutputStream
-import java.io.File
 
 
 object ImageManager {

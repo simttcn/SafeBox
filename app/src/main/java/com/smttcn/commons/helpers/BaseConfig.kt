@@ -144,8 +144,11 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
         set(primaryColor) = prefs.edit().putInt(PRIMARY_COLOR, primaryColor).apply()
 
     public fun removePrefKey(key: String) {
-        prefs.edit().remove(key)
-        prefs.edit().commit()
+        // have to use the same instances for deletion
+        // i.e.: assign to an instance and operate on it.
+        val editor = prefs.edit()
+        editor.remove(key)
+        editor.commit()
     }
 
     private fun getDefaultDateFormat(): String {

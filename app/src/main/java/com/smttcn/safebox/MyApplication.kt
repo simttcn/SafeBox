@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
-import com.smttcn.commons.Manager.FileManager
+import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.helpers.BaseConfig
 import com.smttcn.commons.helpers.PREFS_KEY
 
@@ -42,6 +42,10 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
         var authenticated: Boolean
             get() {
+                // We will always force app password whenever password hash is found in the config
+                if (baseConfig.appPasswordHash.length > 0)
+                    baseConfig.appPasswordEnabled = true
+
                 return baseConfig.appPasswordEnabled == false || _authenticated
             }
             set(value) { _authenticated = value }

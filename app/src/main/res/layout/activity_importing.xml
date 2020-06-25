@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.smttcn.safebox.ui.main.EncryptingActivity">
+    tools:context="com.smttcn.safebox.ui.main.ImportingActivity">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -30,47 +30,35 @@
             android:gravity="center_vertical"
             android:orientation="vertical">
 
-            <TextView
+            <RadioGroup
+                android:id="@+id/importOptionGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/activity_font_size"
-                android:text="@string/enc_msg_encrypting_password"/>
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="40dp"
-                android:paddingBottom="40dp"
-                android:textSize="@dimen/activity_font_size"
-                android:text="@string/enc_warning_encrypting_password"
-                android:textColor="#FF0000" />
+                <RadioButton
+                    android:id="@+id/importOptionSaveInLibrary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/imp_radio_save_in_library"
+                    />
+
+                <RadioButton
+                    android:id="@+id/importOptionDecryptAndOpenIn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:text="@string/imp_radio_decrypt_and_open_in" />
+
+            </RadioGroup>
 
             <EditText
-                android:id="@+id/encrypting_password"
+                android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="3dp"
                 android:ems="10"
-                android:hint="@string/enc_encrypting_password"
+                android:hint="@string/enc_decrypting_password"
                 android:imeOptions="actionNext"
-
-                android:inputType="textPassword"
-                android:paddingLeft="0dp"
-                android:paddingRight="0dp"
-                android:selectAllOnFocus="true"
-                android:textColor="#333"
-                android:textSize="@dimen/customEntry"
-                tools:ignore="Autofill,HardcodedText,LabelFor" />
-
-            <EditText
-                android:id="@+id/confirm_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:ems="10"
-                android:hint="@string/enc_confirm_your_password"
-                android:imeOptions="actionDone"
-
                 android:inputType="textPassword"
                 android:paddingLeft="0dp"
                 android:paddingRight="0dp"

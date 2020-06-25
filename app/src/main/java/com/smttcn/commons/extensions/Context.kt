@@ -25,6 +25,9 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
@@ -131,5 +134,17 @@ fun Context.getPermissionString(id: Int) = when (id) {
 fun Context.getDrawableCompat(@DrawableRes drawableRes: Int): Drawable? {
     return AppCompatResources.getDrawable(this, drawableRes)
 }
+
+fun Context.showKeyboard(et: EditText) {
+    et.requestFocus()
+    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
+}
+
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
 
 

@@ -1,18 +1,17 @@
 package com.smttcn.safebox.ui.main
 
 import android.content.Context
-import android.graphics.Color
-import android.text.InputType
-import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.input.input
-import com.smttcn.commons.Manager.FileManager
-import com.smttcn.commons.extensions.showMessageDialog
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
+import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
 import kotlinx.android.synthetic.main.recyclerview_item.view.*
@@ -123,9 +122,9 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
         var item = fileItems[position]
 
         // ask for the decrypting password for this file
-        MaterialDialog(currentContext).show {
+        var dialog = MaterialDialog(currentContext).show {
             title(R.string.dlg_title_delete_item)
-            message(null, currentContext.getString(R.string.dlg_msg_delete_item) + "\n\n" + item.filename)
+            customView(R.layout.delete_file_view)
             positiveButton(R.string.btn_delete) {
 
                 if (FileManager.deleteFile(File(item.path))) {
@@ -138,6 +137,9 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
             cancelable(false)  // calls setCancelable on the underlying dialog
             cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
         }
+
+        val filename: TextView = dialog.getCustomView().findViewById(R.id.filename)
+        filename.text = item.getOriginalFilename()
 
     }
 

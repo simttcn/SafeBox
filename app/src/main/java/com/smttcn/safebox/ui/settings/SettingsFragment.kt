@@ -62,16 +62,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
             redirectToNewPasswordActivity()
 
         } else {
-            changeAppPassword!!.isEnabled = false
             // ask for current app password before removing the app password
             MaterialDialog(myContext).show {
+                title(R.string.enter_app_password)
                 input(
-                    hintRes = R.string.enter_existing_app_password,
                     inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 ) { _, text ->
 
                     Authenticator().removeAppPassword(text.toString()) {
-                        if (it != true) {
+                        if (it == true) {
+                            enabledAppPassword!!.isChecked = false
+                            changeAppPassword!!.isEnabled = false
+                        } else {
                             enabledAppPassword!!.isChecked = true
                             changeAppPassword!!.isEnabled = true
 
