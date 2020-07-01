@@ -19,8 +19,9 @@
 
     <ImageView
         android:id="@+id/item_thumbnail"
+        android:layout_gravity="center_vertical"
         android:layout_width="@dimen/itemlist_thumbnail_width"
-        android:layout_height="@dimen/itemlist_thumbnail_height"
+        android:layout_height="match_parent"
         android:contentDescription="@string/itemlist_thumbnail" />
 
     <TextView
@@ -31,10 +32,8 @@
         android:layout_marginStart="@dimen/itemlist_thumbnail_width"
         android:background="@android:color/transparent"
         android:paddingStart="@dimen/itemlist_filename_padding_start"
-        android:paddingLeft="@dimen/itemlist_filename_padding_start"
         android:paddingTop="@dimen/itemlist_filename_padding_top"
         android:paddingEnd="@dimen/itemlist_filename_padding_end"
-        android:paddingRight="@dimen/itemlist_filename_padding_end"
         android:paddingBottom="@dimen/itemlist_filename_padding_bottom"
         android:layout_marginEnd="@dimen/popupmenu_width"
         android:text="@string/itemlist_default_text"

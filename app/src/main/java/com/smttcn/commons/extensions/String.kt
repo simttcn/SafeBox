@@ -1,10 +1,6 @@
 package com.smttcn.commons.extensions
 
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Point
-import android.media.MediaMetadataRetriever
 import android.os.StatFs
 import android.text.Spannable
 import android.text.SpannableString
@@ -32,6 +28,9 @@ fun String.withTrailingCharacter(character: Char): String {
     } else return this
 }
 
+fun String.removeEncryptedExtension() = removeSuffix("." + ENCRYPTED_FILE_EXT)
+
+
 fun String.getFilenameFromPath() : String {
     if (lastIndexOf("/") < 1)
         return this
@@ -39,11 +38,20 @@ fun String.getFilenameFromPath() : String {
         return substring(lastIndexOf("/") + 1)
 }
 
-fun String.getFilenameExtension() = substring(lastIndexOf(".") + 1)
+fun String.getOriginalFilenameFromPath() : String {
+    if (lastIndexOf("/") < 1)
+        return this
+    else
+        return substring(lastIndexOf("/") + 1).removeEncryptedExtension()
+}
 
-fun String.getFilenameExtensionOfEncryptedFile(): String{
-    var originalFilename = this.removeSuffix("." + ENCRYPTED_FILE_EXT)
-    return originalFilename.substring(originalFilename.lastIndexOf(".")+1)
+fun String.getFileExtension() = substring(lastIndexOf(".") + 1)
+
+fun String.getOriginalFileExtension() = removeEncryptedExtension().getFileExtension()
+
+fun String.insertBeforeFileExtension(str: String): String {
+    var ext = this.getFileExtension()
+    return this.removeSuffix("." + ext) + str + "." + ext
 }
 
 fun String.isAValidFilename(): Boolean {
@@ -76,7 +84,7 @@ fun String.isImageSlow() = isImageFast() || getMimeType().startsWith("image")
 fun String.isVideoSlow() = isVideoFast() || getMimeType().startsWith("video")
 fun String.isAudioSlow() = isAudioFast() || getMimeType().startsWith("audio")
 
-fun String.getCompressionFormat() = when (getFilenameExtension().toLowerCase()) {
+fun String.getCompressionFormat() = when (getFileExtension().toLowerCase()) {
     "png" -> Bitmap.CompressFormat.PNG
     "webp" -> Bitmap.CompressFormat.WEBP
     else -> Bitmap.CompressFormat.JPEG
@@ -162,9 +170,9 @@ fun String.getAvailableStorageB(): Long {
 fun String.normalizeString() = Normalizer.normalize(this, Normalizer.Form.NFD).replace(normalizeRegex, "")
 
 fun String.getMimeType(): String {
-    return MimeType.typesMap[getFilenameExtension().toLowerCase()] ?: ""
+    return MimeType.typesMap[getFileExtension().toLowerCase()] ?: ""
 }
 
 fun String.getMimeTypeOfEncryptedFile(): String {
-    return MimeType.typesMap[getFilenameExtensionOfEncryptedFile().toLowerCase()] ?: ""
+    return MimeType.typesMap[getOriginalFileExtension().toLowerCase()] ?: ""
 }

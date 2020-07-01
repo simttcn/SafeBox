@@ -11,6 +11,7 @@ import com.smttcn.safebox.MyApplication
 import java.io.*
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 object FileManager {
@@ -86,7 +87,7 @@ object FileManager {
     }
 
 
-    fun toFullPathInDocumentRoot(itemName: String): String = documentDataRoot.withTrailingCharacter('/') + itemName
+    private fun toFullPathInDocumentRoot(itemName: String): String = documentDataRoot.withTrailingCharacter('/') + itemName
 
 
     // Dir operation
@@ -112,7 +113,7 @@ object FileManager {
     fun getFolderInCacheFolder(dir: String = "", toCreate: Boolean = false): File? {
         val f = File(MyApplication.applicationContext.cacheDir.canonicalPath.withTrailingCharacter('/') + dir)
 
-        if (f.exists() && f.isDirectory()) {
+        if (f.exists() && f.isDirectory) {
             return f
         } else {
             if (toCreate) {
@@ -150,13 +151,46 @@ object FileManager {
     // File operations
     fun isFileExistInDocumentRoot(file: String, isHidden: Boolean = false): Boolean {
         val f = File(toFullPathInDocumentRoot(file))
-        return f.exists() && f.isHidden() == isHidden
+        return f.exists() && f.isHidden == isHidden
     }
 
 
     fun isFileExist(file: String, isHidden: Boolean = false): Boolean {
         val f = File(file)
         return f.exists() && f.isHidden() == isHidden
+    }
+
+
+    private fun renameDuplicatedFilePath(filePath: String): String {
+
+        if (isFileExist(filePath)) {
+
+            var filePathWithoutEncExt = filePath.removeSuffix("." + ENCRYPTED_FILE_EXT)
+            var counter = 1
+            var newFilename = filePathWithoutEncExt
+                .insertBeforeFileExtension(DUPLICATED_FILE_SUFFIX + counter.toString()) + "." + ENCRYPTED_FILE_EXT
+
+            while (isFileExist(newFilename)) {
+                counter++
+                newFilename = filePathWithoutEncExt
+                    .insertBeforeFileExtension(DUPLICATED_FILE_SUFFIX + counter.toString()) + "." + ENCRYPTED_FILE_EXT
+            }
+            return newFilename
+
+        } else {
+            return filePath
+        }
+
+
+    }
+
+
+    fun deleteFile(file: File?): Boolean {
+        if (file != null && file.isFile) {
+            return file.delete()
+        } else {
+            return false
+        }
     }
 
 
@@ -173,64 +207,6 @@ object FileManager {
             }
         }
         return ""
-    }
-
-
-    fun copyFileFromUriToFolder(contentResolver: ContentResolver, uri: Uri, folder: String = "") {
-        val (filename, size) = getFilenameAndSizeFromUri(contentResolver, uri)
-
-        if (size < 1) return
-
-        val inputStream = contentResolver.openInputStream(uri)
-        var targetFilePath: String
-
-        if (folder.length > 0)
-            targetFilePath = FileManager.toFullPathInDocumentRoot(folder.withTrailingCharacter('/') + filename)
-        else
-            targetFilePath = FileManager.toFullPathInDocumentRoot(filename)
-
-        FileOutputStream(targetFilePath).use { fileOut ->
-            inputStream!!.copyTo(fileOut)
-            fileOut.close()
-        }
-        inputStream!!.close()
-    }
-
-
-    fun encryptFileFromUriToFolder(contentResolver: ContentResolver, password: CharArray, uri: Uri, folder: String = ""): String {
-        var encryptedFilePath: String
-        val (filename, size) = getFilenameAndSizeFromUri(contentResolver, uri)
-
-        if (size < 1) return ""
-
-        val inputStream = contentResolver.openInputStream(uri)
-
-        // todo next: should check to see if file already exist and change its filename accordingly
-        if (folder.length > 0)
-            encryptedFilePath = FileManager.toFullPathInDocumentRoot(folder.withTrailingCharacter('/') + filename)
-        else
-            encryptedFilePath = FileManager.toFullPathInDocumentRoot(filename)
-
-        encryptedFilePath = encryptedFilePath.addExtension(ENCRYPTED_FILE_EXT)
-
-        //todo later: got to check inputStream validity
-        val bytes = inputStream!!.readBytes()
-        inputStream.close()
-        val map = Encryption().encryptWithFilename(filename, bytes, password)
-
-        if (map.containsKey(APP_ENCRYPT_VAR0) && map.containsKey(APP_ENCRYPT_VAR1) && map.containsKey(
-                APP_ENCRYPT_VAR2
-            ) && map.containsKey(APP_ENCRYPT_VAR3)
-        ) {
-            ObjectOutputStream(FileOutputStream(encryptedFilePath)).use { it ->
-                it.writeObject(map)
-            }
-
-            return encryptedFilePath
-        }
-
-        return ""
-
     }
 
 
@@ -257,12 +233,33 @@ object FileManager {
     }
 
 
-    fun deleteFile(file: File?): Boolean {
-        if (file != null && file.isFile) {
-            return file.delete()
-        } else {
-            return false
+    fun copyFileFromUriToFolder(contentResolver: ContentResolver, uri: Uri, folder: String = ""): String {
+        val (filename, size) = getFilenameAndSizeFromUri(contentResolver, uri)
+
+        if (size < 1) return ""
+
+        val inputStream = contentResolver.openInputStream(uri)
+        var targetFilePath = ""
+
+        if (folder.length > 0)
+            targetFilePath = FileManager.toFullPathInDocumentRoot(folder.withTrailingCharacter('/') + filename)
+        else
+            targetFilePath = FileManager.toFullPathInDocumentRoot(filename)
+
+        targetFilePath = renameDuplicatedFilePath(targetFilePath)
+
+        FileOutputStream(targetFilePath).use { fileOut ->
+            inputStream!!.copyTo(fileOut)
+            fileOut.close()
         }
+        inputStream!!.close()
+
+        // we need to update the encrypted hash's stored filename as to be consistent with its actual displayed filename
+        if (!filename.equals(targetFilePath.getFilenameFromPath(), true))
+            updateEncryptedFileName(File(targetFilePath), targetFilePath.getFilenameFromPath())
+
+
+        return targetFilePath
     }
 
 
@@ -283,7 +280,24 @@ object FileManager {
         try {
             ObjectInputStream(FileInputStream(file)).use { it ->
                 val map = getEncryptedHashMap(it.readObject())
-                if (map != null) {
+                if (isValidEncryptedHashMap(map)) {
+                    return true
+                }
+            }
+        } catch (ex: Exception) {
+            return false
+        }
+
+        return false
+    }
+
+
+    fun isEncryptedFileUri(contentResolver: ContentResolver, uri: Uri): Boolean {
+
+        try {
+            ObjectInputStream(contentResolver.openInputStream(uri)).use { it ->
+                val map = getEncryptedHashMap(it.readObject())
+                if (isValidEncryptedHashMap(map)) {
                     return true
                 }
             }
@@ -316,6 +330,81 @@ object FileManager {
     }
 
 
+    fun writeEncryptedHashMapToFile(map: HashMap<String, ByteArray>, filePath: String): Boolean {
+
+        if (!isValidEncryptedHashMap(map)) return false
+
+        try {
+
+            ObjectOutputStream(FileOutputStream(filePath)).use { it ->
+                it.writeObject(map)
+            }
+            return true
+        } catch (ex: Exception) {
+
+            return false
+        }
+
+    }
+
+
+    fun updateEncryptedFileName(file: File, newFilename: String): Boolean {
+        if (file.isDirectory()) return false
+
+        try {
+            ObjectInputStream(FileInputStream(file)).use { it ->
+                val map = getEncryptedHashMap(it.readObject())
+                if (map != null) {
+                    val fn = map[APP_ENCRYPT_VAR0]
+                    if (fn is ByteArray) {
+                        // update the hashmap object with the new filename
+                        map[APP_ENCRYPT_VAR0] = newFilename.toByteArray()
+
+                        return writeEncryptedHashMapToFile(map, file.canonicalPath)
+
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            return false
+        }
+
+
+        return false
+    }
+
+
+    fun encryptFileFromUriToFolder(contentResolver: ContentResolver, password: CharArray, uri: Uri, folder: String = ""): String {
+        var encryptedFilePath: String
+        val (filename, size) = getFilenameAndSizeFromUri(contentResolver, uri)
+
+        if (size < 1) return ""
+
+        val inputStream = contentResolver.openInputStream(uri)
+
+        if (folder.length > 0)
+            encryptedFilePath = FileManager.toFullPathInDocumentRoot(folder.withTrailingCharacter('/') + filename)
+        else
+            encryptedFilePath = FileManager.toFullPathInDocumentRoot(filename)
+
+        encryptedFilePath = encryptedFilePath.addExtension(ENCRYPTED_FILE_EXT)
+
+        encryptedFilePath = renameDuplicatedFilePath(encryptedFilePath)
+
+        //todo later: got to check inputStream validity
+        val bytes = inputStream!!.readBytes()
+        inputStream.close()
+        // we update the stored filename in the encrypted hash as well
+        val map = Encryption().encryptWithFilename(encryptedFilePath.getOriginalFilenameFromPath(), bytes, password)
+
+        if (writeEncryptedHashMapToFile(map, encryptedFilePath))
+            return encryptedFilePath
+        else
+            return ""
+
+    }
+
+
     // re-encrypt files with new password
     fun reencryptFiles(filePath: String, oldPwd: CharArray, newPwd: CharArray): Boolean {
 
@@ -340,15 +429,8 @@ object FileManager {
             val bytes = inputStream.readBytes()
             val map = Encryption().encryptWithFilename(filename, bytes, password)
 
-            if (map.containsKey(APP_ENCRYPT_VAR0) && map.containsKey(APP_ENCRYPT_VAR1) && map.containsKey(APP_ENCRYPT_VAR2) && map.containsKey(
-                    APP_ENCRYPT_VAR3
-                )
-            ) {
-                ObjectOutputStream(FileOutputStream(encryptedFilePath)).use { it ->
-                    it.writeObject(map)
-                }
-            }
-            return true
+            return writeEncryptedHashMapToFile(map,encryptedFilePath)
+
         } catch (ex: Exception) {
             return false
         }
@@ -459,13 +541,8 @@ object FileManager {
         try {
             when (data) {
                 is HashMap<*, *> -> {
-                    if (data.containsKey(APP_ENCRYPT_VAR0) && data.containsKey(APP_ENCRYPT_VAR1) && data.containsKey(APP_ENCRYPT_VAR2) && data.containsKey(
-                            APP_ENCRYPT_VAR3
-                        )
-                    ) {
-                        @Suppress("UNCHECKED_CAST")
-                        return data as? HashMap<String, ByteArray>
-                    }
+                    @Suppress("UNCHECKED_CAST")
+                    return data as? HashMap<String, ByteArray>
                 }
             }
         } catch (ex: java.lang.Exception) {
@@ -474,4 +551,21 @@ object FileManager {
 
         return null
     }
+
+
+    private fun isValidEncryptedHashMap(hashMap: HashMap<String, ByteArray>?): Boolean {
+
+        if (hashMap != null) {
+            if (hashMap.containsKey(APP_ENCRYPT_VAR0)
+                && hashMap.containsKey(APP_ENCRYPT_VAR1)
+                && hashMap.containsKey(APP_ENCRYPT_VAR2)
+                && hashMap.containsKey(APP_ENCRYPT_VAR3)
+            ) {
+                return true
+            }
+        }
+
+        return false
+    }
+
 }

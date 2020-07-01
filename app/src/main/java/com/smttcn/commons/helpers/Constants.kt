@@ -20,6 +20,7 @@ const val KEY_HASH_ITERATION_COUNT = 10000
 const val MIN_PASSWORD_LENGTH = 6
 const val TEMP_FILE_SHARE_FOLDER_NAME =  "temp_file_share"
 const val ENCRYPTED_FILE_EXT = "enc"
+const val DUPLICATED_FILE_SUFFIX = ".copy"
 
 const val INTERVAL_BACK_BUTTON_QUIT_IN_MS = 3000
 
@@ -37,6 +38,8 @@ const val INTENT_CALL_FROM_MAINACTIVITY = "call_from_mainactivity"
 const val INTENT_TO_CREATE_APP_PASSWORD = "to_create_app_password"
 const val INTENT_SHARE_FILE_URI = "share_file_uri"
 const val INTENT_SHARE_FILE_PATH = "share_file_path"
+const val INTENT_IMPORTED_FILENAME = "imported_filename"
+const val INTENT_ENCRYPTED_FILENAME = "encrypted_filename"
 const val INTENT_RESULT_IMPORTED = 99970
 const val INTENT_RESULT_DECRYPTED = 99980
 const val INTENT_RESULT_FAILED = 99999

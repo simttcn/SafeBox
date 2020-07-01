@@ -23,6 +23,10 @@
     <string name="btn_cancel">Cancel</string>
 <!--    <string name="btn_close">Close</string>-->
     <string name="btn_delete">Delete</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_encrypt_file">Encrypt file</string>
+    <string name="btn_decrypt">Decrypt</string>
+    <string name="btn_decrypt_file">Decrypt and share</string>
 <!--    <string name="btn_change_app_password">Change App Password</string>-->
 
     <!--  UI - common elements  -->
@@ -68,8 +72,6 @@
     <string name="enc_msg_encrypting_password">Please enter a password to encrypt this file.</string>
     <string name="enc_msg_decrypting_password">Please enter the password to decrypt this file.</string>
     <string name="enc_warning_encrypting_password">Warning: if you forget this password, your encrypted file will be unrecoverable and as good as gone unless you have a backup somewhere else. so please choose your password carefully.</string>
-    <string name="btn_encrypt_file">Encrypt file</string>
-    <string name="btn_decrypt_file">Decrypt and share</string>
     <string name="enc_title_encrypting_file">Encrypting File</string>
 <!--    <string name="enc_title_decrypting_file">Decrypting File</string>-->
     <string name="enc_msg_encrypting_success">File succesfully encrypted.</string>
@@ -85,6 +87,8 @@
     <string name="imp_radio_decrypt_and_open_in">Decrypt and open in…</string>
     <string name="imp_msg_import_failed">Failed to import/decrypt the file.</string>
     <string name="imp_msg_import_success">File successfully imported.</string>
+    <string name="imp_msg_invalid_file">This is not a valid SafeBox encrypted file.</string>
+
 
     <!--  UI - change encrypting password  -->
     <string name="dlg_title_change_encrypting_password">Change Encrypting Password</string>

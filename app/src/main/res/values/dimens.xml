@@ -10,8 +10,8 @@
     <dimen name="itemlist_textsize">16sp</dimen>
     <dimen name="itemlist_filename_padding_start">4dp</dimen>
     <dimen name="itemlist_filename_padding_end">4dp</dimen>
-    <dimen name="itemlist_filename_padding_top">12dp</dimen>
-    <dimen name="itemlist_filename_padding_bottom">4dp</dimen>
+    <dimen name="itemlist_filename_padding_top">1dp</dimen>
+    <dimen name="itemlist_filename_padding_bottom">1dp</dimen>
     <dimen name="itemlist_padding_horizontal">4dp</dimen>
     <dimen name="itemlist_padding_vertical">2dp</dimen>
 

@@ -1,11 +1,6 @@
 package com.smttcn.commons.models
 
-import android.R
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
-import androidx.core.net.toUri
 import com.google.gson.Gson
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
@@ -98,14 +93,14 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
 
     fun getOriginalExt(): String {
         if (!isDirectory)
-            return filename.getFilenameExtensionOfEncryptedFile()
+            return filename.getOriginalFileExtension()
         else
             return ""
     }
 
     fun getExt(): String {
         if (!isDirectory)
-            return filename.getFilenameExtension()
+            return filename.getFileExtension()
         else
             return ""
     }

@@ -1,29 +1,41 @@
 package com.smttcn.safebox.ui.main
 
 import android.app.Activity
+import android.content.ContentResolver
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
+import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.getCustomView
+import com.afollestad.materialdialogs.input.input
 import com.smttcn.commons.activities.BaseActivity
-import com.smttcn.commons.extensions.isPasswordConfinedToPolicy
-import com.smttcn.commons.extensions.showKeyboard
-import com.smttcn.commons.extensions.toast
-import com.smttcn.commons.helpers.INTENT_RESULT_DECRYPTED
-import com.smttcn.commons.helpers.INTENT_RESULT_FAILED
-import com.smttcn.commons.helpers.INTENT_RESULT_IMPORTED
+import com.smttcn.commons.extensions.*
+import com.smttcn.commons.helpers.*
+import com.smttcn.commons.manager.FileManager
+import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
+import kotlinx.android.synthetic.main.activity_importing.*
 
 class ImportingActivity: BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         initActivity()
         initActivityUI()
+
+        showProgressBar(false)
     }
 
 
@@ -47,6 +59,7 @@ class ImportingActivity: BaseActivity() {
         val btnOk = findViewById<Button>(R.id.ok)
         val btnCancel = findViewById<Button>(R.id.cancel)
 
+
         optionSave.isChecked = true
         password.isEnabled = false
         btnOk.isEnabled = true
@@ -56,12 +69,14 @@ class ImportingActivity: BaseActivity() {
                 R.id.importOptionSaveInLibrary -> {
                     password.text.clear()
                     password.isEnabled = false
+                    btnOk.text = getString(R.string.btn_save)
                     btnOk.isEnabled = true
                 }
                 R.id.importOptionDecryptAndOpenIn -> {
                     password.isEnabled = true
                     password.text.clear()
                     showKeyboard(password)
+                    btnOk.text = getString(R.string.btn_decrypt)
                     btnOk.isEnabled = false
                 }
                 else -> {
@@ -85,12 +100,20 @@ class ImportingActivity: BaseActivity() {
 
         btnOk.setOnClickListener {
 
+            var fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
+
             if (optionSave.isChecked) {
 
-                setResult(INTENT_RESULT_IMPORTED)
+                var filename = FileManager.copyFileFromUriToFolder(contentResolver, fileUri)
+
+                var resultIntent = Intent()
+                resultIntent.putExtra(INTENT_IMPORTED_FILENAME, filename.getFilenameFromPath().removeEncryptedExtension())
+                setResult(INTENT_RESULT_IMPORTED, resultIntent)
 
             } else if (optionDecryptAndOpen.isChecked) {
 
+                //todo next: decrypt and share
+                //shareItemDecrypted(contentResolver, fileUri)
                 setResult(INTENT_RESULT_DECRYPTED)
 
             } else {
@@ -103,5 +126,60 @@ class ImportingActivity: BaseActivity() {
 
         }
     }
+
+
+//    private fun shareItemDecrypted(contentResolver: ContentResolver, uri: Uri) {
+//        // file: FileDirItem
+//
+//        // ask for the decrypting password for this file
+//        MaterialDialog(this).show {
+//            title(R.string.enc_enter_password)
+//            message(R.string.enc_msg_decrypting_password)
+//            input(
+//                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+//            ) { _, text ->
+//
+//                showProgressBar(true)
+//                var decryptedFilePath =
+//                    decryptFileForSharing(text.toString().toCharArray(), file.path)
+//                showProgressBar(false)
+//
+//                if (FileManager.isFileExist(decryptedFilePath)) {
+//                    // succesfully decrypted file
+//                    sendShareItent((decryptedFilePath))
+//                } else {
+//                    // fail to encrypt file
+//                    showMessageDialog(
+//                        myContext,
+//                        R.string.error,
+//                        R.string.enc_enter_decrypting_password_error
+//                    ) {}
+//                }
+//            }
+//            positiveButton(R.string.btn_decrypt_file)
+//            negativeButton(R.string.btn_cancel)
+//            cancelable(false)  // calls setCancelable on the underlying dialog
+//            cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+//        }
+//    }
+
+    private fun showProgressBar(show: Boolean) {
+        if (show) {
+            getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            );
+
+            importingActivityProgressBarContainer.visibility = View.VISIBLE
+            //itemListRecyclerView.visibility = View.GONE
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+            importingActivityProgressBarContainer.visibility = View.GONE
+            //itemListRecyclerView.visibility = View.VISIBLE
+        }
+    }
+
+
 
 }

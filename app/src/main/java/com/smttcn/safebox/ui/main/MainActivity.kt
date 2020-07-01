@@ -126,16 +126,25 @@ class MainActivity : BaseActivity() {
 
             toast(filename)
 
-            if (filename.getFilenameExtension() == ENCRYPTED_FILE_EXT) {
-                // todo next: have to check if the shared file is a supported encrypted file
-                // FileManager.isEncryptedFileUri(uri: Uri)
+            if (filename.getFileExtension() == ENCRYPTED_FILE_EXT) {
+                // check if the shared file is a supported encrypted file
+                if (FileManager.isEncryptedFileUri(contentResolver, uri)) {
 
-                // It is an encrypted file, so ask user if they want to save it in the library or decrypt it
-                val importIntent = Intent(this, ImportingActivity::class.java)
-                importIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
-                startActivityForResult(importIntent, REQUEST_CODE_TO_IMPORTDECRYPT_FILE)
+                    // It is an encrypted file, so ask user if they want to save it in the library or decrypt it
+                    val importIntent = Intent(this, ImportingActivity::class.java)
+                    importIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
+                    startActivityForResult(importIntent, REQUEST_CODE_TO_IMPORTDECRYPT_FILE)
+
+                } else {
+
+                    showMessageDialog(this, R.string.error, R.string.imp_msg_invalid_file){
+                        finishAndRemoveTask()
+                    }
+
+                }
 
             } else {
+                // it's an ordinary file, show encrypting option and password input
                 val encryptingIntent = Intent(this, EncryptingActivity::class.java)
                 encryptingIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
                 startActivityForResult(encryptingIntent, REQUEST_CODE_TO_ENCRYPT_FILE)
@@ -170,9 +179,8 @@ class MainActivity : BaseActivity() {
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
 
-        when (id) {
+        when (item.itemId) {
             R.id.menu_visible -> {
                 GlobalScope.launch(Dispatchers.Main) {
                     showProgressBar(true)
@@ -306,23 +314,35 @@ class MainActivity : BaseActivity() {
                 inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             ) { _, text ->
 
-                showProgressBar(true)
-                var decryptedFilePath =
-                    decryptFileForSharing(text.toString().toCharArray(), file.path)
-                showProgressBar(false)
+                GlobalScope.launch(Dispatchers.Main) {
+                    showProgressBar(true)
 
-                if (FileManager.isFileExist(decryptedFilePath)) {
-                    // succesfully decrypted file
-                    sendShareItent((decryptedFilePath))
-                } else {
-                    // fail to encrypt file
-                    showMessageDialog(
-                        myContext,
-                        R.string.error,
-                        R.string.enc_enter_decrypting_password_error
-                    ) {}
+                }.invokeOnCompletion {
+                    GlobalScope.launch(Dispatchers.IO) {
+
+                        var decryptedFilePath =
+                            decryptFileForSharing(text.toString().toCharArray(), file.path)
+
+                        GlobalScope.launch(Dispatchers.Main) {
+
+                            showProgressBar(false)
+                            if (FileManager.isFileExist(decryptedFilePath)) {
+                                // succesfully decrypted file
+                                sendShareItent((decryptedFilePath))
+                            } else {
+                                // fail to encrypt file
+                                showMessageDialog(
+                                    myContext,
+                                    R.string.error,
+                                    R.string.enc_enter_decrypting_password_error
+                                ) {}
+                            }
+
+                        }
+                    }
                 }
             }
+
             positiveButton(R.string.btn_decrypt_file)
             negativeButton(R.string.btn_cancel)
             cancelable(false)  // calls setCancelable on the underlying dialog
@@ -391,12 +411,12 @@ class MainActivity : BaseActivity() {
         val newPasswordInput: EditText = dialog.getCustomView().findViewById(R.id.new_password)
         val confirmPasswordInput: EditText =
             dialog.getCustomView().findViewById(R.id.confirm_password)
-        val progressBarContainer: View =
-            dialog.getCustomView().findViewById(R.id.progressBarContainer)
+        val dialogProgressBarContainer: View =
+            dialog.getCustomView().findViewById(R.id.dialogProgressBarContainer)
         var btnOk = dialog.getActionButton(WhichButton.POSITIVE)
         var btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
 
-        progressBarContainer.visibility = View.GONE
+        dialogProgressBarContainer.visibility = View.GONE
         btnCancel.isEnabled = true
         btnOk.isEnabled = false
         showKeyboard(originalPasswordInput)
@@ -431,7 +451,7 @@ class MainActivity : BaseActivity() {
 
                 btnOk.isEnabled = false
                 btnCancel.isEnabled = false
-                progressBarContainer.visibility = View.VISIBLE
+                dialogProgressBarContainer.visibility = View.VISIBLE
 
             }.invokeOnCompletion {
 
@@ -454,7 +474,7 @@ class MainActivity : BaseActivity() {
                         )
 
                     GlobalScope.launch(Dispatchers.Main) {
-                        progressBarContainer.visibility = View.GONE
+                        dialogProgressBarContainer.visibility = View.GONE
                         if (success)
                             showMessageDialog(
                                 this@MainActivity,
@@ -490,12 +510,12 @@ class MainActivity : BaseActivity() {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
             );
 
-            progressBarContainer.visibility = View.VISIBLE
+            mainActivityProgressBarContainer.visibility = View.VISIBLE
             //itemListRecyclerView.visibility = View.GONE
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-            progressBarContainer.visibility = View.GONE
+            mainActivityProgressBarContainer.visibility = View.GONE
             //itemListRecyclerView.visibility = View.VISIBLE
         }
     }
@@ -508,14 +528,19 @@ class MainActivity : BaseActivity() {
 
             if (resultCode == Activity.RESULT_OK) {
 
-                refreshFileItemList()
-
                 // file encrypted
+                var filename = ""
+                if (resultData != null) {
+                    filename = "\n\n" + resultData.getStringExtra(INTENT_ENCRYPTED_FILENAME)
+                }
+
                 showMessageDialog(
                     this,
-                    R.string.enc_title_encrypting_file,
-                    R.string.enc_msg_encrypting_success
-                ) {}
+                    getString(R.string.enc_title_encrypting_file),
+                    getString(R.string.enc_msg_encrypting_success) + filename
+                ) {
+                    refreshFileItemList()
+                }
 
             } else if (resultCode == INTENT_RESULT_FAILED) {
                 // failed to encrypt file
@@ -539,13 +564,18 @@ class MainActivity : BaseActivity() {
 
             if (resultCode == INTENT_RESULT_IMPORTED) {
                 // file imported
-                refreshFileItemList()
+                var filename = ""
+                if (resultData != null) {
+                    filename = "\n\n" + resultData.getStringExtra(INTENT_IMPORTED_FILENAME)
+                }
 
                 showMessageDialog(
                     this,
-                    R.string.imp_title_import_decrypt,
-                    R.string.imp_msg_import_success
-                ) {}
+                    getString(R.string.imp_title_import_decrypt),
+                    getString(R.string.imp_msg_import_success) + filename
+                ) {
+                    refreshFileItemList()
+                }
 
             } else if (resultCode == INTENT_RESULT_DECRYPTED) {
                 // successfully decrypted and shared the file
@@ -557,7 +587,9 @@ class MainActivity : BaseActivity() {
                     this,
                     R.string.imp_title_import_decrypt,
                     R.string.imp_msg_import_failed
-                ) {}
+                ) {
+                    finishAndRemoveTask()
+                }
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // User cancelled import/decrypt operation
@@ -565,7 +597,9 @@ class MainActivity : BaseActivity() {
                     this,
                     R.string.imp_title_import_decrypt,
                     R.string.operation_cancelled
-                ) {}
+                ) {
+                    finishAndRemoveTask()
+                }
 
             }
         }

@@ -1,6 +1,7 @@
 package com.smttcn.safebox.ui.main
 
 import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -12,12 +13,15 @@ import android.widget.Button
 import android.widget.EditText
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
+import com.smttcn.commons.extensions.getFilenameFromPath
+import com.smttcn.commons.extensions.removeEncryptedExtension
 import com.smttcn.commons.extensions.showKeyboard
-import com.smttcn.commons.helpers.INTENT_RESULT_FAILED
-import com.smttcn.commons.helpers.INTENT_SHARE_FILE_URI
-import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
+import com.smttcn.commons.helpers.*
 import com.smttcn.safebox.R
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_encrypting.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 
 class EncryptingActivity: BaseActivity() {
@@ -27,6 +31,8 @@ class EncryptingActivity: BaseActivity() {
 
         initActivity()
         initActivityUI()
+
+        showProgressBar(false)
     }
 
     override fun onStop() {
@@ -44,6 +50,9 @@ class EncryptingActivity: BaseActivity() {
         val ConfirmPassword = findViewById<EditText>(R.id.confirm_password)
         val btnOk = findViewById<Button>(R.id.ok)
         val btnCancel = findViewById<Button>(R.id.cancel)
+
+        showKeyboard(EncryptingPassword)
+
 
         EncryptingPassword.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -72,31 +81,46 @@ class EncryptingActivity: BaseActivity() {
         btnOk.setOnClickListener {
             if (isEncryptingPasswordValid(EncryptingPassword.text.toString(), ConfirmPassword.text.toString())){
 
-                var encryptedSuccess = false
+                GlobalScope.launch(Dispatchers.Main) {
+                    showProgressBar(true)
 
-                var fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
-                var encryptedFilePath = encryptFileFromURI(EncryptingPassword.text.toString().toCharArray(), fileUri)
+                }.invokeOnCompletion {
 
-                if (FileManager.isFileExist(encryptedFilePath)
-                    && FileManager.isEncryptedFile(File(encryptedFilePath)))
-                    encryptedSuccess = true
+                    GlobalScope.launch(Dispatchers.IO) {
 
-                if (encryptedSuccess) {
-                    // succesfully encrypted file
-                    setResult(Activity.RESULT_OK)
-                    finish()
+                        var encryptedSuccess = false
 
-                } else {
-                    // fail to encrypt file
-                    setResult(INTENT_RESULT_FAILED)
-                    finish()
+                        var fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
+                        var encryptedFilePath = encryptFileFromURI(EncryptingPassword.text.toString().toCharArray(), fileUri)
 
+                        if (FileManager.isFileExist(encryptedFilePath)
+                            && FileManager.isEncryptedFile(File(encryptedFilePath)))
+                            encryptedSuccess = true
+
+                        GlobalScope.launch(Dispatchers.Main) {
+
+                            showProgressBar(false)
+
+                            if (encryptedSuccess) {
+                                // succesfully encrypted file
+                                var resultIntent = Intent()
+                                resultIntent.putExtra(INTENT_ENCRYPTED_FILENAME, encryptedFilePath.getFilenameFromPath().removeEncryptedExtension())
+                                setResult(Activity.RESULT_OK, resultIntent)
+                                finish()
+
+                            } else {
+                                // fail to encrypt file
+                                setResult(INTENT_RESULT_FAILED)
+                                finish()
+
+                            }
+
+                        }
+                    }
                 }
 
             }
         }
-
-        showKeyboard(EncryptingPassword)
 
     }
 
@@ -123,11 +147,11 @@ class EncryptingActivity: BaseActivity() {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-            progressBarContainer.visibility = View.VISIBLE
+            encryptingActivityProgressBarContainer.visibility = View.VISIBLE
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-            progressBarContainer.visibility = View.GONE
+            encryptingActivityProgressBarContainer.visibility = View.GONE
         }
     }
 
