@@ -38,7 +38,7 @@ fun String.getFilenameFromPath() : String {
         return substring(lastIndexOf("/") + 1)
 }
 
-fun String.getOriginalFilenameFromPath() : String {
+fun String.getUnencryptedFilenameFromPath() : String {
     if (lastIndexOf("/") < 1)
         return this
     else
@@ -47,7 +47,7 @@ fun String.getOriginalFilenameFromPath() : String {
 
 fun String.getFileExtension() = substring(lastIndexOf(".") + 1)
 
-fun String.getOriginalFileExtension() = removeEncryptedExtension().getFileExtension()
+fun String.getUnencryptedFileExtension() = removeEncryptedExtension().getFileExtension()
 
 fun String.insertBeforeFileExtension(str: String): String {
     var ext = this.getFileExtension()
@@ -174,5 +174,5 @@ fun String.getMimeType(): String {
 }
 
 fun String.getMimeTypeOfEncryptedFile(): String {
-    return MimeType.typesMap[getOriginalFileExtension().toLowerCase()] ?: ""
+    return MimeType.typesMap[getUnencryptedFileExtension().toLowerCase()] ?: ""
 }

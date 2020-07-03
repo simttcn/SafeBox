@@ -254,7 +254,7 @@ class MainActivity : BaseActivity() {
                     // copy the file to be shared to the designated share folder
                     val shareFilePath = FileManager.copyFileToTempShareFolder(item.path)
                     if (shareFilePath.length > 0) {
-                        sendShareItent(shareFilePath)
+                        sendShareItent(myContext, shareFilePath)
                     }
                     true
                 }
@@ -321,18 +321,18 @@ class MainActivity : BaseActivity() {
                     GlobalScope.launch(Dispatchers.IO) {
 
                         var decryptedFilePath =
-                            decryptFileForSharing(text.toString().toCharArray(), file.path)
+                            FileManager.decryptFileForSharing(text.toString().toCharArray(), file.path)
 
                         GlobalScope.launch(Dispatchers.Main) {
 
                             showProgressBar(false)
                             if (FileManager.isFileExist(decryptedFilePath)) {
                                 // succesfully decrypted file
-                                sendShareItent((decryptedFilePath))
+                                sendShareItent(myContext, decryptedFilePath)
                             } else {
                                 // fail to encrypt file
                                 showMessageDialog(
-                                    myContext,
+                                    this@MainActivity,
                                     R.string.error,
                                     R.string.enc_enter_decrypting_password_error
                                 ) {}
@@ -348,49 +348,6 @@ class MainActivity : BaseActivity() {
             cancelable(false)  // calls setCancelable on the underlying dialog
             cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
         }
-    }
-
-
-    private fun decryptFileForSharing(pwd: CharArray, filepath: String): String {
-
-        var decryptedFilepath: String = ""
-        val targetfile = File(filepath)
-
-        if (!targetfile.exists())
-            return decryptedFilepath
-
-        val targetpath = FileManager.getFolderInCacheFolder(TEMP_FILE_SHARE_FOLDER_NAME, true)
-        if (targetfile.length() > 0 && targetpath != null) {
-            decryptedFilepath =
-                FileManager.decryptFile(targetfile, pwd, targetpath.canonicalPath, false)
-        }
-
-        return decryptedFilepath
-
-    }
-
-
-    private fun sendShareItent(filepath: String) {
-
-        if (filepath.isNotEmpty()) {
-
-            MyApplication.isSharingItem = true
-
-            val AUTHORITY = "com.smttcn.safebox.fileprovider"
-
-            val file = File(filepath)
-            val contentUri = FileProvider.getUriForFile(applicationContext, AUTHORITY, file)
-            // create new Intent
-            val sharingIntent = Intent(Intent.ACTION_SEND)
-            // set flag to give temporary permission to external app to use your FileProvider
-            sharingIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            // I am opening a PDF file so I give it a valid MIME type
-            sharingIntent.setDataAndType(contentUri, filepath.getMimeType());
-            sharingIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-            // start sharing activity sheet
-            startActivity(Intent.createChooser(sharingIntent, "Share Image"));
-        }
-
     }
 
 
@@ -579,7 +536,8 @@ class MainActivity : BaseActivity() {
 
             } else if (resultCode == INTENT_RESULT_DECRYPTED) {
                 // successfully decrypted and shared the file
-                // so nothing to do here
+                // so nothing to do here and quit
+                finishAndRemoveTask()
 
             } else if (resultCode == INTENT_RESULT_FAILED) {
                 // import/decrypt operation failed

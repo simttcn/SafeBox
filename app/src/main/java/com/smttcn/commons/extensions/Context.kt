@@ -1,52 +1,37 @@
 package com.smttcn.commons.extensions
 
+//import com.smttcn.commons.views.*
 import android.Manifest
 import android.app.Activity
-import android.content.ComponentName
-import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
-import android.graphics.Color
-import android.graphics.Point
+import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
-import android.media.ExifInterface
-import android.media.MediaMetadataRetriever
-import android.media.RingtoneManager
-import android.net.Uri
-import android.os.Build
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.provider.BaseColumns
-import android.provider.DocumentsContract
-import android.provider.MediaStore
-import android.provider.OpenableColumns
+import android.os.Parcelable
 import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.DrawableRes
-import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
-import androidx.loader.content.CursorLoader
 import com.afollestad.materialdialogs.MaterialDialog
-import com.smttcn.safebox.R
-import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
-//import com.smttcn.commons.views.*
+import com.smttcn.safebox.MyApplication
+import com.smttcn.safebox.R
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.*
+
 
 fun Context.toast(id: Int, length: Int = Toast.LENGTH_SHORT) {
     toast(getString(id), length)
 }
+
 
 fun Context.toast(msg: String, length: Int = Toast.LENGTH_SHORT) {
     try {
@@ -61,6 +46,7 @@ fun Context.toast(msg: String, length: Int = Toast.LENGTH_SHORT) {
     }
 }
 
+
 private fun doToast(context: Context, message: String, length: Int) {
     if (context is Activity) {
         if (!context.isFinishing && !context.isDestroyed) {
@@ -70,6 +56,7 @@ private fun doToast(context: Context, message: String, length: Int) {
         Toast.makeText(context, message, length).show()
     }
 }
+
 
 fun showMessageDialog(context: Context, title: String, message: String, callback: () -> Unit){
     MaterialDialog(context).show {
@@ -83,6 +70,7 @@ fun showMessageDialog(context: Context, title: String, message: String, callback
     }
 }
 
+
 fun showMessageDialog(context: Context, titleID: Int, messageID: Int, callback: () -> Unit){
     MaterialDialog(context).show {
         title(titleID)
@@ -95,17 +83,21 @@ fun showMessageDialog(context: Context, titleID: Int, messageID: Int, callback: 
     }
 }
 
+
 fun Context.showErrorToast(msg: String, length: Int = Toast.LENGTH_LONG) {
     toast(String.format(getString(R.string.an_error_occurred), msg), length)
 }
+
 
 fun Context.showErrorToast(exception: Exception, length: Int = Toast.LENGTH_LONG) {
     showErrorToast(exception.toString(), length)
 }
 
+
 fun Context.isPasswordConfinedToPolicy(password: String): Boolean {
     return (password.length >= MIN_PASSWORD_LENGTH)
 }
+
 
 fun Context.isNewPasswordConfinedToPolicy(newPassword: String, confirmPassword: String): Boolean {
     return (newPassword.length >= MIN_PASSWORD_LENGTH
@@ -113,7 +105,9 @@ fun Context.isNewPasswordConfinedToPolicy(newPassword: String, confirmPassword: 
             && newPassword.equals(confirmPassword, false))
 }
 
+
 fun Context.hasPermission(permId: Int) = ContextCompat.checkSelfPermission(this, getPermissionString(permId)) == PackageManager.PERMISSION_GRANTED
+
 
 fun Context.getPermissionString(id: Int) = when (id) {
     PERMISSION_READ_STORAGE -> Manifest.permission.READ_EXTERNAL_STORAGE
@@ -131,9 +125,11 @@ fun Context.getPermissionString(id: Int) = when (id) {
     else -> ""
 }
 
+
 fun Context.getDrawableCompat(@DrawableRes drawableRes: Int): Drawable? {
     return AppCompatResources.getDrawable(this, drawableRes)
 }
+
 
 fun Context.showKeyboard(et: EditText) {
     et.requestFocus()
@@ -141,10 +137,53 @@ fun Context.showKeyboard(et: EditText) {
     imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
 }
 
+
 fun Context.hideKeyboard(view: View) {
     val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }
+
+
+fun sendShareItent(context: Context, filepath: String) {
+
+    if (filepath.isNotEmpty()) {
+
+        MyApplication.isSharingItem = true
+
+        val file = File(filepath)
+        val contentUri = FileProvider.getUriForFile(MyApplication.applicationContext, APP_AUTHORITY, file)
+        var targetedShareIntents: MutableList<Intent> = mutableListOf()
+
+        // create new Intent for getting list of related intent
+        val intent = Intent(Intent.ACTION_SEND)
+        // only MimeType is good enough
+        intent.setType(filepath.getMimeType())
+
+        // get a list of related share intents
+        val resInfo: List<ResolveInfo> = context.getPackageManager().queryIntentActivities(intent, 0)
+        // loop through all of them
+        for (resolveInfo in resInfo) {
+            val packageName: String = resolveInfo.activityInfo.packageName
+            if (packageName != PACKAGE_NAME) { // Remove own share intent
+                val targetedShareIntent = Intent(Intent.ACTION_SEND)
+                targetedShareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                targetedShareIntent.setDataAndType(contentUri, filepath.getMimeType());
+                targetedShareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                targetedShareIntent.setPackage(packageName)
+                targetedShareIntents.add(targetedShareIntent)
+            }
+        }
+
+        // create chooser intent, fill it in and start it
+        val chooserIntent = Intent.createChooser(Intent(), context.getString(R.string.sharing_to))
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetedShareIntents.toTypedArray())
+        startActivity(context, chooserIntent, null);
+
+    }
+
+}
+
+
 
 
 

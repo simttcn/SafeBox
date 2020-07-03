@@ -9,7 +9,6 @@ import com.smttcn.commons.helpers.*
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import java.io.*
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -394,8 +393,8 @@ object FileManager {
         //todo later: got to check inputStream validity
         val bytes = inputStream!!.readBytes()
         inputStream.close()
-        // we update the stored filename in the encrypted hash as well
-        val map = Encryption().encryptWithFilename(encryptedFilePath.getOriginalFilenameFromPath(), bytes, password)
+        // perform the encryption with the filename
+        val map = Encryption().encryptWithFilename(encryptedFilePath.getUnencryptedFilenameFromPath(), bytes, password)
 
         if (writeEncryptedHashMapToFile(map, encryptedFilePath))
             return encryptedFilePath
@@ -410,9 +409,9 @@ object FileManager {
 
         // Todo future: should decrypt to hashmap in memory and then encrypt it back to file
         // decrypt file with delete original
-        val decryptedFilePath = decryptFile(File(filePath), oldPwd, deleteOriginal = true)
+        val decryptedFilePath = decryptFile(filePath, password = oldPwd, deleteOriginal = true)
         // encrypt file with delete original
-        val encryptedFilePath = encryptFile(File(decryptedFilePath), newPwd, true)
+        val encryptedFilePath = encryptFile(decryptedFilePath, filePath, newPwd, true)
 
         if (isEncryptedFile(File(encryptedFilePath))) {
             return true
@@ -423,13 +422,13 @@ object FileManager {
     }
 
 
-    fun encryptFile(inputStream: InputStream, filename: String, encryptedFilePath: String, password: CharArray): Boolean {
+    fun encryptFile(inputStream: InputStream, filename: String, targetFilePath: String, password: CharArray): Boolean {
 
         try {
             val bytes = inputStream.readBytes()
             val map = Encryption().encryptWithFilename(filename, bytes, password)
 
-            return writeEncryptedHashMapToFile(map,encryptedFilePath)
+            return writeEncryptedHashMapToFile(map, targetFilePath)
 
         } catch (ex: Exception) {
             return false
@@ -437,74 +436,112 @@ object FileManager {
     }
 
 
-    fun encryptFile(file: File, password: CharArray, deleteOriginal: Boolean = true): String {
-        if (file.isDirectory()) return ""
+    fun encryptFile(sourceFilePath: String, targetFilePath: String, password: CharArray, deleteOriginal: Boolean = true): String {
 
-        val originalFilename = file.name
-        val encryptedFilePath = file.canonicalPath.addExtension(ENCRYPTED_FILE_EXT)
+        val sourceFile = File(sourceFilePath)
 
-        try {
-            val inputStream = file.inputStream()
-            val result = encryptFile(inputStream, originalFilename, encryptedFilePath, password)
-            inputStream.close()
+        if (sourceFile.exists() && !sourceFile.isDirectory()) {
 
-            if (deleteOriginal && result && isFileExist(encryptedFilePath))
-                file.delete()
+            val originalFilename = sourceFile.name
+            var encryptedFilePath = targetFilePath.removeEncryptedExtension().addExtension(ENCRYPTED_FILE_EXT)
 
-            return if (result) encryptedFilePath else ""
-        } catch (ex: Exception) {
+            encryptedFilePath = renameDuplicatedFilePath(encryptedFilePath)
+
+            try {
+                val inputStream = sourceFile.inputStream()
+                val result = encryptFile(inputStream, originalFilename, encryptedFilePath, password)
+                inputStream.close()
+
+                if (deleteOriginal && result && isFileExist(encryptedFilePath))
+                    sourceFile.delete()
+
+                return if (result) encryptedFilePath else ""
+            } catch (ex: Exception) {
+                return ""
+            }
+
+        } else {
+
             return ""
+
         }
     }
 
 
-    fun decryptFile(file: File, password: CharArray, targetFolder: String = "", deleteOriginal: Boolean = true): String {
-        if (file.isDirectory()) return ""
+    fun decryptFile(objectInputStream: ObjectInputStream, targetFolder: String = "", password: CharArray, deleteExisting: Boolean = true): String {
 
         var decryptedFilePath: String
 
         if (targetFolder.length > 0)
             decryptedFilePath = targetFolder.withTrailingCharacter('/')
         else
-            decryptedFilePath = file.canonicalPath.getParentPath().withTrailingCharacter('/')
+            // default decrypting folder will be in app cache folder
+            decryptedFilePath = getFolderInCacheFolder()!!.canonicalPath.withTrailingCharacter('/')
 
+        var decrypted: ByteArray? = null
+        val map = getEncryptedHashMap(objectInputStream.readObject())
 
-        try {
-            var decrypted: ByteArray? = null
-            ObjectInputStream(FileInputStream(file)).use { it ->
-                val map = getEncryptedHashMap(it.readObject())
-                if (map != null) {
-                    val fn = map[APP_ENCRYPT_VAR0]
-                    val iv = map[APP_ENCRYPT_VAR1]
-                    val salt = map[APP_ENCRYPT_VAR2]
-                    val encrypted = map[APP_ENCRYPT_VAR3]
-                    if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
-                        decryptedFilePath += String(fn)
-                        decrypted = Encryption().decrypt(
-                            hashMapOf(APP_ENCRYPT_VAR1 to iv, APP_ENCRYPT_VAR2 to salt, APP_ENCRYPT_VAR3 to encrypted), password
-                        )
-                    }
-                }
+        if (map != null) {
+            val fn = map[APP_ENCRYPT_VAR0]
+            val iv = map[APP_ENCRYPT_VAR1]
+            val salt = map[APP_ENCRYPT_VAR2]
+            val encrypted = map[APP_ENCRYPT_VAR3]
+            if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
+                // try remove the encrypted extension just in case
+                decryptedFilePath += String(fn).removeEncryptedExtension()
+                decrypted = Encryption().decrypt(
+                    hashMapOf(APP_ENCRYPT_VAR1 to iv, APP_ENCRYPT_VAR2 to salt, APP_ENCRYPT_VAR3 to encrypted), password
+                )
             }
 
             if (decrypted != null) {
+
+                // do we need to delete the existing file?
+                if (isFileExist(decryptedFilePath) && deleteExisting)
+                    File(decryptedFilePath).delete()
+
                 // write decrypted data out as binary file object
                 FileOutputStream(decryptedFilePath).use { it ->
                     it.write(decrypted)
                 }
 
-                if (isFileExist(decryptedFilePath) && deleteOriginal)
-                    file.delete()
-
                 return decryptedFilePath
 
             }
-
-            return ""
-
-        } catch (ex: Exception) {
-            return ""
         }
+
+        return ""
+    }
+
+
+    fun decryptFile(sourceFilePath: String, targetFolder: String = "", password: CharArray, deleteOriginal: Boolean = true): String {
+        val sourceFile = File(sourceFilePath)
+
+        if (sourceFile.exists() && !sourceFile.isDirectory()){
+
+            try {
+                var decrypted: ByteArray? = null
+                ObjectInputStream(FileInputStream(sourceFile)).use { it ->
+                    val decryptedFilePath = decryptFile(it, targetFolder, password, deleteExisting = true)
+
+                    if (decryptedFilePath.length > 0 && deleteOriginal)
+                        // only delete the original if the file was decrypted successfully
+                        sourceFile.delete()
+
+                    return decryptedFilePath
+                }
+
+            } catch (ex: Exception) {
+                return ""
+            }
+
+        } else {
+
+            return ""
+
+        }
+
+        return ""
     }
 
 
@@ -533,6 +570,39 @@ object FileManager {
         } catch (ex: Exception) {
             return null
         }
+    }
+
+
+    fun decryptFileForSharing(pwd: CharArray, filePath: String): String {
+
+        var decryptedFilepath: String = ""
+        val sourcefile = File(filePath)
+
+        if (!sourcefile.exists())
+            return decryptedFilepath
+
+        val targetPath = getFolderInCacheFolder(TEMP_FILE_SHARE_FOLDER_NAME, true)
+        if (sourcefile.length() > 0 && targetPath != null) {
+            decryptedFilepath =
+                decryptFile(filePath, targetPath.canonicalPath, pwd, false)
+        }
+
+        return decryptedFilepath
+
+    }
+
+
+    fun decryptFileForSharing(pwd: CharArray, objectInputStream: ObjectInputStream): String {
+
+        var decryptedFilepath: String = ""
+
+        val targetFolder = getFolderInCacheFolder(TEMP_FILE_SHARE_FOLDER_NAME, true)
+        if (targetFolder != null) {
+            decryptedFilepath = decryptFile(objectInputStream, targetFolder.canonicalPath, pwd, true)
+        }
+
+        return decryptedFilepath
+
     }
 
 

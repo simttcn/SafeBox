@@ -2,6 +2,7 @@ package com.smttcn.safebox.ui.main
 
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,18 +16,28 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import androidx.core.content.FileProvider
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.customview.getCustomView
+import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import com.smttcn.commons.manager.FileManager
-import com.smttcn.commons.models.FileDirItem
+import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import kotlinx.android.synthetic.main.activity_importing.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileInputStream
+import java.io.ObjectInputStream
+import java.lang.Exception
 
-class ImportingActivity: BaseActivity() {
+class ImportingActivity : BaseActivity() {
+
+    lateinit var myContext: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -47,6 +58,7 @@ class ImportingActivity: BaseActivity() {
 
 
     private fun initActivity() {
+        myContext = this
         setContentView(R.layout.activity_importing)
     }
 
@@ -84,7 +96,7 @@ class ImportingActivity: BaseActivity() {
             }
         }
 
-        password.addTextChangedListener(object: TextWatcher {
+        password.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
@@ -109,59 +121,61 @@ class ImportingActivity: BaseActivity() {
                 var resultIntent = Intent()
                 resultIntent.putExtra(INTENT_IMPORTED_FILENAME, filename.getFilenameFromPath().removeEncryptedExtension())
                 setResult(INTENT_RESULT_IMPORTED, resultIntent)
+                finish()
 
             } else if (optionDecryptAndOpen.isChecked) {
 
-                //todo next: decrypt and share
-                //shareItemDecrypted(contentResolver, fileUri)
-                setResult(INTENT_RESULT_DECRYPTED)
+                //todo next last check: decrypt and share
+                GlobalScope.launch(Dispatchers.Main) {
+
+                    showProgressBar(true)
+
+                }.invokeOnCompletion {
+
+                    var decryptedFilePath: String = ""
+                    GlobalScope.launch(Dispatchers.IO) {
+
+                        val inputStream = contentResolver.openInputStream(fileUri)
+                        try {
+                            ObjectInputStream(inputStream).use { it ->
+                                decryptedFilePath = FileManager.decryptFileForSharing(password.text.toString().toCharArray(), it)
+                            }
+                        } catch (ex: Exception) {
+                        }
+
+                    }.invokeOnCompletion {
+
+                        GlobalScope.launch(Dispatchers.Main) {
+                            showProgressBar(false)
+                            if (FileManager.isFileExist(decryptedFilePath)) {
+                                // succesfully decrypted file
+                                sendShareItent(myContext, decryptedFilePath)
+                                setResult(INTENT_RESULT_DECRYPTED)
+                                finish()
+                            } else {
+                                // fail to encrypt file
+                                showMessageDialog(
+                                    myContext,
+                                    R.string.error,
+                                    R.string.enc_enter_decrypting_password_error
+                                ) {
+                                    setResult(INTENT_RESULT_FAILED)
+                                    finish()
+                                }
+                            }
+                        }
+                    }
+                }
 
             } else {
 
                 setResult(INTENT_RESULT_FAILED)
+                finish()
 
             }
-
-            finish()
-
         }
     }
 
-
-//    private fun shareItemDecrypted(contentResolver: ContentResolver, uri: Uri) {
-//        // file: FileDirItem
-//
-//        // ask for the decrypting password for this file
-//        MaterialDialog(this).show {
-//            title(R.string.enc_enter_password)
-//            message(R.string.enc_msg_decrypting_password)
-//            input(
-//                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-//            ) { _, text ->
-//
-//                showProgressBar(true)
-//                var decryptedFilePath =
-//                    decryptFileForSharing(text.toString().toCharArray(), file.path)
-//                showProgressBar(false)
-//
-//                if (FileManager.isFileExist(decryptedFilePath)) {
-//                    // succesfully decrypted file
-//                    sendShareItent((decryptedFilePath))
-//                } else {
-//                    // fail to encrypt file
-//                    showMessageDialog(
-//                        myContext,
-//                        R.string.error,
-//                        R.string.enc_enter_decrypting_password_error
-//                    ) {}
-//                }
-//            }
-//            positiveButton(R.string.btn_decrypt_file)
-//            negativeButton(R.string.btn_cancel)
-//            cancelable(false)  // calls setCancelable on the underlying dialog
-//            cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-//        }
-//    }
 
     private fun showProgressBar(show: Boolean) {
         if (show) {
@@ -179,7 +193,6 @@ class ImportingActivity: BaseActivity() {
             //itemListRecyclerView.visibility = View.VISIBLE
         }
     }
-
 
 
 }

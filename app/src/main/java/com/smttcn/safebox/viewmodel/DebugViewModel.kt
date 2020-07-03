@@ -28,27 +28,6 @@ class DebugViewModel(application: Application) : AndroidViewModel(application){
         return result.toString()
     }
 
-    private fun getDebugText5(): String {
-        var result: StringBuilder = java.lang.StringBuilder()
-
-        val files = FileManager.getFilesInDocumentRoot()
-
-        files.forEach(){
-            if (!FileManager.isEncryptedFile(it)) {
-                val encFilename = FileManager.encryptFile(it, "111111".toCharArray())
-                if (encFilename.length > 5) result.append(encFilename + "\n")
-            }
-        }
-
-//        if (FileManager.isEncryptedFile(file)) {
-//            result.append("Decrypting : " + file.name)
-//            FileManager.decryptFile(file, "password".toCharArray())
-//        } else {
-//            result.append("Encrypted file not found!")
-//        }
-
-        return result.toString()
-    }
 
     private fun getDebugText1(): String {
         val path = FileManager.documentDataRoot

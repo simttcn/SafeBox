@@ -93,7 +93,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
 
     fun getOriginalExt(): String {
         if (!isDirectory)
-            return filename.getOriginalFileExtension()
+            return filename.getUnencryptedFileExtension()
         else
             return ""
     }
