@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/imageviewer" />
             <option value="$PROJECT_DIR$/materialdialogs" />
+            <option value="$PROJECT_DIR$/pdfview-library" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

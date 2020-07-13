@@ -1,24 +1,12 @@
 package com.smttcn.commons.extensions
 
 import com.smttcn.commons.helpers.*
+import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
 import java.io.File
 
-fun File.isMediaFile() = absolutePath.isImageFast() || absolutePath.isVideoFast() || absolutePath.isGif() || absolutePath.isRawFast() || absolutePath.isSvg()
-fun File.isGif() = absolutePath.endsWith(".gif", true)
-fun File.isVideoFast() = videoExtensions.any { absolutePath.endsWith(it, true) }
-fun File.isImageFast() = photoExtensions.any { absolutePath.endsWith(it, true) }
-fun File.isAudioFast() = audioExtensions.any { absolutePath.endsWith(it, true) }
-fun File.isRawFast() = rawExtensions.any { absolutePath.endsWith(it, true) }
-fun File.isSvg() = absolutePath.isSvg()
-
-fun File.isImageSlow() = absolutePath.isImageFast() || getMimeType().startsWith("image")
-fun File.isVideoSlow() = absolutePath.isVideoFast() || getMimeType().startsWith("video")
-fun File.isAudioSlow() = absolutePath.isAudioFast() || getMimeType().startsWith("audio")
-
 fun File.getMimeType() = absolutePath.getMimeType()
-fun File.getMimeTypeOfEncryptedFile() = absolutePath.getMimeTypeOfEncryptedFile()
 
 fun File.getProperSize(countHiddenItems: Boolean): Long {
     return if (isDirectory) {
@@ -101,7 +89,7 @@ fun File.doesThisOrParentHaveNoMedia(): Boolean {
 }
 
 fun File.getFileTypeDrawableId(): Int {
-    val ext = "." + name.getUnencryptedFileExtension()
+    val ext = "." + FileManager.getFileExtensionFromEncryptedFile(this)
 
     if (photoExtensions.contains(ext)) return R.drawable.ic_image_file_50
     if (videoExtensions.contains(ext)) return R.drawable.ic_video_file_50

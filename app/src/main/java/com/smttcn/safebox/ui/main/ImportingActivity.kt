@@ -125,7 +125,7 @@ class ImportingActivity : BaseActivity() {
 
             } else if (optionDecryptAndOpen.isChecked) {
 
-                //todo next last check: decrypt and share
+                // decrypt and share
                 GlobalScope.launch(Dispatchers.Main) {
 
                     showProgressBar(true)

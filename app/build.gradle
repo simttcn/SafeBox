@@ -8,8 +8,8 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 29
-    //buildToolsVersion "29.0.2"
+    compileSdkVersion versions.compileSdk
+    //buildToolsVersion versions.buildTools
 
     def versionPropsFile = file('version.properties')
 
@@ -22,8 +22,8 @@ android {
 
         defaultConfig {
             applicationId "com.smttcn.safebox"
-            minSdkVersion 23
-            targetSdkVersion 29
+            minSdkVersion versions.minSdk
+            targetSdkVersion versions.targetSdk
             versionCode code
             versionName "1.0"
             multiDexEnabled true
@@ -84,7 +84,7 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlin"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

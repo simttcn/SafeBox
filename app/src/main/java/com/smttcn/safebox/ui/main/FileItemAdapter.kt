@@ -44,8 +44,8 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
                 fileItems[currSelectedItemIndex].isSelected = !fileItems[currSelectedItemIndex].isSelected
                 */
 
-                notifyItemChanged(prevSelectedItemIndex)
-                notifyItemChanged(currSelectedItemIndex)
+                //notifyItemChanged(prevSelectedItemIndex)
+                //notifyItemChanged(currSelectedItemIndex)
 
                 // invoke the onItemClick method in MainActivity
                 onItemClick?.invoke(it, fileItems[currSelectedItemIndex], prevSelectedItemIndex, currSelectedItemIndex)
@@ -62,13 +62,13 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
 
             itemView.item_name.text = item.getOriginalFilename() //item.filename
 
-            if (item.isSelected) {
-                itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundSelected))
-            } else if (item.isOptionMenuActive) {
-                itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundOptionMenuActive))
-            }else {
-                itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundNormal))
-            }
+//            if (item.isSelected) {
+//                itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundSelected))
+//            } else if (item.isOptionMenuActive) {
+//                itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundOptionMenuActive))
+//            }else {
+//                itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundNormal))
+//            }
         }
 
     }

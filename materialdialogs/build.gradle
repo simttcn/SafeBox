@@ -12,8 +12,8 @@ logger.info("Package ID: $module_package_id")
 apply plugin: "kotlin-android"
 
 android {
-  compileSdkVersion 29
-  //buildToolsVersion "29.0.0"
+  compileSdkVersion versions.compileSdk
+  //buildToolsVersion versions.buildTools
 
   compileOptions {
     sourceCompatibility 1.8
@@ -21,8 +21,8 @@ android {
   }
 
   defaultConfig {
-    minSdkVersion 16
-    targetSdkVersion 29
+    minSdkVersion versions.minSdk //16
+    targetSdkVersion versions.targetSdk
     versionCode 262
     versionName "3.3.0"
   }

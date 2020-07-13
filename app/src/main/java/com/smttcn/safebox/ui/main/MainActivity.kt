@@ -17,7 +17,6 @@ import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,11 +36,13 @@ import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
-import com.smttcn.safebox.helpers.ImageViewerHelpers
+import com.smttcn.safebox.managers.ViewerManager
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.FileItemViewModel
+import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -54,6 +55,7 @@ class MainActivity : BaseActivity() {
 
     private val FILE_PASSWORD_SEPERATOR = "=::::="
     private lateinit var fileItemViewModel: FileItemViewModel
+    private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: FileItemAdapter
     private var IsShareFromOtherApp = false
     private lateinit var toolbarMenu: Menu
@@ -94,7 +96,7 @@ class MainActivity : BaseActivity() {
 
 
     private fun initializeUI() {
-        val recyclerView = findViewById<RecyclerView>(R.id.itemListRecyclerView)
+        recyclerView = findViewById<RecyclerView>(R.id.itemListRecyclerView)
         recyclerViewAdapter = FileItemAdapter(this)
         recyclerView.adapter = recyclerViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -214,7 +216,15 @@ class MainActivity : BaseActivity() {
     private fun onRecyclerViewItemClicked(view: View, item: FileDirItem, prevIdx: Int, currIdx: Int) {
         // Todo: to decide whether should allow user to open just by taping on it.
 
-        view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
+//        // set previous selected view background to normal
+//        val previousItemView = recyclerView.findViewHolderForAdapterPosition(prevIdx)
+//        if (previousItemView != null)
+//            previousItemView.itemView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorItemBackgroundNormal))
+//
+//        // highlight the current selected view
+//        view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
+
+
         //toast(item.filename + " clicked")
 
         // update toolbar icon status
@@ -238,11 +248,17 @@ class MainActivity : BaseActivity() {
         var popupMenu = PopupMenu(this, view, Gravity.BOTTOM + Gravity.RIGHT)
         popupMenu.menuInflater.inflate(R.menu.filediritem_popup_menu, popupMenu.menu)
 
+        // color the last menu item "Delete" as red colour
         val menuItem: MenuItem = popupMenu.menu.getItem(popupMenu.menu.size() - 1)
         val menuItemText = menuItem.title
         val s = SpannableString(menuItemText)
         s.setSpan(ForegroundColorSpan(Color.RED), 0, s.length, 0)
         menuItem.title = s
+
+        // disable the first menu item "View" if no viewer support for this file
+        if (!ViewerManager.hasSupportedViewer(item)) {
+            popupMenu.menu.getItem(0).setVisible(false)
+        }
 
         popupMenu.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -277,13 +293,11 @@ class MainActivity : BaseActivity() {
         }
 
         item.isOptionMenuActive = true
-        //view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorItemBackgroundOptionMenuActive))
-        recyclerViewAdapter.notifyItemChanged(position)
+        view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorItemBackgroundOptionMenuActive))
 
         popupMenu.setOnDismissListener {
             item.isOptionMenuActive = false
-            //view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorItemBackgroundNormal))
-            recyclerViewAdapter.notifyItemChanged(position)
+            view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorItemBackgroundNormal))
         }
 
         popupMenu.show()
@@ -293,17 +307,82 @@ class MainActivity : BaseActivity() {
 
     // let people view the contetnt of supported file
     private fun viewItem(item: FileDirItem, view: View) {
-        // todo next: have to decide on which viewer helper to handle the file
 
-        if (item.getOriginalFilename().isImageSlow()) {
+        // get the appropriate viewer through the viewer manager
+        val helper = ViewerManager.getHelper(this, view, item)
 
-            var helper = ImageViewerHelpers(this, view, item)
-            helper.view()
+        if (helper != null) { // helper not null
+
+            promptDecryptingPassword() {
+                helper?.view(it)
+            }
 
         }
 
     }
 
+
+    private fun promptDecryptingPassword(callback: (password: CharArray) -> Unit) {
+
+        // ask for the decrypting password for this file
+        val dialog = MaterialDialog(this).show {
+            title(R.string.enc_enter_password)
+            customView(R.layout.enter_password_view, scrollable = true, horizontalPadding = true)
+            positiveButton(R.string.btn_ok)
+            negativeButton(R.string.btn_cancel)
+            cancelable(false)  // calls setCancelable on the underlying dialog
+            cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+        }
+
+        val passwordInput: EditText = dialog.getCustomView().findViewById(R.id.password)
+        val progressBarContainer: View = dialog.getCustomView().findViewById(R.id.progressBarContainer)
+        var btnOk = dialog.getActionButton(WhichButton.POSITIVE)
+        var btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
+
+        progressBarContainer.visibility = View.GONE
+        btnCancel.isEnabled = true
+        btnOk.isEnabled = false
+        showKeyboard(passwordInput)
+
+        passwordInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                btnOk.isEnabled = isPasswordConfinedToPolicy(passwordInput.text.toString())
+            }
+
+        })
+
+        btnOk.setOnClickListener {
+            // display a progress activity when decrypting file.
+            GlobalScope.launch(Dispatchers.Main) {
+
+                btnOk.isEnabled = false
+                btnCancel.isEnabled = false
+                progressBarContainer.visibility = View.VISIBLE
+
+            }.invokeOnCompletion {
+
+                GlobalScope.launch(Dispatchers.IO) {
+
+                    // Pull the password out of the custom view when the positive button is pressed
+                    val password = passwordInput.text.toString()
+
+                    callback(password.toCharArray())
+
+                    GlobalScope.launch(Dispatchers.Main) {
+
+                        dialog.dismiss()
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
 
     private fun shareItemDecrypted(file: FileDirItem) {
         // ask for the decrypting password for this file

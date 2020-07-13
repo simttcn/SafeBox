@@ -91,13 +91,6 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         return filename.removeSuffix("." + ENCRYPTED_FILE_EXT)
     }
 
-    fun getOriginalExt(): String {
-        if (!isDirectory)
-            return filename.getUnencryptedFileExtension()
-        else
-            return ""
-    }
-
     fun getExt(): String {
         if (!isDirectory)
             return filename.getFileExtension()

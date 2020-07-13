@@ -255,7 +255,7 @@ object FileManager {
 
         // we need to update the encrypted hash's stored filename as to be consistent with its actual displayed filename
         if (!filename.equals(targetFilePath.getFilenameFromPath(), true))
-            updateEncryptedFileName(File(targetFilePath), targetFilePath.getFilenameFromPath())
+            updateEncryptedFileName(File(targetFilePath), targetFilePath.getFilenameFromPath().removeEncryptedExtension())
 
 
         return targetFilePath
@@ -328,6 +328,10 @@ object FileManager {
         return ""
     }
 
+
+    fun getFileExtensionFromEncryptedFile(file: File): String {
+        return getFilenameFromEncryptedFile(file).getFileExtension()
+    }
 
     fun writeEncryptedHashMapToFile(map: HashMap<String, ByteArray>, filePath: String): Boolean {
 

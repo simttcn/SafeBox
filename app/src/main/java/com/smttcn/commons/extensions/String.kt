@@ -47,8 +47,6 @@ fun String.getUnencryptedFilenameFromPath() : String {
 
 fun String.getFileExtension() = substring(lastIndexOf(".") + 1)
 
-fun String.getUnencryptedFileExtension() = removeEncryptedExtension().getFileExtension()
-
 fun String.insertBeforeFileExtension(str: String): String {
     var ext = this.getFileExtension()
     return this.removeSuffix("." + ext) + str + "." + ext
@@ -63,7 +61,7 @@ fun String.isAValidFilename(): Boolean {
     return true
 }
 
-fun String.isMediaFile() = isImageFast() || isVideoFast() || isGif() || isRawFast() || isSvg()
+fun String.isMediaFile() = isImageExtension() || isVideoExtension() || isGif() || isRawExtension() || isSvg()
 
 fun String.isGif() = endsWith(".gif", true)
 
@@ -74,15 +72,14 @@ fun String.isJpg() = endsWith(".jpg", true) or endsWith(".jpeg", true)
 fun String.isSvg() = endsWith(".svg", true)
 
 // fast extension checks, not guaranteed to be accurate
-fun String.isVideoFast() = videoExtensions.any { endsWith(it, true) }
+fun String.isImageExtension() = photoExtensions.any { endsWith(it, true) }
+fun String.isAudioExtension() = audioExtensions.any { endsWith(it, true) }
+fun String.isVideoExtension() = videoExtensions.any { endsWith(it, true) }
+fun String.isRawExtension() = rawExtensions.any { endsWith(it, true) }
 
-fun String.isImageFast() = photoExtensions.any { endsWith(it, true) }
-fun String.isAudioFast() = audioExtensions.any { endsWith(it, true) }
-fun String.isRawFast() = rawExtensions.any { endsWith(it, true) }
-
-fun String.isImageSlow() = isImageFast() || getMimeType().startsWith("image")
-fun String.isVideoSlow() = isVideoFast() || getMimeType().startsWith("video")
-fun String.isAudioSlow() = isAudioFast() || getMimeType().startsWith("audio")
+fun String.isImageMimeType() = isImageExtension() || getMimeType().startsWith("image")
+fun String.isVideoMimeType() = isVideoExtension() || getMimeType().startsWith("video")
+fun String.isAudioMimeType() = isAudioExtension() || getMimeType().startsWith("audio")
 
 fun String.getCompressionFormat() = when (getFileExtension().toLowerCase()) {
     "png" -> Bitmap.CompressFormat.PNG
@@ -171,8 +168,4 @@ fun String.normalizeString() = Normalizer.normalize(this, Normalizer.Form.NFD).r
 
 fun String.getMimeType(): String {
     return MimeType.typesMap[getFileExtension().toLowerCase()] ?: ""
-}
-
-fun String.getMimeTypeOfEncryptedFile(): String {
-    return MimeType.typesMap[getUnencryptedFileExtension().toLowerCase()] ?: ""
 }
