@@ -34,12 +34,14 @@ const val REQUEST_CODE_NEW_APP_PASSWORD = 100
 const val REQUEST_CODE_CHANGE_APP_PASSWORD = 110
 const val REQUEST_CODE_TO_ENCRYPT_FILE = 120
 const val REQUEST_CODE_TO_IMPORTDECRYPT_FILE = 130
+const val REQUEST_CODE_TO_VIEW_FILE = 140
 
 // Intent request string
 const val INTENT_CALL_FROM_MAINACTIVITY = "call_from_mainactivity"
 const val INTENT_TO_CREATE_APP_PASSWORD = "to_create_app_password"
 const val INTENT_SHARE_FILE_URI = "share_file_uri"
 const val INTENT_SHARE_FILE_PATH = "share_file_path"
+const val INTENT_VIEW_FILE_PATH = "view_file_path"
 const val INTENT_IMPORTED_FILENAME = "imported_filename"
 const val INTENT_ENCRYPTED_FILENAME = "encrypted_filename"
 const val INTENT_RESULT_IMPORTED = 99970
@@ -107,8 +109,8 @@ val archiveExtensions: Array<String> get() = arrayOf(".7z",".apk",".arj",".bz2",
 val officeWorldExtensions: Array<String> get() = arrayOf(".doc",".docx",".docm")
 val officeExcelExtensions: Array<String> get() = arrayOf(".xls",".xlsx",".xlsm")
 val officePowerPointExtensions: Array<String> get() = arrayOf(".ppt",".pptx")
-val officePdfExtensions: Array<String> get() = arrayOf(".pdf")
-val officeTextExtensions: Array<String> get() = arrayOf(".txt")
+val PdfExtensions: Array<String> get() = arrayOf(".pdf")
+val TextExtensions: Array<String> get() = arrayOf(".txt")
 
 const val DATE_FORMAT_ONE = "dd.MM.yyyy"
 const val DATE_FORMAT_TWO = "dd/MM/yyyy"

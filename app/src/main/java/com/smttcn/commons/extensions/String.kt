@@ -22,6 +22,18 @@ fun String.removeTrailingCharacter(character: Char): String {
     } else return this
 }
 
+fun String.removeLeadingCharacter(character: Char): String {
+    if (startsWith(character, ignoreCase = false)) {
+        return substring(1, length)
+    } else return this
+}
+
+fun String.withLeadingCharacter(character: Char): String {
+    if (!startsWith(character, ignoreCase = false)) {
+        return character + this
+    } else return this
+}
+
 fun String.withTrailingCharacter(character: Char): String {
     if (!endsWith(character, ignoreCase = false)) {
         return this + character

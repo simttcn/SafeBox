@@ -9,8 +9,6 @@ import com.smttcn.commons.helpers.*
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.MyApplication
 import java.io.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 object FileManager {
@@ -125,7 +123,20 @@ object FileManager {
     }
 
 
-    fun deleteCache() {
+    fun emptyCacheFolder() {
+        try {
+            val cacheFolder = MyApplication.applicationContext.cacheDir
+            val children: Array<String> = cacheFolder.list()
+            for (i in children.indices) {
+                File(cacheFolder, children[i]).delete()
+            }
+        } catch (e: java.lang.Exception) {
+            //e.printStackTrace()
+        }
+    }
+
+
+    fun deleteCacheShareFolder() {
         try {
             val cacheShareDir = getFolderInCacheFolder(TEMP_FILE_SHARE_FOLDER_NAME)
             deleteDir(cacheShareDir, true)
@@ -238,7 +249,7 @@ object FileManager {
         if (size < 1) return ""
 
         val inputStream = contentResolver.openInputStream(uri)
-        var targetFilePath = ""
+        var targetFilePath: String
 
         if (folder.length > 0)
             targetFilePath = FileManager.toFullPathInDocumentRoot(folder.withTrailingCharacter('/') + filename)
@@ -413,7 +424,7 @@ object FileManager {
 
         // Todo future: should decrypt to hashmap in memory and then encrypt it back to file
         // decrypt file with delete original
-        val decryptedFilePath = decryptFile(filePath, password = oldPwd, deleteOriginal = true)
+        val decryptedFilePath = decryptFile(filePath, password = oldPwd, deleteEncryptedSource = true)
         // encrypt file with delete original
         val encryptedFilePath = encryptFile(decryptedFilePath, filePath, newPwd, true)
 
@@ -518,17 +529,17 @@ object FileManager {
     }
 
 
-    fun decryptFile(sourceFilePath: String, targetFolder: String = "", password: CharArray, deleteOriginal: Boolean = true): String {
+    fun decryptFile(sourceFilePath: String, targetFolder: String = "", password: CharArray, deleteEncryptedSource: Boolean = false): String {
         val sourceFile = File(sourceFilePath)
 
         if (sourceFile.exists() && !sourceFile.isDirectory()){
 
             try {
-                var decrypted: ByteArray? = null
+                //var decrypted: ByteArray? = null
                 ObjectInputStream(FileInputStream(sourceFile)).use { it ->
                     val decryptedFilePath = decryptFile(it, targetFolder, password, deleteExisting = true)
 
-                    if (decryptedFilePath.length > 0 && deleteOriginal)
+                    if (decryptedFilePath.length > 0 && deleteEncryptedSource)
                         // only delete the original if the file was decrypted successfully
                         sourceFile.delete()
 
@@ -545,7 +556,7 @@ object FileManager {
 
         }
 
-        return ""
+        //return ""
     }
 
 

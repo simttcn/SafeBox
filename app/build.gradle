@@ -81,6 +81,7 @@ dependencies {
     // local copy library
     implementation project(path: ':imageviewer')
     implementation project(path: ':materialdialogs')
+    implementation project(path: ':pdfview-library')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.multidex:multidex:2.0.1'

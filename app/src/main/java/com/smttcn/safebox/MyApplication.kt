@@ -62,7 +62,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
                 // reset the flag so we will clear the cache next time
                 _isSharingItem = false
             } else {
-                FileManager.deleteCache()
+                FileManager.deleteCacheShareFolder()
             }
         }
 
@@ -82,7 +82,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
 
         registerActivityLifecycleCallbacks(this)
 
-        FileManager.deleteCache()
+        FileManager.emptyCacheFolder()
     }
 
 

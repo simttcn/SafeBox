@@ -76,7 +76,7 @@ class ImportingActivity : BaseActivity() {
         password.isEnabled = false
         btnOk.isEnabled = true
 
-        optionGroup.setOnCheckedChangeListener { group, checkedId ->
+        optionGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.importOptionSaveInLibrary -> {
                     password.text.clear()

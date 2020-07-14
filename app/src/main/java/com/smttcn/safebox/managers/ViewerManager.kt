@@ -1,9 +1,15 @@
 package com.smttcn.safebox.managers
 
+import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.view.View
+import com.smttcn.commons.extensions.getFileExtension
 import com.smttcn.commons.extensions.getMimeType
 import com.smttcn.commons.extensions.isImageMimeType
+import com.smttcn.commons.extensions.withLeadingCharacter
+import com.smttcn.commons.helpers.PdfExtensions
+import com.smttcn.commons.helpers.photoExtensions
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.helpers.BaseViewer
 import com.smttcn.safebox.helpers.ImageViewer
@@ -18,19 +24,20 @@ import kotlin.reflect.KClass
 
 object ViewerManager{
 
-    var viewerMap: HashMap<String, String> = hashMapOf()
+    var viewerMap: HashMap<String, Array<String>> = hashMapOf()
 
     init {
-        viewerMap["image"] = "com.smttcn.safebox.helpers.ImageViewer"
+        viewerMap["com.smttcn.safebox.helpers.ImageViewer"] = photoExtensions
+        viewerMap["com.smttcn.safebox.helpers.PdfViewer"] = PdfExtensions
     }
 
 
     fun hasSupportedViewer(file: FileDirItem): Boolean {
 
-        val mimeType = file.getOriginalFilename().getMimeType().split('/')[0]
+        val fileExt = file.getOriginalFilename().getFileExtension()
 
         for (item in viewerMap.entries) {
-            if (item.key.equals(mimeType, true)) {
+            if (item.value.contains(fileExt.withLeadingCharacter('.'))) {
                 return true
             }
         }
@@ -40,17 +47,16 @@ object ViewerManager{
     }
 
 
-    fun getHelper(context: Context, view: View, file: FileDirItem): BaseViewer? {
+    fun getHelper(activity: Activity, view: View, file: FileDirItem): BaseViewer? {
 
         var helper: BaseViewer? = null
-        val mimeType = file.getOriginalFilename().getMimeType().split('/')[0]
+        val fileExt = file.getOriginalFilename().getFileExtension()
 
-        // todo next: loop through viewerMap to decide which helpers to return
         for (item in viewerMap.entries) {
-            if (item.key.equals(mimeType, true)) {
+            if (item.value.contains(fileExt.withLeadingCharacter('.'))) {
 
-                helper = Class.forName(item.value).newInstance() as BaseViewer
-                helper.initialize(context, view, file)
+                helper = Class.forName(item.key).newInstance() as BaseViewer
+                helper.initialize(activity, view, file)
 
             }
         }

@@ -40,13 +40,10 @@ import com.smttcn.safebox.managers.ViewerManager
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.FileItemViewModel
-import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.File
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -124,7 +121,7 @@ class MainActivity : BaseActivity() {
         val uri = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri
 
         if (uri != null) {
-            val (filename, size) = FileManager.getFilenameAndSizeFromUri(contentResolver, uri)
+            val (filename, _) = FileManager.getFilenameAndSizeFromUri(contentResolver, uri)
 
             toast(filename)
 
@@ -314,7 +311,7 @@ class MainActivity : BaseActivity() {
         if (helper != null) { // helper not null
 
             promptDecryptingPassword() {
-                helper?.view(it)
+                helper.view(it)
             }
 
         }
@@ -639,6 +636,7 @@ class MainActivity : BaseActivity() {
                 }
 
             }
+
         }
     }
 

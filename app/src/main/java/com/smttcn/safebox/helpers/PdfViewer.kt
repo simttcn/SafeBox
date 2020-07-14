@@ -2,30 +2,29 @@ package com.smttcn.safebox.helpers
 
 import android.app.Activity
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
+import android.content.Intent
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.EditText
 import android.widget.ImageView
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.WhichButton
-import com.afollestad.materialdialogs.actions.getActionButton
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
-import com.smttcn.commons.extensions.*
+import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContextCompat.startActivity
+import com.smttcn.commons.extensions.getDrawableCompat
+import com.smttcn.commons.extensions.showMessageDialog
+import com.smttcn.commons.helpers.INTENT_VIEW_FILE_PATH
+import com.smttcn.commons.helpers.REQUEST_CODE_TO_VIEW_FILE
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.manager.ImageManager
 import com.smttcn.commons.models.FileDirItem
+import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
-import com.stfalcon.imageviewer.StfalconImageViewer
-import kotlinx.android.synthetic.main.recyclerview_item.view.*
+import com.smttcn.safebox.ui.main.MainActivity
+import com.smttcn.safebox.ui.main.PdfViewActivity
+import com.smttcn.safebox.ui.settings.SettingsActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.File
 
-class ImageViewer(): BaseViewer() {
+class PdfViewer(): BaseViewer() {
 
 
     override fun initialize(activity: Activity, view: View, fileDirItem: FileDirItem) {
@@ -37,20 +36,16 @@ class ImageViewer(): BaseViewer() {
 
     override fun view(password: CharArray) {
 
-        val decryptedFileByteArray = FileManager.decryptFileContentToByteArray(File(_file.path), password)
+        val decryptedFilePath = FileManager.decryptFile(_file.path, "", password, false)
 
         GlobalScope.launch(Dispatchers.Main) {
 
-            if (decryptedFileByteArray != null) {
+            if (decryptedFilePath.length > 0) {
 
-                val imagePaths = listOf(decryptedFileByteArray)
-                StfalconImageViewer.Builder<ByteArray>(
-                    _parentActivity,
-                    imagePaths,
-                    ::loadImage
-                )
-                    .withTransitionFrom(_view.item_background)
-                    .show()
+                val viewerIntent = Intent(_parentActivity, PdfViewActivity::class.java)
+                viewerIntent.putExtra(INTENT_VIEW_FILE_PATH, decryptedFilePath)
+
+                startActivity(_parentActivity, viewerIntent,null)
 
             } else {
 
