@@ -6,6 +6,7 @@ import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import com.smttcn.safebox.MyApplication
 import java.io.File
+import java.util.*
 
 
 open class FileDirItem(_file: File) : Comparable<FileDirItem> {
@@ -50,7 +51,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         } else {
             var result: Int
             when {
-                sorting and SORT_BY_NAME != 0 -> result = filename.toLowerCase().compareTo(other.filename.toLowerCase())
+                sorting and SORT_BY_NAME != 0 -> result = filename.lowerCase().compareTo(other.filename.lowerCase())
                 sorting and SORT_BY_SIZE != 0 -> result = when {
                     size == other.size -> 0
                     size > other.size -> 1
@@ -71,7 +72,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
 
                 }
                 else -> {
-                    result = getExt().toLowerCase().compareTo(other.getExt().toLowerCase())
+                    result = getExt().lowerCase().compareTo(other.getExt().lowerCase())
                 }
             }
 

@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.smttcn.commons.extensions.fromBase64String
+import com.smttcn.commons.extensions.lowerCase
 import com.smttcn.commons.extensions.toBase64String
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
@@ -16,7 +17,6 @@ import java.util.*
 open class BaseConfig(val inPrefs: SharedPreferences) {
 
     val prefs = inPrefs
-    val context = MyApplication.applicationContext
 
     companion object {
         fun newInstance(prefs: SharedPreferences) = BaseConfig(prefs)
@@ -109,11 +109,11 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
     */
 
     var sorting: Int
-        get() = prefs.getInt(SORT_ORDER, context.resources.getInteger(R.integer.default_sorting))
+        get() = prefs.getInt(SORT_ORDER, MyApplication.applicationContext.resources.getInteger(R.integer.default_sorting))
         set(sorting) = prefs.edit().putInt(SORT_ORDER, sorting).apply()
 
     var use24HourFormat: Boolean
-        get() = prefs.getBoolean(USE_24_HOUR_FORMAT, DateFormat.is24HourFormat(context))
+        get() = prefs.getBoolean(USE_24_HOUR_FORMAT, DateFormat.is24HourFormat(MyApplication.applicationContext))
         set(use24HourFormat) = prefs.edit().putBoolean(USE_24_HOUR_FORMAT, use24HourFormat).apply()
 
     var isSundayFirst: Boolean
@@ -132,29 +132,29 @@ open class BaseConfig(val inPrefs: SharedPreferences) {
         set(dateFormat) = prefs.edit().putString(DATE_FORMAT, dateFormat).apply()
 
     var textColor: Int
-        get() = prefs.getInt(TEXT_COLOR, ContextCompat.getColor(context, R.color.colorText))
+        get() = prefs.getInt(TEXT_COLOR, ContextCompat.getColor(MyApplication.applicationContext, R.color.colorText))
         set(textColor) = prefs.edit().putInt(TEXT_COLOR, textColor).apply()
 
     var backgroundColor: Int
-        get() = prefs.getInt(BACKGROUND_COLOR, ContextCompat.getColor(context, R.color.colorBackground))
+        get() = prefs.getInt(BACKGROUND_COLOR, ContextCompat.getColor(MyApplication.applicationContext, R.color.colorBackground))
         set(backgroundColor) = prefs.edit().putInt(BACKGROUND_COLOR, backgroundColor).apply()
 
     var primaryColor: Int
-        get() = prefs.getInt(PRIMARY_COLOR, ContextCompat.getColor(context, R.color.colorPrimary))
+        get() = prefs.getInt(PRIMARY_COLOR, ContextCompat.getColor(MyApplication.applicationContext, R.color.colorPrimary))
         set(primaryColor) = prefs.edit().putInt(PRIMARY_COLOR, primaryColor).apply()
 
-    public fun removePrefKey(key: String) {
+    fun removePrefKey(key: String) {
         // have to use the same instances for deletion
         // i.e.: assign to an instance and operate on it.
         val editor = prefs.edit()
         editor.remove(key)
-        editor.commit()
+        editor.apply()
     }
 
     private fun getDefaultDateFormat(): String {
-        val format = DateFormat.getDateFormat(context)
+        val format = DateFormat.getDateFormat(MyApplication.applicationContext)
         val pattern = (format as SimpleDateFormat).toLocalizedPattern()
-        return when (pattern.toLowerCase().replace(" ", "")) {
+        return when (pattern.lowerCase().replace(" ", "")) {
             "dd/mm/y" -> DATE_FORMAT_TWO
             "mm/dd/y" -> DATE_FORMAT_THREE
             "y-mm-dd" -> DATE_FORMAT_FOUR

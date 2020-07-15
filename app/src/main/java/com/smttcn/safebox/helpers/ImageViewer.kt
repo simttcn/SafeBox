@@ -25,7 +25,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 
-class ImageViewer(): BaseViewer() {
+class ImageViewer : BaseViewer() {
 
 
     override fun initialize(activity: Activity, view: View, fileDirItem: FileDirItem) {

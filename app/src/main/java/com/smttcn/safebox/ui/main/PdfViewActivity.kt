@@ -11,6 +11,7 @@ import com.smttcn.commons.helpers.INTENT_VIEW_FILE_PATH
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.safebox.R
 import kotlinx.android.synthetic.main.activity_view_pdf.*
+import com.smttcn.commons.extensions.lowerCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -65,15 +66,15 @@ class PdfViewActivity : BaseActivity() {
 
     private fun showProgressBar(show: Boolean) {
         if (show) {
-            getWindow().setFlags(
+            window.setFlags(
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-            );
+            )
 
             pdfViewActivityProgressBarContainer.visibility = View.VISIBLE
             pdfView.visibility = View.GONE
         } else {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             pdfViewActivityProgressBarContainer.visibility = View.GONE
             pdfView.visibility = View.VISIBLE
         }

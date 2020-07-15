@@ -1,8 +1,9 @@
 package com.smttcn.commons.helpers
 
+import com.smttcn.commons.extensions.lowerCase
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
-import java.util.HashMap
+import java.util.*
 
 class MimeType {
     companion object {
@@ -135,7 +136,7 @@ class MimeType {
             put("dxr", "application/x-director")
             put("eml", "message/rfc822")
             put("emz", "application/octet-stream")
-            put(ENCRYPTED_FILE_EXT, "application/" + MyApplication.mainActivityContext.getString(R.string.app_name).toLowerCase())
+            put(ENCRYPTED_FILE_EXT, "application/" + MyApplication.mainActivityContext.getString(R.string.app_name).lowerCase())
             put("eot", "application/vnd.ms-fontobject")
             put("eps", "application/postscript")
             put("etl", "application/etl")

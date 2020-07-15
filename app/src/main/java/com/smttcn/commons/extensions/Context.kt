@@ -157,18 +157,18 @@ fun sendShareItent(context: Context, filepath: String) {
         // create new Intent for getting list of related intent
         val intent = Intent(Intent.ACTION_SEND)
         // only MimeType is good enough
-        intent.setType(filepath.getMimeType())
+        intent.type = filepath.getMimeType()
 
         // get a list of related share intents
-        val resInfo: List<ResolveInfo> = context.getPackageManager().queryIntentActivities(intent, 0)
+        val resInfo: List<ResolveInfo> = context.packageManager.queryIntentActivities(intent, 0)
         // loop through all of them
         for (resolveInfo in resInfo) {
             val packageName: String = resolveInfo.activityInfo.packageName
             if (packageName != PACKAGE_NAME) { // Remove own share intent
                 val targetedShareIntent = Intent(Intent.ACTION_SEND)
-                targetedShareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                targetedShareIntent.setDataAndType(contentUri, filepath.getMimeType());
-                targetedShareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                targetedShareIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                targetedShareIntent.setDataAndType(contentUri, filepath.getMimeType())
+                targetedShareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
                 targetedShareIntent.setPackage(packageName)
                 targetedShareIntents.add(targetedShareIntent)
             }
@@ -177,7 +177,7 @@ fun sendShareItent(context: Context, filepath: String) {
         // create chooser intent, fill it in and start it
         val chooserIntent = Intent.createChooser(Intent(), context.getString(R.string.sharing_to))
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetedShareIntents.toTypedArray())
-        startActivity(context, chooserIntent, null);
+        startActivity(context, chooserIntent, null)
 
     }
 

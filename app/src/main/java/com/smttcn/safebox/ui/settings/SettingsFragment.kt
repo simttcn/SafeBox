@@ -11,6 +11,7 @@ import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
+import com.smttcn.commons.extensions.lowerCase
 import com.smttcn.commons.helpers.*
 import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.safebox.MyApplication
@@ -24,6 +25,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     var enabledAppPassword: SwitchPreferenceCompat? = null
     var changeAppPassword: Preference? = null
 
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val prefManager: PreferenceManager = preferenceManager
         prefManager.sharedPreferencesName = PREFS_KEY
@@ -35,27 +37,28 @@ class SettingsFragment : PreferenceFragmentCompat() {
         initializeUI()
     }
 
+
     private fun initializeUI() {
-        if (enabledAppPassword!!.isChecked){
-            changeAppPassword!!.isEnabled = true
-        } else {
-            changeAppPassword!!.isEnabled = false
-        }
+        changeAppPassword!!.isEnabled = enabledAppPassword!!.isChecked
     }
+
 
     override fun onAttach(context: Context) {
         myContext = context
         super.onAttach(context)
     }
 
+
+    // todo next: see if we can do the password check on before the toggle button changed event
     override fun onPreferenceTreeClick(preference: Preference?): Boolean {
-        when (preference?.key?.toLowerCase()) {
+        when (preference?.key?.lowerCase()) {
             "enableapppassword" -> toggleEnableAppPasswordActivity(preference as SwitchPreferenceCompat?)
             "changeapppassword" -> showChangeAppPasswordActivity()
         }
 
         return super.onPreferenceTreeClick(preference)
     }
+
 
     private fun toggleEnableAppPasswordActivity(preference: SwitchPreferenceCompat?) {
         if (preference!!.isChecked){
@@ -97,16 +100,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+
     private fun redirectToNewPasswordActivity() {
         val intent = Intent(myContext, PasswordActivity::class.java)
         intent.putExtra(INTENT_TO_CREATE_APP_PASSWORD, "yes")
         startActivityForResult(intent, REQUEST_CODE_NEW_APP_PASSWORD)
     }
 
+
     private fun showChangeAppPasswordActivity() {
         val intent = Intent(myContext, PasswordActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE_CHANGE_APP_PASSWORD)
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

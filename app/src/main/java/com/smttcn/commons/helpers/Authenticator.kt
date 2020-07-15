@@ -3,7 +3,7 @@ package com.smttcn.commons.helpers
 import com.smttcn.commons.crypto.Hashing
 import com.smttcn.safebox.MyApplication
 
-internal class Authenticator() {
+internal class Authenticator {
 
     fun isAppPasswordHashExist(): Boolean {
         return MyApplication.baseConfig.appPasswordHash.length > 20

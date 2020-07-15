@@ -24,7 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class PdfViewer(): BaseViewer() {
+class PdfViewer : BaseViewer() {
 
 
     override fun initialize(activity: Activity, view: View, fileDirItem: FileDirItem) {

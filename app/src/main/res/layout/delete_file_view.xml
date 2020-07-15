@@ -33,7 +33,7 @@
             android:textSize="@dimen/activity_font_size"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
-            android:text="filename"
+            android:text=""
             android:textColor="@color/colorText" />
 
     </LinearLayout>

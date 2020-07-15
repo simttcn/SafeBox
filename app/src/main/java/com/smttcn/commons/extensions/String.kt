@@ -12,6 +12,10 @@ import java.text.Normalizer
 import java.util.*
 import java.util.regex.Pattern
 
+fun String.lowerCase() = this.toLowerCase(Locale.ENGLISH)
+
+fun String.upperCase() = this.toUpperCase(Locale.ENGLISH)
+
 fun String.addExtension(ext: String) = this + "." + ext
 
 fun String.appendPath(path: String) = this.removeSuffix("/") + "/" + path
@@ -93,7 +97,7 @@ fun String.isImageMimeType() = isImageExtension() || getMimeType().startsWith("i
 fun String.isVideoMimeType() = isVideoExtension() || getMimeType().startsWith("video")
 fun String.isAudioMimeType() = isAudioExtension() || getMimeType().startsWith("audio")
 
-fun String.getCompressionFormat() = when (getFileExtension().toLowerCase()) {
+fun String.getCompressionFormat() = when (getFileExtension().lowerCase()) {
     "png" -> Bitmap.CompressFormat.PNG
     "webp" -> Bitmap.CompressFormat.WEBP
     else -> Bitmap.CompressFormat.JPEG
@@ -179,5 +183,5 @@ fun String.getAvailableStorageB(): Long {
 fun String.normalizeString() = Normalizer.normalize(this, Normalizer.Form.NFD).replace(normalizeRegex, "")
 
 fun String.getMimeType(): String {
-    return MimeType.typesMap[getFileExtension().toLowerCase()] ?: ""
+    return MimeType.typesMap[getFileExtension().lowerCase()] ?: ""
 }

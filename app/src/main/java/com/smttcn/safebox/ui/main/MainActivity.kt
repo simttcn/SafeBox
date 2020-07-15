@@ -83,7 +83,7 @@ class MainActivity : BaseActivity() {
         MyApplication.mainActivityContext = this
         myContext = this
 
-        IsShareFromOtherApp = if (intent?.action == Intent.ACTION_SEND) true else false
+        IsShareFromOtherApp = intent?.action == Intent.ACTION_SEND
 
         if (IsShareFromOtherApp) {
             IsShareFromOtherApp = false
@@ -242,7 +242,7 @@ class MainActivity : BaseActivity() {
 
 
     private fun onRecyclerViewItemPopupMenuClicked(view: View, item: FileDirItem, position: Int) {
-        var popupMenu = PopupMenu(this, view, Gravity.BOTTOM + Gravity.RIGHT)
+        var popupMenu = PopupMenu(this, view, Gravity.BOTTOM + Gravity.END)
         popupMenu.menuInflater.inflate(R.menu.filediritem_popup_menu, popupMenu.menu)
 
         // color the last menu item "Delete" as red colour
@@ -254,7 +254,7 @@ class MainActivity : BaseActivity() {
 
         // disable the first menu item "View" if no viewer support for this file
         if (!ViewerManager.hasSupportedViewer(item)) {
-            popupMenu.menu.getItem(0).setVisible(false)
+            popupMenu.menu.getItem(0).isVisible = false
         }
 
         popupMenu.setOnMenuItemClickListener {
@@ -310,7 +310,7 @@ class MainActivity : BaseActivity() {
 
         if (helper != null) { // helper not null
 
-            promptDecryptingPassword() {
+            promptDecryptingPassword {
                 helper.view(it)
             }
 
@@ -538,15 +538,15 @@ class MainActivity : BaseActivity() {
 
     private fun showProgressBar(show: Boolean) {
         if (show) {
-            getWindow().setFlags(
+            window.setFlags(
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-            );
+            )
 
             mainActivityProgressBarContainer.visibility = View.VISIBLE
             //itemListRecyclerView.visibility = View.GONE
         } else {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
             mainActivityProgressBarContainer.visibility = View.GONE
             //itemListRecyclerView.visibility = View.VISIBLE

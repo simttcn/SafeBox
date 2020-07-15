@@ -104,7 +104,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
     override fun onActivityStopped(activity: Activity) {
         // Tracing activity status to determine if the app still in the foreground
         //      in order to set the Authentication status and trigger the login screen
-        isActivityChangingConfigurations = activity.isChangingConfigurations();
+        isActivityChangingConfigurations = activity.isChangingConfigurations
         if (--activityReferences == 0 && !isActivityChangingConfigurations) {
             // App enters background
             lockApp()

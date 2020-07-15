@@ -33,7 +33,7 @@ object FileManager {
     init {
         // create data folder if necessary
         val f = File(documentDataRoot)
-        if (!f.exists() || !f.isDirectory())
+        if (!f.exists() || !f.isDirectory)
             f.mkdir()
     }
 
@@ -90,19 +90,19 @@ object FileManager {
     // Dir operation
     fun isFolderExist(file: String, isHidden: Boolean = false): Boolean {
         val f = File(file)
-        return f.isDirectory() && f.exists() && f.isHidden() == isHidden
+        return f.isDirectory && f.exists() && f.isHidden == isHidden
     }
 
 
     fun isFolderExistInDocumentRoot(dir: String, isHidden: Boolean = false): Boolean {
         val f = File(toFullPathInDocumentRoot(dir))
-        return f.exists() && f.isDirectory() && f.isHidden() == isHidden
+        return f.exists() && f.isDirectory && f.isHidden == isHidden
     }
 
 
     fun createFolderInDocumentRoot(dir: String) {
         val f = File(toFullPathInDocumentRoot(dir))
-        if (!f.exists() || !f.isDirectory())
+        if (!f.exists() || !f.isDirectory)
             f.mkdir()
     }
 
@@ -167,7 +167,7 @@ object FileManager {
 
     fun isFileExist(file: String, isHidden: Boolean = false): Boolean {
         val f = File(file)
-        return f.exists() && f.isHidden() == isHidden
+        return f.exists() && f.isHidden == isHidden
     }
 
 
@@ -285,7 +285,7 @@ object FileManager {
 
 
     fun isEncryptedFile(file: File): Boolean {
-        if (!file.exists() || file.isDirectory()) return false
+        if (!file.exists() || file.isDirectory) return false
 
         try {
             ObjectInputStream(FileInputStream(file)).use { it ->
@@ -320,7 +320,7 @@ object FileManager {
 
 
     fun getFilenameFromEncryptedFile(file: File): String {
-        if (file.isDirectory()) return ""
+        if (file.isDirectory) return ""
 
         try {
             ObjectInputStream(FileInputStream(file)).use { it ->
@@ -363,7 +363,7 @@ object FileManager {
 
 
     fun updateEncryptedFileName(file: File, newFilename: String): Boolean {
-        if (file.isDirectory()) return false
+        if (file.isDirectory) return false
 
         try {
             ObjectInputStream(FileInputStream(file)).use { it ->
@@ -428,11 +428,7 @@ object FileManager {
         // encrypt file with delete original
         val encryptedFilePath = encryptFile(decryptedFilePath, filePath, newPwd, true)
 
-        if (isEncryptedFile(File(encryptedFilePath))) {
-            return true
-        } else {
-            return false
-        }
+        return isEncryptedFile(File(encryptedFilePath))
 
     }
 
@@ -455,7 +451,7 @@ object FileManager {
 
         val sourceFile = File(sourceFilePath)
 
-        if (sourceFile.exists() && !sourceFile.isDirectory()) {
+        if (sourceFile.exists() && !sourceFile.isDirectory) {
 
             val originalFilename = sourceFile.name
             var encryptedFilePath = targetFilePath.removeEncryptedExtension().addExtension(ENCRYPTED_FILE_EXT)
@@ -532,7 +528,7 @@ object FileManager {
     fun decryptFile(sourceFilePath: String, targetFolder: String = "", password: CharArray, deleteEncryptedSource: Boolean = false): String {
         val sourceFile = File(sourceFilePath)
 
-        if (sourceFile.exists() && !sourceFile.isDirectory()){
+        if (sourceFile.exists() && !sourceFile.isDirectory){
 
             try {
                 //var decrypted: ByteArray? = null
@@ -561,7 +557,7 @@ object FileManager {
 
 
     fun decryptFileContentToByteArray(file: File, password: CharArray): ByteArray? {
-        if (file.isDirectory()) return null
+        if (file.isDirectory) return null
 
         try {
             var decrypted: ByteArray? = null

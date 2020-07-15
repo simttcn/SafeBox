@@ -5,7 +5,7 @@ import android.content.Context
 import android.view.View
 import com.smttcn.commons.models.FileDirItem
 
-abstract class BaseViewer() {
+abstract class BaseViewer {
 
     internal lateinit var _parentActivity: Activity
     internal lateinit var _view: View

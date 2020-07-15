@@ -143,13 +143,13 @@ class EncryptingActivity: BaseActivity() {
 
     fun showProgressBar(show: Boolean) {
         if (show) {
-            getWindow().setFlags(
+            window.setFlags(
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
             encryptingActivityProgressBarContainer.visibility = View.VISIBLE
         } else {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
             encryptingActivityProgressBarContainer.visibility = View.GONE
         }

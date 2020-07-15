@@ -28,21 +28,6 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         //var funAfterSAFPermission: ((success: Boolean) -> Unit)? = null
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-
-        super.onCreate(savedInstanceState)
-
-        // Disabling the piracy check routine
-//        if (!packageName.startsWith("com.simtetchun.", true)) {
-//            if ((0..50).random() == 10 || baseConfig.appRunCount % 100 == 0) {
-//                val label = "You are using a fake version of the app. For your own safety download the original one from www.simplemobiletools.com. Thanks"
-//                ConfirmationDialog(this, label, positive = R.string.ok, negative = 0) {
-//                    launchViewIntent("https://play.google.com/store/apps/dev?id=9070296388022589266")
-//                }
-//            }
-//        }
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -67,19 +52,10 @@ abstract class BaseActivity : AppCompatActivity(), CoroutineScope by MainScope()
         super.onStop()
         actionOnPermission = null
         if (sessionDepth > 0)
-            sessionDepth--;
+            sessionDepth--
         if (sessionDepth == 0) {
             // app went to background
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //funAfterSAFPermission = null
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-        super.onActivityResult(requestCode, resultCode, resultData)
     }
 
     fun performAuthentication() {

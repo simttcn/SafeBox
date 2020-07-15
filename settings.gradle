@@ -1,2 +1,2 @@
-include ':app', ':imageviewer', ':materialdialogs', 'pdfview-library'
+include ':app', ':imageviewer', ':materialdialogs', ':pdfview-library'
 rootProject.name='SafeBox'

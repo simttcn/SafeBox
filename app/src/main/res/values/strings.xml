@@ -75,7 +75,7 @@
     <string name="enc_warning_encrypting_password">Warning: if you forget this password, your encrypted file will be unrecoverable and as good as gone unless you have a backup somewhere else. so please choose your password carefully.</string>
     <string name="enc_title_encrypting_file">Encrypting File</string>
 <!--    <string name="enc_title_decrypting_file">Decrypting File</string>-->
-    <string name="enc_msg_encrypting_success">File succesfully encrypted.</string>
+    <string name="enc_msg_encrypting_success">File successfully encrypted.</string>
     <string name="enc_msg_encrypting_cancelled">File encryption cancelled.</string>
     <string name="enc_msg_encrypting_failed">Error encrypting the file.</string>
 <!--    <string name="enc_msg_decrypting_success">File succesfully decrypted</string>-->
@@ -333,5 +333,6 @@
     <string name="title_activity_image_view">ImageViewActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="debug_console">Debug Console</string>
 
 </resources>
