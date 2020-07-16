@@ -27,10 +27,18 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="*/*" />
+            </intent-filter>
+            <intent-filter
+                android:icon="@mipmap/ic_launcher"
+                android:label="@string/app_name"
+                android:priority="1">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="file" android:host="*" android:mimeType="*/*" android:pathPattern=".*\\.enc"/>
+                <data android:scheme="content" android:pathPattern=".*\\.enc" android:mimeType="application/safebox" />
             </intent-filter>
         </activity>
         <activity

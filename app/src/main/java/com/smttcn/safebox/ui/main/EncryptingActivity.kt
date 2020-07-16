@@ -81,41 +81,37 @@ class EncryptingActivity: BaseActivity() {
         btnOk.setOnClickListener {
             if (isEncryptingPasswordValid(EncryptingPassword.text.toString(), ConfirmPassword.text.toString())){
 
-                GlobalScope.launch(Dispatchers.Main) {
-                    showProgressBar(true)
+                showProgressBar(true)
 
-                }.invokeOnCompletion {
+                GlobalScope.launch(Dispatchers.IO) {
 
-                    GlobalScope.launch(Dispatchers.IO) {
+                    var encryptedSuccess = false
 
-                        var encryptedSuccess = false
+                    var fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
+                    var encryptedFilePath = encryptFileFromURI(EncryptingPassword.text.toString().toCharArray(), fileUri)
 
-                        var fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
-                        var encryptedFilePath = encryptFileFromURI(EncryptingPassword.text.toString().toCharArray(), fileUri)
+                    if (FileManager.isFileExist(encryptedFilePath)
+                        && FileManager.isEncryptedFile(File(encryptedFilePath)))
+                        encryptedSuccess = true
 
-                        if (FileManager.isFileExist(encryptedFilePath)
-                            && FileManager.isEncryptedFile(File(encryptedFilePath)))
-                            encryptedSuccess = true
+                    launch(Dispatchers.Main) {
 
-                        GlobalScope.launch(Dispatchers.Main) {
+                        showProgressBar(false)
 
-                            showProgressBar(false)
+                        if (encryptedSuccess) {
+                            // succesfully encrypted file
+                            var resultIntent = Intent()
+                            resultIntent.putExtra(INTENT_ENCRYPTED_FILENAME, encryptedFilePath.getFilenameFromPath().removeEncryptedExtension())
+                            setResult(Activity.RESULT_OK, resultIntent)
+                            finish()
 
-                            if (encryptedSuccess) {
-                                // succesfully encrypted file
-                                var resultIntent = Intent()
-                                resultIntent.putExtra(INTENT_ENCRYPTED_FILENAME, encryptedFilePath.getFilenameFromPath().removeEncryptedExtension())
-                                setResult(Activity.RESULT_OK, resultIntent)
-                                finish()
-
-                            } else {
-                                // fail to encrypt file
-                                setResult(INTENT_RESULT_FAILED)
-                                finish()
-
-                            }
+                        } else {
+                            // fail to encrypt file
+                            setResult(INTENT_RESULT_FAILED)
+                            finish()
 
                         }
+
                     }
                 }
 

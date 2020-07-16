@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -12,6 +13,10 @@ import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
+import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class LoginActivity : BaseActivity() {
@@ -23,6 +28,8 @@ class LoginActivity : BaseActivity() {
 
         setContentView(R.layout.activity_login)
         initializeUI()
+
+        showProgressBar(false)
     }
 
 
@@ -34,6 +41,8 @@ class LoginActivity : BaseActivity() {
     private fun initializeUI() {
         val Password = findViewById<EditText>(R.id.password)
         val LoginButton = findViewById<Button>(R.id.login)
+
+        Password.text.clear()
 
         Password.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -47,11 +56,13 @@ class LoginActivity : BaseActivity() {
         LoginButton.setOnClickListener {
             // perform authenticaiton here
             val authenticator: Authenticator = Authenticator()
+
             if (Password.length() >= MIN_PASSWORD_LENGTH) {
                 authenticator.authenticateAppPassword((Password.text.toString())) {
+                    //showProgressBar(false)
+                    Password.text.clear()
                     if (it == true) {
                         // Login successfully
-                        Password.text.clear()
                         MyApplication.authenticated = true
                         // finish and return
                         finish()
@@ -65,5 +76,30 @@ class LoginActivity : BaseActivity() {
             }
         }
     }
+
+
+    private fun showProgressBar(show: Boolean) {
+
+        GlobalScope.launch(Dispatchers.Main) {
+
+            if (show) {
+                window.setFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                )
+
+                loginActivityProgressBarContainer.visibility = View.VISIBLE
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+
+                loginActivityProgressBarContainer.visibility = View.GONE
+            }
+
+        }
+
+    }
+
+
+
 
 }

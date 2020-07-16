@@ -33,7 +33,7 @@
         android:layout_height="0dp"
         android:background="@android:color/white"
         android:scrollbars="vertical"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        android:visibility="gone"
         android:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -75,14 +76,13 @@
             android:id="@+id/progressBarText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/please_wait"
+            android:text="@string/reading_files_please_wait"
             android:gravity="center_horizontal"
             android:textSize="@dimen/dialog_alert_font_size"
             android:textColor="@color/colorWhite"
             />
 
         <androidx.core.widget.ContentLoadingProgressBar
-            android:id="@+id/itemListRecyclerViewProgressBar"
             style="?android:attr/progressBarStyleLarge"
             android:layout_marginTop="10dp"
             android:layout_width="wrap_content"

@@ -116,52 +116,57 @@ class ImportingActivity : BaseActivity() {
 
             if (optionSave.isChecked) {
 
-                var filename = FileManager.copyFileFromUriToFolder(contentResolver, fileUri)
+                showProgressBar(true)
 
-                var resultIntent = Intent()
-                resultIntent.putExtra(INTENT_IMPORTED_FILENAME, filename.getFilenameFromPath().removeEncryptedExtension())
-                setResult(INTENT_RESULT_IMPORTED, resultIntent)
-                finish()
+                GlobalScope.launch(Dispatchers.IO) {
+
+                    var filename = FileManager.copyFileFromUriToFolder(contentResolver, fileUri)
+
+                    var resultIntent = Intent()
+                    resultIntent.putExtra(INTENT_IMPORTED_FILENAME, filename.getFilenameFromPath().removeEncryptedExtension())
+                    setResult(INTENT_RESULT_IMPORTED, resultIntent)
+
+                    launch(Dispatchers.Main) {
+
+                        showProgressBar(false)
+                        finish()
+
+                    }
+                }
 
             } else if (optionDecryptAndOpen.isChecked) {
 
                 // decrypt and share
-                GlobalScope.launch(Dispatchers.Main) {
+                showProgressBar(true)
 
-                    showProgressBar(true)
+                var decryptedFilePath: String = ""
 
-                }.invokeOnCompletion {
+                GlobalScope.launch(Dispatchers.IO) {
 
-                    var decryptedFilePath: String = ""
-                    GlobalScope.launch(Dispatchers.IO) {
-
-                        val inputStream = contentResolver.openInputStream(fileUri)
-                        try {
-                            ObjectInputStream(inputStream).use { it ->
-                                decryptedFilePath = FileManager.decryptFileForSharing(password.text.toString().toCharArray(), it)
-                            }
-                        } catch (ex: Exception) {
+                    val inputStream = contentResolver.openInputStream(fileUri)
+                    try {
+                        ObjectInputStream(inputStream).use { it ->
+                            decryptedFilePath = FileManager.decryptFileForSharing(password.text.toString().toCharArray(), it)
                         }
+                    } catch (ex: Exception) {
+                    }
 
-                    }.invokeOnCompletion {
-
-                        GlobalScope.launch(Dispatchers.Main) {
-                            showProgressBar(false)
-                            if (FileManager.isFileExist(decryptedFilePath)) {
-                                // succesfully decrypted file
-                                sendShareItent(myContext, decryptedFilePath)
-                                setResult(INTENT_RESULT_DECRYPTED)
+                    launch(Dispatchers.Main) {
+                        showProgressBar(false)
+                        if (FileManager.isFileExist(decryptedFilePath)) {
+                            // succesfully decrypted file
+                            sendShareItent(myContext, decryptedFilePath)
+                            setResult(INTENT_RESULT_DECRYPTED)
+                            finish()
+                        } else {
+                            // fail to encrypt file
+                            showMessageDialog(
+                                myContext,
+                                R.string.error,
+                                R.string.enc_enter_decrypting_password_error
+                            ) {
+                                setResult(INTENT_RESULT_FAILED)
                                 finish()
-                            } else {
-                                // fail to encrypt file
-                                showMessageDialog(
-                                    myContext,
-                                    R.string.error,
-                                    R.string.enc_enter_decrypting_password_error
-                                ) {
-                                    setResult(INTENT_RESULT_FAILED)
-                                    finish()
-                                }
                             }
                         }
                     }

@@ -46,6 +46,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.concurrent.schedule
+import kotlin.coroutines.CoroutineContext
 
 
 class MainActivity : BaseActivity() {
@@ -62,20 +63,20 @@ class MainActivity : BaseActivity() {
     var LastPressedBackTime = System.currentTimeMillis()
 
 
+    // todo next: Investigate "The application may be doing too much work on its main thread"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+//        fab.setOnClickListener { view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                .setAction("Action", null).show()
+//        }
 
         initialize()
         initializeUI()
 
-        showProgressBar(false)
     }
 
 
@@ -93,25 +94,35 @@ class MainActivity : BaseActivity() {
 
 
     private fun initializeUI() {
+
+        showProgressBar(true)
+
         recyclerView = findViewById<RecyclerView>(R.id.itemListRecyclerView)
-        recyclerViewAdapter = FileItemAdapter(this)
+        recyclerViewAdapter = FileItemAdapter(myContext)
         recyclerView.adapter = recyclerViewAdapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = LinearLayoutManager(myContext)
 
-        recyclerViewAdapter.onItemClick = { view, item, prevIdx, currIdx ->
-            onRecyclerViewItemClicked(view, item, prevIdx, currIdx)
+        GlobalScope.launch(Dispatchers.IO) {
+
+            recyclerViewAdapter.onItemClick = { view, item, prevIdx, currIdx ->
+                onRecyclerViewItemClicked(view, item, prevIdx, currIdx)
+            }
+
+            recyclerViewAdapter.onItemPopupMenuClick = { view, item, position ->
+                onRecyclerViewItemPopupMenuClicked(view, item, position)
+            }
+
+            fileItemViewModel = ViewModelProviders.of(this@MainActivity).get(FileItemViewModel::class.java)
+
+
+            launch(Dispatchers.Main) {
+                fileItemViewModel.allFileItems.observe(this@MainActivity, Observer { item ->
+                    // Update the cached copy of the fileItems in the adapter.
+                    item?.let { recyclerViewAdapter.setFileItems(it as MutableList<FileDirItem>) }
+                })
+                showProgressBar(false)
+            }
         }
-
-        recyclerViewAdapter.onItemPopupMenuClick = { view, item, position ->
-            onRecyclerViewItemPopupMenuClicked(view, item, position)
-        }
-
-        fileItemViewModel = ViewModelProviders.of(this).get(FileItemViewModel::class.java)
-
-        fileItemViewModel.allFileItems.observe(this, Observer { item ->
-            // Update the cached copy of the fileItems in the adapter.
-            item?.let { recyclerViewAdapter.setFileItems(it as MutableList<FileDirItem>) }
-        })
     }
 
 
@@ -163,9 +174,14 @@ class MainActivity : BaseActivity() {
             LastPressedBackTime = System.currentTimeMillis()
             return
         } else {
+            //showProgressBar(true)
             finishAndRemoveTask()
         }
         super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
 
@@ -352,26 +368,20 @@ class MainActivity : BaseActivity() {
 
         btnOk.setOnClickListener {
             // display a progress activity when decrypting file.
-            GlobalScope.launch(Dispatchers.Main) {
+            btnOk.isEnabled = false
+            btnCancel.isEnabled = false
+            progressBarContainer.visibility = View.VISIBLE
 
-                btnOk.isEnabled = false
-                btnCancel.isEnabled = false
-                progressBarContainer.visibility = View.VISIBLE
+            GlobalScope.launch(Dispatchers.IO) {
 
-            }.invokeOnCompletion {
+                // Pull the password out of the custom view when the positive button is pressed
+                val password = passwordInput.text.toString()
 
-                GlobalScope.launch(Dispatchers.IO) {
+                callback(password.toCharArray())
 
-                    // Pull the password out of the custom view when the positive button is pressed
-                    val password = passwordInput.text.toString()
+                launch(Dispatchers.Main) {
 
-                    callback(password.toCharArray())
-
-                    GlobalScope.launch(Dispatchers.Main) {
-
-                        dialog.dismiss()
-
-                    }
+                    dialog.dismiss()
 
                 }
 
@@ -381,49 +391,75 @@ class MainActivity : BaseActivity() {
 
     }
 
+
     private fun shareItemDecrypted(file: FileDirItem) {
+
         // ask for the decrypting password for this file
-        MaterialDialog(this).show {
+        val dialog = MaterialDialog(this).show {
             title(R.string.enc_enter_password)
-            message(R.string.enc_msg_decrypting_password)
-            input(
-                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            ) { _, text ->
-
-                GlobalScope.launch(Dispatchers.Main) {
-                    showProgressBar(true)
-
-                }.invokeOnCompletion {
-                    GlobalScope.launch(Dispatchers.IO) {
-
-                        var decryptedFilePath =
-                            FileManager.decryptFileForSharing(text.toString().toCharArray(), file.path)
-
-                        GlobalScope.launch(Dispatchers.Main) {
-
-                            showProgressBar(false)
-                            if (FileManager.isFileExist(decryptedFilePath)) {
-                                // succesfully decrypted file
-                                sendShareItent(myContext, decryptedFilePath)
-                            } else {
-                                // fail to encrypt file
-                                showMessageDialog(
-                                    this@MainActivity,
-                                    R.string.error,
-                                    R.string.enc_enter_decrypting_password_error
-                                ) {}
-                            }
-
-                        }
-                    }
-                }
-            }
-
-            positiveButton(R.string.btn_decrypt_file)
+            customView(R.layout.enter_password_view, scrollable = true, horizontalPadding = true)
+            positiveButton(R.string.btn_ok)
             negativeButton(R.string.btn_cancel)
             cancelable(false)  // calls setCancelable on the underlying dialog
             cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
         }
+
+        val passwordInput: EditText = dialog.getCustomView().findViewById(R.id.password)
+        val progressBarContainer: View = dialog.getCustomView().findViewById(R.id.progressBarContainer)
+        var btnOk = dialog.getActionButton(WhichButton.POSITIVE)
+        var btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
+
+        progressBarContainer.visibility = View.GONE
+        btnCancel.isEnabled = true
+        btnOk.isEnabled = false
+        showKeyboard(passwordInput)
+
+        passwordInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                btnOk.isEnabled = isPasswordConfinedToPolicy(passwordInput.text.toString())
+            }
+
+        })
+
+        btnOk.setOnClickListener {
+            // display a progress activity when decrypting file.
+            btnOk.isEnabled = false
+            btnCancel.isEnabled = false
+            progressBarContainer.visibility = View.VISIBLE
+
+            GlobalScope.launch(Dispatchers.IO) {
+
+                // Pull the password out of the custom view when the positive button is pressed
+                val password = passwordInput.text.toString()
+
+                //callback(password.toCharArray())
+                var decryptedFilePath = FileManager.decryptFileForSharing(passwordInput.text.toString().toCharArray(), file.path)
+
+
+                launch(Dispatchers.Main) {
+
+                    dialog.dismiss()
+
+                    if (FileManager.isFileExist(decryptedFilePath)) {
+                        // succesfully decrypted file
+                        sendShareItent(myContext, decryptedFilePath)
+                    } else {
+                        // fail to encrypt file
+                        showMessageDialog(
+                            this@MainActivity,
+                            R.string.error,
+                            R.string.enc_enter_decrypting_password_error
+                        ) {}
+                    }
+
+                }
+
+            }
+
+        }
+
     }
 
 
@@ -480,51 +516,45 @@ class MainActivity : BaseActivity() {
 
         btnOk.setOnClickListener {
             // display a progress activity when re-encrypting file.
-            GlobalScope.launch(Dispatchers.Main) {
+            btnOk.isEnabled = false
+            btnCancel.isEnabled = false
+            dialogProgressBarContainer.visibility = View.VISIBLE
 
-                btnOk.isEnabled = false
-                btnCancel.isEnabled = false
-                dialogProgressBarContainer.visibility = View.VISIBLE
+            GlobalScope.launch(Dispatchers.IO) {
 
-            }.invokeOnCompletion {
+                // Pull the password out of the custom view when the positive button is pressed
+                val oldPassword = originalPasswordInput.text.toString()
+                val newPassword = newPasswordInput.text.toString()
 
-                GlobalScope.launch(Dispatchers.IO) {
+                var success = false
 
-                    // Pull the password out of the custom view when the positive button is pressed
-                    val oldPassword = originalPasswordInput.text.toString()
-                    val newPassword = newPasswordInput.text.toString()
-
-                    var success = false
-
-                    if (isPasswordConfinedToPolicy(oldPassword) && isPasswordConfinedToPolicy(
-                            newPassword
-                        )
+                if (isPasswordConfinedToPolicy(oldPassword) && isPasswordConfinedToPolicy(
+                        newPassword
                     )
-                        success = FileManager.reencryptFiles(
-                            item.path,
-                            oldPassword.toCharArray(),
-                            newPassword.toCharArray()
-                        )
+                )
+                    success = FileManager.reencryptFiles(
+                        item.path,
+                        oldPassword.toCharArray(),
+                        newPassword.toCharArray()
+                    )
 
-                    GlobalScope.launch(Dispatchers.Main) {
-                        dialogProgressBarContainer.visibility = View.GONE
-                        if (success)
-                            showMessageDialog(
-                                this@MainActivity,
-                                R.string.dlg_title_success,
-                                R.string.dlg_msg_change_encrypting_password_success
-                            ) {}
-                        else
-                            showMessageDialog(
-                                this@MainActivity,
-                                R.string.dlg_title_error,
-                                R.string.dlg_msg_change_encrypting_password_failed
-                            ) {}
+                launch(Dispatchers.Main) {
+                    dialogProgressBarContainer.visibility = View.GONE
+                    if (success)
+                        showMessageDialog(
+                            this@MainActivity,
+                            R.string.dlg_title_success,
+                            R.string.dlg_msg_change_encrypting_password_success
+                        ) {}
+                    else
+                        showMessageDialog(
+                            this@MainActivity,
+                            R.string.dlg_title_error,
+                            R.string.dlg_msg_change_encrypting_password_failed
+                        ) {}
 
-                        dialog.dismiss()
-                    }
+                    dialog.dismiss()
                 }
-
             }
         }
 
@@ -532,7 +562,13 @@ class MainActivity : BaseActivity() {
 
 
     private fun refreshFileItemList() {
-        fileItemViewModel.refresh()
+        showProgressBar(true)
+        GlobalScope.launch(Dispatchers.IO) {
+            fileItemViewModel.refresh()
+            launch(Dispatchers.Main) {
+                showProgressBar(false)
+            }
+        }
     }
 
 
@@ -544,13 +580,14 @@ class MainActivity : BaseActivity() {
             )
 
             mainActivityProgressBarContainer.visibility = View.VISIBLE
-            //itemListRecyclerView.visibility = View.GONE
+            itemListRecyclerView.visibility = View.GONE
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
             mainActivityProgressBarContainer.visibility = View.GONE
-            //itemListRecyclerView.visibility = View.VISIBLE
+            itemListRecyclerView.visibility = View.VISIBLE
         }
+
     }
 
 

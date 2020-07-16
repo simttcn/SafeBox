@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-// todo next more checking: pdf view activity
 class PdfViewActivity : BaseActivity() {
 
     lateinit var myContext: Context

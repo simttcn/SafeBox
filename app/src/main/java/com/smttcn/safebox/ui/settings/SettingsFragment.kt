@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.view.View
 import androidx.preference.*
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
@@ -34,6 +35,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
         enabledAppPassword = findPreference("enableapppassword")
         changeAppPassword = findPreference("changeapppassword")
 
+        enabledAppPassword?.setOnPreferenceClickListener {
+            toggleEnableAppPasswordActivity(it as SwitchPreferenceCompat?)
+            true
+        }
+
+        changeAppPassword?.setOnPreferenceClickListener {
+            showChangeAppPasswordActivity()
+            true
+        }
+
+
         initializeUI()
     }
 
@@ -46,17 +58,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onAttach(context: Context) {
         myContext = context
         super.onAttach(context)
-    }
-
-
-    // todo next: see if we can do the password check on before the toggle button changed event
-    override fun onPreferenceTreeClick(preference: Preference?): Boolean {
-        when (preference?.key?.lowerCase()) {
-            "enableapppassword" -> toggleEnableAppPasswordActivity(preference as SwitchPreferenceCompat?)
-            "changeapppassword" -> showChangeAppPasswordActivity()
-        }
-
-        return super.onPreferenceTreeClick(preference)
     }
 
 
