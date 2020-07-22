@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.smttcn.commons.activities.BaseActivity
+import com.smttcn.commons.extensions.showKeyboard
 import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.smttcn.safebox.MyApplication
@@ -43,6 +44,8 @@ class LoginActivity : BaseActivity() {
         val LoginButton = findViewById<Button>(R.id.login)
 
         Password.text.clear()
+
+        showKeyboard(Password)
 
         Password.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

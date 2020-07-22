@@ -56,7 +56,7 @@
         android:id="@+id/mainActivityProgressBarContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="#72000000"
+        android:background="#52000000"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

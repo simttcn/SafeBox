@@ -126,9 +126,11 @@ object FileManager {
     fun emptyCacheFolder() {
         try {
             val cacheFolder = MyApplication.applicationContext.cacheDir
-            val children: Array<String> = cacheFolder.list()
-            for (i in children.indices) {
-                File(cacheFolder, children[i]).delete()
+            val children: Array<String>? = cacheFolder.list()
+            if (children != null) {
+                for (i in children.indices) {
+                    File(cacheFolder, children[i]).delete()
+                }
             }
         } catch (e: java.lang.Exception) {
             //e.printStackTrace()

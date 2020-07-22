@@ -17,8 +17,9 @@ import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -52,7 +53,7 @@ import kotlin.coroutines.CoroutineContext
 class MainActivity : BaseActivity() {
 
     private val FILE_PASSWORD_SEPERATOR = "=::::="
-    private lateinit var fileItemViewModel: FileItemViewModel
+    private val fileItemViewModel: FileItemViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: FileItemAdapter
     private var IsShareFromOtherApp = false
@@ -63,8 +64,12 @@ class MainActivity : BaseActivity() {
     var LastPressedBackTime = System.currentTimeMillis()
 
 
-    // todo next: Investigate "The application may be doing too much work on its main thread"
+    // todo: Investigate "The application may be doing too much work on its main thread"
     override fun onCreate(savedInstanceState: Bundle?) {
+        MyApplication.mainActivityContext = this
+        myContext = this
+        IsShareFromOtherApp = intent?.action == Intent.ACTION_SEND
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
@@ -74,15 +79,18 @@ class MainActivity : BaseActivity() {
 //                .setAction("Action", null).show()
 //        }
 
-        initialize()
+        if (IsShareFromOtherApp) {
+            IsShareFromOtherApp = false
+            handleShareFromOtherApp()
+        }
+
         initializeUI()
 
     }
 
 
-    private fun initialize() {
-        MyApplication.mainActivityContext = this
-        myContext = this
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
 
         IsShareFromOtherApp = intent?.action == Intent.ACTION_SEND
 
@@ -111,9 +119,6 @@ class MainActivity : BaseActivity() {
             recyclerViewAdapter.onItemPopupMenuClick = { view, item, position ->
                 onRecyclerViewItemPopupMenuClicked(view, item, position)
             }
-
-            fileItemViewModel = ViewModelProviders.of(this@MainActivity).get(FileItemViewModel::class.java)
-
 
             launch(Dispatchers.Main) {
                 fileItemViewModel.allFileItems.observe(this@MainActivity, Observer { item ->
@@ -430,9 +435,6 @@ class MainActivity : BaseActivity() {
             progressBarContainer.visibility = View.VISIBLE
 
             GlobalScope.launch(Dispatchers.IO) {
-
-                // Pull the password out of the custom view when the positive button is pressed
-                val password = passwordInput.text.toString()
 
                 //callback(password.toCharArray())
                 var decryptedFilePath = FileManager.decryptFileForSharing(passwordInput.text.toString().toCharArray(), file.path)

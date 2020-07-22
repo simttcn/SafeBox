@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 class PdfViewActivity : BaseActivity() {
 
     lateinit var myContext: Context
-    lateinit var filePath: String
+    var filePath: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -40,13 +40,18 @@ class PdfViewActivity : BaseActivity() {
 
     private fun initActivityUI() {
 
-        var viewer = pdfView.fromFile(filePath)
+        if (filePath.length > 0) {
 
-        supportActionBar?.title = filePath.getFilenameFromPath()
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            var viewer = pdfView.fromFile(filePath)
 
-        viewer.show()
-        showProgressBar(false)
+            supportActionBar?.title = filePath.getFilenameFromPath()
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+            viewer.show()
+            showProgressBar(false)
+        } else {
+            finish()
+        }
 
     }
 

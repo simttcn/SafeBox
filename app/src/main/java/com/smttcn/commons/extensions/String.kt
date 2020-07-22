@@ -61,6 +61,10 @@ fun String.getUnencryptedFilenameFromPath() : String {
         return substring(lastIndexOf("/") + 1).removeEncryptedExtension()
 }
 
+fun String.getUnencryptedFileExtensionFromPath() : String {
+    return this.getUnencryptedFilenameFromPath().getFileExtension()
+}
+
 fun String.getFileExtension() = substring(lastIndexOf(".") + 1)
 
 fun String.insertBeforeFileExtension(str: String): String {
