@@ -42,7 +42,8 @@
                 android:layout_marginTop="10dp"
                 android:textColor="#333"
                 android:paddingStart="0dp"
-                android:paddingEnd="0dp"/>
+                android:paddingEnd="0dp"
+                android:importantForAutofill="no" />
 
             <TextView
                 android:id="@+id/message"

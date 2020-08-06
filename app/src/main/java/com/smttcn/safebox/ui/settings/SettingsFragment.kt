@@ -20,6 +20,7 @@ import com.smttcn.safebox.ui.security.PasswordActivity
 import com.smttcn.safebox.R
 import com.smttcn.safebox.ui.security.LoginActivity
 
+// todo next: finish up Settings page
 class SettingsFragment : PreferenceFragmentCompat() {
 
     lateinit var myContext: Context
