@@ -7,12 +7,14 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
+import android.provider.Settings
 import android.text.Editable
 import android.text.InputType
 import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.Toast
@@ -44,7 +46,9 @@ import com.smttcn.safebox.viewmodel.FileItemViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.Thread.sleep
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.coroutines.CoroutineContext
@@ -581,13 +585,23 @@ class MainActivity : BaseActivity() {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
             )
 
+            val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadein_fast)
+            mainActivityProgressBarContainer.startAnimation(aniFade)
             mainActivityProgressBarContainer.visibility = View.VISIBLE
             itemListRecyclerView.visibility = View.GONE
+
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
-            mainActivityProgressBarContainer.visibility = View.GONE
-            itemListRecyclerView.visibility = View.VISIBLE
+            GlobalScope.launch(Dispatchers.Main){
+                delay(750)
+
+                itemListRecyclerView.visibility = View.VISIBLE
+
+                val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadeout_fast)
+                mainActivityProgressBarContainer.startAnimation(aniFade)
+                mainActivityProgressBarContainer.visibility = View.INVISIBLE
+            }
         }
 
     }
