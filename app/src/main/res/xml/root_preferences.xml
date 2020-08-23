@@ -33,6 +33,7 @@
 
     </PreferenceCategory>
 
+<!--
     <PreferenceCategory app:title="@string/messages_header"
         app:iconSpaceReserved="false">
 
@@ -70,5 +71,6 @@
             app:iconSpaceReserved="false"/>
 
     </PreferenceCategory>
+-->
 
 </PreferenceScreen>
