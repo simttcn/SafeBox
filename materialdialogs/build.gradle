@@ -37,6 +37,15 @@ android {
   packagingOptions {
     exclude 'META-INF/atomicfu.kotlin_module'
   }
+
+  buildTypes {
+    debug {
+      debuggable = true
+    }
+    release {
+      debuggable = false
+    }
+  }
 }
 
 dependencies {

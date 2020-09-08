@@ -198,6 +198,11 @@ class MainActivity : BaseActivity() {
         menuInflater.inflate(R.menu.main_menu, menu)
         toolbarMenu = menu
 
+        if (MyApplication.isDebug) { // show debug menu item when in debug mode
+            toolbarMenu.findItem(R.id.menu_visible).setVisible(true)
+            toolbarMenu.findItem(R.id.menu_debug_console).setVisible(true)
+        }
+
         return super.onCreateOptionsMenu(menu)
     }
 

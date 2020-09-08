@@ -3,22 +3,22 @@ package com.smttcn.safebox.ui.settings
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.InputType
-import android.view.View
-import androidx.preference.*
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
+import androidx.preference.SwitchPreferenceCompat
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.WhichButton
-import com.afollestad.materialdialogs.actions.setActionButtonEnabled
-import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
-import com.smttcn.commons.extensions.lowerCase
 import com.smttcn.commons.helpers.*
-import com.smttcn.commons.helpers.Authenticator
+import com.smttcn.safebox.BuildConfig
 import com.smttcn.safebox.MyApplication
-import com.smttcn.safebox.ui.security.PasswordActivity
 import com.smttcn.safebox.R
-import com.smttcn.safebox.ui.security.LoginActivity
+import com.smttcn.safebox.ui.security.PasswordActivity
+
 
 // todo next: finish up Settings page
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -32,6 +32,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val prefManager: PreferenceManager = preferenceManager
         prefManager.sharedPreferencesName = PREFS_KEY
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
+
+        var appInfo: Preference? = findPreference("appinfo")
+        var buildText = if (BuildConfig.DEBUG) " Debug" else ""
+        var versionText = " " + BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE
+        appInfo?.summary = getString(R.string.pref_aoo_build_no) + versionText + buildText
 
         enabledAppPassword = findPreference("enableapppassword")
         changeAppPassword = findPreference("changeapppassword")

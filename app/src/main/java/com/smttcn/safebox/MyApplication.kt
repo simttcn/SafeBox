@@ -3,6 +3,7 @@ package com.smttcn.safebox
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.helpers.BaseConfig
@@ -53,6 +54,10 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks{
         var isSharingItem: Boolean
             get() = _isSharingItem
             set(value) {_isSharingItem = value}
+
+        var isDebug: Boolean
+            get() = BuildConfig.DEBUG
+            private set(_) {}
 
         fun lockApp() {
             _authenticated = false

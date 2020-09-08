@@ -33,44 +33,55 @@
 
     </PreferenceCategory>
 
-<!--
-    <PreferenceCategory app:title="@string/messages_header"
+    <PreferenceCategory app:title="@string/info_header"
         app:iconSpaceReserved="false">
 
-        <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
-            app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
-
-        <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
-            app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
+        <Preference
+            android:selectable="false"
+            android:enabled="true"
+            android:key="appinfo"
+            android:title="@string/app_name"
+            android:summary="@string/pref_aoo_build_no" />
 
     </PreferenceCategory>
+    <!--
+        <PreferenceCategory app:title="@string/messages_header"
+            app:iconSpaceReserved="false">
 
-    <PreferenceCategory app:title="@string/sync_header"
-        app:iconSpaceReserved="false">
+            <EditTextPreference
+                app:key="signature"
+                app:title="@string/signature_title"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
 
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title"
-            app:iconSpaceReserved="false"/>
+            <ListPreference
+                app:defaultValue="reply"
+                app:entries="@array/reply_entries"
+                app:entryValues="@array/reply_values"
+                app:key="reply"
+                app:title="@string/reply_title"
+                app:iconSpaceReserved="false"
+                app:useSimpleSummaryProvider="true" />
 
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title"
-            app:iconSpaceReserved="false"/>
+        </PreferenceCategory>
 
-    </PreferenceCategory>
--->
+        <PreferenceCategory app:title="@string/sync_header"
+            app:iconSpaceReserved="false">
+
+            <SwitchPreferenceCompat
+                app:key="sync"
+                app:title="@string/sync_title"
+                app:iconSpaceReserved="false"/>
+
+            <SwitchPreferenceCompat
+                app:dependency="sync"
+                app:key="attachment"
+                app:summaryOff="@string/attachment_summary_off"
+                app:summaryOn="@string/attachment_summary_on"
+                app:title="@string/attachment_title"
+                app:iconSpaceReserved="false"/>
+
+        </PreferenceCategory>
+    -->
 
 </PreferenceScreen>

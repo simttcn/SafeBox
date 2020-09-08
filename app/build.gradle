@@ -53,11 +53,13 @@ android {
 
     buildTypes {
         debug {
+            debuggable = true
             //applicationIdSuffix = '.debug'
         }
         release {
-            minifyEnabled true
-            shrinkResources true
+            debuggable = false
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             consumerProguardFiles 'proguard-rules.pro'
             signingConfig signingConfigs.release
