@@ -3,7 +3,11 @@ package com.smttcn.commons.manager
 import android.content.ContentResolver
 import android.net.Uri
 import android.provider.OpenableColumns
-import com.smttcn.commons.crypto.Encryption
+import com.smttcn.crypto.Encryption
+import com.smttcn.crypto.APP_ENCRYPT_VAR0
+import com.smttcn.crypto.APP_ENCRYPT_VAR1
+import com.smttcn.crypto.APP_ENCRYPT_VAR2
+import com.smttcn.crypto.APP_ENCRYPT_VAR3
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import com.smttcn.commons.models.FileDirItem

@@ -1,9 +1,8 @@
 // Copyright (C) 2011 - Will Glozer.  All rights reserved.
 
-package com.smttcn.commons.helpers
+package com.smttcn.crypto
 
 import java.util.Arrays
-import kotlin.experimental.and
 
 /**
  * High-performance base64 codec based on the algorithm used in Mikael Grev's MiG Base64.

@@ -36,7 +36,7 @@ class PdfViewActivity : BaseActivity() {
 
     private fun initActivity() {
         myContext = this
-        filePath = intent.getStringExtra(INTENT_VIEW_FILE_PATH)
+        filePath = intent.getStringExtra(INTENT_VIEW_FILE_PATH)!!
         setContentView(R.layout.activity_view_pdf)
     }
 

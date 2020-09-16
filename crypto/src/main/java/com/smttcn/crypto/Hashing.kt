@@ -1,6 +1,6 @@
-package com.smttcn.commons.crypto
+package com.smttcn.crypto
 
-internal class Hashing {
+public class Hashing {
 
     private val saltLength: Int = 256
     private val keyLength: Int = 256
@@ -14,7 +14,7 @@ internal class Hashing {
             return ""
         }
 
-        val generatedSecuredPasswordHash = SCryptUtil.scrypt(originalPassword, saltLength, keyLength,cpuCost, memoryCost, parallelization)
+        val generatedSecuredPasswordHash = SCryptUtil.scrypt(originalPassword, saltLength, keyLength, cpuCost, memoryCost, parallelization)
 
         return generatedSecuredPasswordHash
     }

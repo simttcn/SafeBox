@@ -1,6 +1,6 @@
 // Copyright (C) 2011 - Will Glozer.  All rights reserved.
 
-package com.smttcn.commons.jni;
+package com.smttcn.crypto.jni;
 
 /**
  * {@code LibraryLoaders} will create the appropriate {@link LibraryLoader} for

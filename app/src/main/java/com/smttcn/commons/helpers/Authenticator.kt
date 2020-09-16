@@ -1,6 +1,6 @@
 package com.smttcn.commons.helpers
 
-import com.smttcn.commons.crypto.Hashing
+import com.smttcn.crypto.Hashing
 import com.smttcn.safebox.MyApplication
 
 internal class Authenticator {

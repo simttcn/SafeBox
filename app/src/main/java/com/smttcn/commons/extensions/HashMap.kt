@@ -1,6 +1,6 @@
 package com.smttcn.commons.extensions
 
-import com.smttcn.commons.helpers.Base64
+import com.smttcn.crypto.Base64
 
 private const val delimiter0 = "$=//=$"
 private const val delimiter1 = "$=\\=$"

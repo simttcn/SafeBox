@@ -3,16 +3,16 @@ package com.smttcn.safebox.ui.debug
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.smttcn.commons.activities.BaseActivity
-import com.smttcn.commons.helpers.Base64
 import com.smttcn.safebox.R
 import com.smttcn.safebox.viewmodel.DebugViewModel
+import com.smttcn.safebox.viewmodel.FileItemViewModel
 
 class DebugconsoleActivity : BaseActivity() {
 
-    private lateinit var debugViewModel: DebugViewModel
+    private val debugViewModel: DebugViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +26,6 @@ class DebugconsoleActivity : BaseActivity() {
         val textView: TextView = findViewById(R.id.text_debug)
         textView.movementMethod = ScrollingMovementMethod()
 
-        debugViewModel = ViewModelProviders.of(this).get(DebugViewModel::class.java)
         debugViewModel.text.observe(this, Observer {
             textView.text = it
         })

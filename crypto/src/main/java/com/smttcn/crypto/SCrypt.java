@@ -1,8 +1,8 @@
 // Copyright (C) 2011 - Will Glozer.  All rights reserved.
 
-package com.smttcn.commons.crypto;
+package com.smttcn.crypto;
 
-import com.smttcn.commons.jni.*;
+import com.smttcn.crypto.jni.*;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

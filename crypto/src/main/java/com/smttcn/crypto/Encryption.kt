@@ -28,11 +28,9 @@
  * THE SOFTWARE.
  */
 
-package com.smttcn.commons.crypto
+package com.smttcn.crypto
 
 import android.util.Log
-import com.smttcn.commons.helpers.*
-import com.smttcn.commons.helpers.Base64
 import java.security.SecureRandom
 import java.util.*
 import javax.crypto.Cipher
@@ -41,7 +39,7 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
-internal class Encryption {
+public class Encryption {
 
     fun generateSecret(saltLen : Int = 64) : String {
         val random = SecureRandom()

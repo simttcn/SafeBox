@@ -27,11 +27,11 @@ fun Int.getFormattedDuration(): String {
     val seconds = this % 60
 
     if (this >= 3600) {
-        sb.append(String.format(Locale.getDefault(), "%02d", hours)).append(":")
+        sb.append(String.format("%02d", hours)).append(":")
     }
 
-    sb.append(String.format(Locale.getDefault(), "%02d", minutes))
-    sb.append(":").append(String.format(Locale.getDefault(), "%02d", seconds))
+    sb.append(String.format("%02d", minutes))
+    sb.append(":").append(String.format("%02d", seconds))
     return sb.toString()
 }
 

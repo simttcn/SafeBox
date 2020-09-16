@@ -1,9 +1,9 @@
 // Copyright (C) 2011 - Will Glozer.  All rights reserved.
 
-package com.smttcn.commons.crypto
+package com.smttcn.crypto
 
-import com.smttcn.commons.helpers.Base64.decode
-import com.smttcn.commons.helpers.Base64.encode
+import com.smttcn.crypto.Base64.decode
+import com.smttcn.crypto.Base64.encode
 import java.io.UnsupportedEncodingException
 import java.security.GeneralSecurityException
 import java.security.SecureRandom

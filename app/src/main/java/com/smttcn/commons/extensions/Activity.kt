@@ -3,28 +3,11 @@ package com.smttcn.commons.extensions
 import android.app.Activity
 import android.content.*
 import android.net.Uri
-import android.text.InputType
-import android.text.method.PasswordTransformationMethod
-import android.view.View
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.HtmlCompat
 import com.smttcn.safebox.R
-import com.smttcn.commons.crypto.Encryption
-import com.smttcn.commons.crypto.Hashing
 //import com.smttcn.commons.dialogs.*
 import com.smttcn.commons.helpers.*
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.ModalDialog
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
-import com.afollestad.materialdialogs.input.input
-import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import com.smttcn.safebox.MyApplication
 //import kotlinx.android.synthetic.main.dialog_title.view.*
-import java.io.*
 
 fun Activity.appLaunched(appId: String) {
     MyApplication.baseConfig.appId = appId

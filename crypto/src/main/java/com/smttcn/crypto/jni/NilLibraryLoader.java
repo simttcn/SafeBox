@@ -1,6 +1,6 @@
 // Copyright (C) 2013 - Will Glozer.  All rights reserved.
 
-package com.smttcn.commons.jni;
+package com.smttcn.crypto.jni;
 
 /**
  * A native library loader that refuses to load libraries.
