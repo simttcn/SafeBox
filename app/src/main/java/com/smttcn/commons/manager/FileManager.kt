@@ -428,6 +428,7 @@ object FileManager {
     // re-encrypt files with new password
     fun reencryptFiles(filePath: String, oldPwd: CharArray, newPwd: CharArray): Boolean {
 
+        // todo: last
         // Todo future: should decrypt to hashmap in memory and then encrypt it back to file
         // decrypt file with delete original
         val decryptedFilePath = decryptFile(filePath, password = oldPwd, deleteEncryptedSource = true)
@@ -495,21 +496,12 @@ object FileManager {
             // default decrypting folder will be in app cache folder
             decryptedFilePath = getFolderInCacheFolder()!!.canonicalPath.withTrailingCharacter('/')
 
-        var decrypted: ByteArray? = null
-        val map = getEncryptedHashMap(objectInputStream.readObject())
+        if (objectInputStream != null) {
 
-        if (map != null) {
-            val fn = map[APP_ENCRYPT_VAR0]
-            val iv = map[APP_ENCRYPT_VAR1]
-            val salt = map[APP_ENCRYPT_VAR2]
-            val encrypted = map[APP_ENCRYPT_VAR3]
-            if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
-                // try remove the encrypted extension just in case
-                decryptedFilePath += String(fn).removeEncryptedExtension()
-                decrypted = Encryption().decrypt(
-                    hashMapOf(APP_ENCRYPT_VAR1 to iv, APP_ENCRYPT_VAR2 to salt, APP_ENCRYPT_VAR3 to encrypted), password
-                )
-            }
+            val (fn, decrypted) = Encryption().decryptObjectInputStreamWithFilename(objectInputStream, password)
+
+            // try remove the encrypted extension just in case0
+            decryptedFilePath += fn.removeEncryptedExtension()
 
             if (decrypted != null) {
 
@@ -566,23 +558,12 @@ object FileManager {
         if (file.isDirectory) return null
 
         try {
-            var decrypted: ByteArray? = null
+
             ObjectInputStream(FileInputStream(file)).use { it ->
-                val map = getEncryptedHashMap(it.readObject())
-                if (map != null) {
-                    val fn = map[APP_ENCRYPT_VAR0]
-                    val iv = map[APP_ENCRYPT_VAR1]
-                    val salt = map[APP_ENCRYPT_VAR2]
-                    val encrypted = map[APP_ENCRYPT_VAR3]
-                    if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
-                        decrypted = Encryption().decrypt(
-                            hashMapOf(APP_ENCRYPT_VAR1 to iv, APP_ENCRYPT_VAR2 to salt, APP_ENCRYPT_VAR3 to encrypted), password
-                        )
-                    }
-                }
+                val (fn, decrypted) = Encryption().decryptObjectInputStreamWithFilename(it, password)
+                return decrypted
             }
 
-            return decrypted
 
         } catch (ex: Exception) {
             return null

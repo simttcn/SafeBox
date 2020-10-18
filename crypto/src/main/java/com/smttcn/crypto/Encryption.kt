@@ -31,6 +31,10 @@
 package com.smttcn.crypto
 
 import android.util.Log
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 import java.security.SecureRandom
 import java.util.*
 import javax.crypto.Cipher
@@ -38,17 +42,23 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
+import kotlin.ByteArray
 
 public class Encryption {
 
-    fun generateSecret(saltLen : Int = 64) : String {
+    fun generateSecretKey(length : Int = 128) : CharArray {
         val random = SecureRandom()
-        val pwd = ByteArray(saltLen)
+        val pwd = ByteArray(length)
         random.nextBytes(pwd)
-        return String(Base64.encode(pwd)).dropLast(2)
+        return String(Base64.encode(pwd)).dropLast(2).toCharArray()
     }
 
     fun encryptWithFilename(filename: String, dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
+
+        return encryptWithFilenameLite(filename,dataToEncrypt, password)
+    }
+
+    fun encryptWithFilenameLite(filename: String, dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
 
         var map = encrypt(dataToEncrypt, password)
         map[APP_ENCRYPT_VAR0] = filename.toByteArray()
@@ -56,7 +66,83 @@ public class Encryption {
         return map
     }
 
-    fun encrypt(dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
+    fun encryptWithFilenameHeavy(filename: String, dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
+
+
+        // generate a secret key to encrypt the actual data
+        var secretKey = this.generateSecretKey(256)
+
+        // encrypt the secret key
+        var map = encrypt(secretKey.toString().toByteArray(), password)
+
+        // next encrypt the actual data with auto generated secret key
+        var mapData = encrypt(dataToEncrypt, secretKey)
+
+        map[APP_ENCRYPT_VAR4] = mapData.toByteArray()
+        map[APP_ENCRYPT_VAR0] = filename.toByteArray()
+
+        return map
+    }
+
+    fun decryptObjectInputStreamWithFilename(objectInputStream: ObjectInputStream, password: CharArray): Pair<String, ByteArray?> {
+
+        return decryptObjectInputStreamLite(objectInputStream, password)
+
+    }
+
+    fun decryptObjectInputStreamLite(objectInputStream: ObjectInputStream, password: CharArray): Pair<String, ByteArray?> {
+
+        val map = getEncryptedHashMap(objectInputStream.readObject())
+
+        if (map != null) {
+
+            try {
+                val fn = map[APP_ENCRYPT_VAR0]
+                val iv = map[APP_ENCRYPT_VAR1]
+                val salt = map[APP_ENCRYPT_VAR2]
+                val encrypted = map[APP_ENCRYPT_VAR3]
+
+                if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
+
+                    //Decrypt
+                    return Pair(String(fn), decrypt(iv, salt, encrypted, password))
+                }
+            } catch (e: Exception){
+            }
+
+        }
+
+        return Pair("", null)
+
+    }
+    // todo: heavy decrypt function
+    fun decryptObjectInputStreamHeavy(objectInputStream: ObjectInputStream, password: CharArray): ByteArray? {
+
+        val map = getEncryptedHashMap(objectInputStream.readObject())
+
+        if (map != null) {
+
+            try {
+                val fn = map[APP_ENCRYPT_VAR0]
+                val iv = map[APP_ENCRYPT_VAR1]
+                val salt = map[APP_ENCRYPT_VAR2]
+                val encrypted = map[APP_ENCRYPT_VAR3]
+
+                if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
+
+                    //Decrypt
+                    return Pair(String(fn), decrypt(iv, salt, encrypted, password))
+                }
+            } catch (e: Exception){
+            }
+
+        }
+
+        return Pair("", null)
+
+    }
+
+    private fun encrypt(dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
         val map = HashMap<String, ByteArray>()
         try {
             //Random salt for next step
@@ -80,44 +166,21 @@ public class Encryption {
 
     }
 
-    fun decrypt(map: HashMap<String, ByteArray>, password: CharArray): ByteArray? {
-        var decrypted: ByteArray? = null
-        try {
-            val iv = map[APP_ENCRYPT_VAR1]
-            val salt = map[APP_ENCRYPT_VAR2]
-            val encrypted = map[APP_ENCRYPT_VAR3]
+    private fun decrypt(iv: ByteArray?, salt: ByteArray?, encrypted: ByteArray?, password: CharArray): ByteArray? {
 
+        var decrypted: ByteArray? = null
+
+        try {
             val cipher = getCipher(Cipher.DECRYPT_MODE, password, salt, iv)
 
             //Decrypt
             decrypted = cipher.doFinal(encrypted)
+
         } catch (e: Exception) {
             Log.e("MYAPP", "decryption exception", e)
         }
 
         return decrypted
-    }
-
-    fun decryptToHashMap(map: HashMap<String, ByteArray>, password: CharArray): HashMap<String, ByteArray> {
-        val result = HashMap<String, ByteArray>()
-        try {
-            val iv = map[APP_ENCRYPT_VAR1]
-            val salt = map[APP_ENCRYPT_VAR2]
-            val encrypted = map[APP_ENCRYPT_VAR3]
-
-            if (salt != null && iv != null && encrypted != null) {
-                val cipher = getCipher(Cipher.DECRYPT_MODE, password, salt, iv)
-
-                //Decrypt
-                result[APP_ENCRYPT_VAR1] = cipher.iv
-                result[APP_ENCRYPT_VAR2] = salt
-                result[APP_ENCRYPT_VAR3] = cipher.doFinal(encrypted)
-            }
-        } catch (e: Exception) {
-            Log.e("MYAPP", "decryption exception", e)
-        }
-
-        return result
     }
 
     private fun getCipher(mode: Int, password: CharArray, s: ByteArray?, i: ByteArray?) : Cipher {
@@ -145,5 +208,36 @@ public class Encryption {
         return cipher
     }
 
+    private fun getEncryptedHashMap(data: Any): HashMap<String, ByteArray>? {
+        try {
+            when (data) {
+                is HashMap<*, *> -> {
+                    @Suppress("UNCHECKED_CAST")
+                    return data as? HashMap<String, ByteArray>
+                }
+            }
+        } catch (ex: java.lang.Exception) {
+            return null
+        }
+
+        return null
+    }
+
 }
 
+private fun <K, V> java.util.HashMap<K, V>.toByteArray(): ByteArray {
+
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    val objectOutputStream: ObjectOutputStream
+
+    objectOutputStream = ObjectOutputStream(byteArrayOutputStream)
+    objectOutputStream.writeObject(this)
+    objectOutputStream.flush()
+
+    val result = byteArrayOutputStream.toByteArray()
+
+    byteArrayOutputStream.close()
+    objectOutputStream.close()
+
+    return result
+}

@@ -1,6 +1,8 @@
 package com.smttcn.commons.extensions
 
 import com.smttcn.crypto.Base64
+import java.io.ByteArrayOutputStream
+import java.io.ObjectOutputStream
 
 private const val delimiter0 = "$=//=$"
 private const val delimiter1 = "$=\\=$"
@@ -23,3 +25,4 @@ fun HashMap<String, ByteArray>.fromBase64String(str : String) : HashMap<String, 
     }
     return map
 }
+
