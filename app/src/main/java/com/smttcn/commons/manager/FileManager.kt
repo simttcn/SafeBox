@@ -496,27 +496,24 @@ object FileManager {
             // default decrypting folder will be in app cache folder
             decryptedFilePath = getFolderInCacheFolder()!!.canonicalPath.withTrailingCharacter('/')
 
-        if (objectInputStream != null) {
+        val (fn, decrypted) = Encryption().decryptObjectInputStreamWithFilename(objectInputStream, password)
 
-            val (fn, decrypted) = Encryption().decryptObjectInputStreamWithFilename(objectInputStream, password)
+        // try remove the encrypted extension just in case0
+        decryptedFilePath += fn.removeEncryptedExtension()
 
-            // try remove the encrypted extension just in case0
-            decryptedFilePath += fn.removeEncryptedExtension()
+        if (decrypted != null) {
 
-            if (decrypted != null) {
+            // do we need to delete the existing file?
+            if (isFileExist(decryptedFilePath) && deleteExisting)
+                File(decryptedFilePath).delete()
 
-                // do we need to delete the existing file?
-                if (isFileExist(decryptedFilePath) && deleteExisting)
-                    File(decryptedFilePath).delete()
-
-                // write decrypted data out as binary file object
-                FileOutputStream(decryptedFilePath).use { it ->
-                    it.write(decrypted)
-                }
-
-                return decryptedFilePath
-
+            // write decrypted data out as binary file object
+            FileOutputStream(decryptedFilePath).use { it ->
+                it.write(decrypted)
             }
+
+            return decryptedFilePath
+
         }
 
         return ""
@@ -560,7 +557,7 @@ object FileManager {
         try {
 
             ObjectInputStream(FileInputStream(file)).use { it ->
-                val (fn, decrypted) = Encryption().decryptObjectInputStreamWithFilename(it, password)
+                val (_, decrypted) = Encryption().decryptObjectInputStreamWithFilename(it, password)
                 return decrypted
             }
 

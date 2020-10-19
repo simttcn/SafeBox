@@ -31,10 +31,7 @@
 package com.smttcn.crypto
 
 import android.util.Log
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
+import java.io.*
 import java.security.SecureRandom
 import java.util.*
 import javax.crypto.Cipher
@@ -46,11 +43,15 @@ import kotlin.ByteArray
 
 public class Encryption {
 
-    fun generateSecretKey(length : Int = 128) : CharArray {
+    fun generateRandomByte(length : Int = 128) : ByteArray {
         val random = SecureRandom()
-        val pwd = ByteArray(length)
-        random.nextBytes(pwd)
-        return String(Base64.encode(pwd)).dropLast(2).toCharArray()
+        val data = ByteArray(length)
+        random.nextBytes(data)
+        return data
+    }
+
+    fun generateSecretKey(length : Int = 128) : CharArray {
+        return String(Base64.encode(generateRandomByte(length))).dropLast(2).toCharArray()
     }
 
     fun encryptWithFilename(filename: String, dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
@@ -62,24 +63,26 @@ public class Encryption {
 
         var map = encrypt(dataToEncrypt, password)
         map[APP_ENCRYPT_VAR0] = filename.toByteArray()
+        map[APP_ENCRYPT_VAR4] = generateRandomByte(128)
 
         return map
     }
 
     fun encryptWithFilenameHeavy(filename: String, dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
 
-
         // generate a secret key to encrypt the actual data
         var secretKey = this.generateSecretKey(256)
 
-        // encrypt the secret key
+        // encrypt the actual data with auto generated secret key
+        var mapData = encrypt(dataToEncrypt, secretKey)
+        mapData[APP_ENCRYPT_VAR0] = generateRandomByte(128)
+        mapData[APP_ENCRYPT_VAR4] = generateRandomByte(128)
+
+        // then encrypt the secret key
         var map = encrypt(secretKey.toString().toByteArray(), password)
 
-        // next encrypt the actual data with auto generated secret key
-        var mapData = encrypt(dataToEncrypt, secretKey)
-
-        map[APP_ENCRYPT_VAR4] = mapData.toByteArray()
         map[APP_ENCRYPT_VAR0] = filename.toByteArray()
+        map[APP_ENCRYPT_VAR4] = mapData.toByteArray()
 
         return map
     }
@@ -116,7 +119,7 @@ public class Encryption {
 
     }
     // todo: heavy decrypt function
-    fun decryptObjectInputStreamHeavy(objectInputStream: ObjectInputStream, password: CharArray): ByteArray? {
+    fun decryptObjectInputStreamHeavy(objectInputStream: ObjectInputStream, password: CharArray): Pair<String, ByteArray?> {
 
         val map = getEncryptedHashMap(objectInputStream.readObject())
 
@@ -126,12 +129,31 @@ public class Encryption {
                 val fn = map[APP_ENCRYPT_VAR0]
                 val iv = map[APP_ENCRYPT_VAR1]
                 val salt = map[APP_ENCRYPT_VAR2]
-                val encrypted = map[APP_ENCRYPT_VAR3]
+                val encryptedKey = map[APP_ENCRYPT_VAR3]
+                val encryptedData = map[APP_ENCRYPT_VAR4]
 
-                if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
+                if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encryptedData is ByteArray && encryptedKey is ByteArray) {
 
-                    //Decrypt
-                    return Pair(String(fn), decrypt(iv, salt, encrypted, password))
+                    // 1. decrypt key
+                    val decryptedKey = decrypt(iv, salt, encryptedKey, password)
+
+                    if (decryptedKey != null) {
+
+                        val key = String(decryptedKey, Charsets.UTF_8)
+                        val mapData = getEncryptedHashMap(encryptedData)
+
+                        // 2. decrypt data
+                        if (mapData != null) {
+                            val ivInner = mapData[APP_ENCRYPT_VAR1]
+                            val saltInner = mapData[APP_ENCRYPT_VAR2]
+                            val encryptedDataInner = mapData[APP_ENCRYPT_VAR3]
+
+                            if (ivInner is ByteArray && saltInner is ByteArray && encryptedDataInner is ByteArray) {
+                                return Pair(String(fn), decrypt(ivInner, saltInner, encryptedDataInner, key.toCharArray()))
+                            }
+                        }
+                    }
+
                 }
             } catch (e: Exception){
             }
@@ -214,6 +236,28 @@ public class Encryption {
                 is HashMap<*, *> -> {
                     @Suppress("UNCHECKED_CAST")
                     return data as? HashMap<String, ByteArray>
+                }
+            }
+        } catch (ex: java.lang.Exception) {
+            return null
+        }
+
+        return null
+    }
+
+    private fun getEncryptedHashMap(data: ByteArray): HashMap<String, ByteArray>? {
+        try {
+            val byteArrayInputStream = ByteArrayInputStream(data)
+            val objectInput: ObjectInput
+            objectInput = ObjectInputStream(byteArrayInputStream)
+            val map = objectInput.readObject()
+            objectInput.close()
+            byteArrayInputStream.close()
+
+            when (map) {
+                is HashMap<*, *> -> {
+                    @Suppress("UNCHECKED_CAST")
+                    return map as? HashMap<String, ByteArray>
                 }
             }
         } catch (ex: java.lang.Exception) {
