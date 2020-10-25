@@ -37,7 +37,7 @@ class ImageViewer : BaseViewer() {
 
     override fun view(password: CharArray) {
 
-        val decryptedFileByteArray = FileManager.decryptFileContentToByteArray(File(_file.path), password)
+        val decryptedFileByteArray = FileManager.decryptFileToByteArray(File(_file.path), password)
 
         GlobalScope.launch(Dispatchers.Main) {
 

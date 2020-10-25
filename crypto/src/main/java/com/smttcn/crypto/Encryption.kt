@@ -30,18 +30,27 @@
 
 package com.smttcn.crypto
 
+import android.app.Application
+import android.content.Context
 import android.util.Log
 import java.io.*
 import java.security.SecureRandom
 import java.util.*
 import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
+import javax.crypto.CipherOutputStream
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.ByteArray
+import kotlin.collections.HashMap
 
-public class Encryption {
+public class Encryption constructor() {
+
+    val IV_LENGTH = 16
+    val SALT_LENGTH = 256
+    val KEY_LENGTH = 256
 
     fun generateRandomByte(length : Int = 128) : ByteArray {
         val random = SecureRandom()
@@ -50,174 +59,281 @@ public class Encryption {
         return data
     }
 
-    fun generateSecretKey(length : Int = 128) : CharArray {
+    fun generateSecretKey(length : Int = 128) : ByteArray {
+        return generateRandomByte(length)
+    }
+
+    fun generateSecretKeyAsString(length : Int = 128) : String {
+        return generateRandomByte(length).toString()
+    }
+
+    fun generateSecretKeyAsBase64CharArray(length : Int = 128) : CharArray {
         return String(Base64.encode(generateRandomByte(length))).dropLast(2).toCharArray()
     }
 
-    fun encryptWithFilename(filename: String, dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
+    // encrypt byte array to byte array
+    fun encryptByteArrayToTripleByteArray(data : ByteArray, password : CharArray) : Triple<ByteArray, ByteArray, ByteArray>?{
 
-        return encryptWithFilenameLite(filename,dataToEncrypt, password)
+        val salt = this.generateRandomByte(SALT_LENGTH)
+        val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
+
+        return Triple(cipher.iv, salt, cipher.doFinal(data))
     }
 
-    fun encryptWithFilenameLite(filename: String, dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
+    // encrypt input stream to file
+    fun encryptInputStreamToFile(input : InputStream, targetFilepath : String, password : CharArray, overwite : Boolean = false) : Boolean{
 
-        var map = encrypt(dataToEncrypt, password)
-        map[APP_ENCRYPT_VAR0] = filename.toByteArray()
-        map[APP_ENCRYPT_VAR4] = generateRandomByte(128)
+        val salt = this.generateRandomByte(SALT_LENGTH)
+        val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
 
-        return map
-    }
+        // is the input okay
+        if (input.available() < 1)
+            return false
 
-    fun encryptWithFilenameHeavy(filename: String, dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
+        val outFile = File(targetFilepath)
 
-        // generate a secret key to encrypt the actual data
-        var secretKey = this.generateSecretKey(256)
+        // if not overwrite and target file already exist
+        if (!overwite && outFile.exists())
+            return false
 
-        // encrypt the actual data with auto generated secret key
-        var mapData = encrypt(dataToEncrypt, secretKey)
-        mapData[APP_ENCRYPT_VAR0] = generateRandomByte(128)
-        mapData[APP_ENCRYPT_VAR4] = generateRandomByte(128)
-
-        // then encrypt the secret key
-        var map = encrypt(secretKey.toString().toByteArray(), password)
-
-        map[APP_ENCRYPT_VAR0] = filename.toByteArray()
-        map[APP_ENCRYPT_VAR4] = mapData.toByteArray()
-
-        return map
-    }
-
-    fun decryptObjectInputStreamWithFilename(objectInputStream: ObjectInputStream, password: CharArray): Pair<String, ByteArray?> {
-
-        return decryptObjectInputStreamLite(objectInputStream, password)
-
-    }
-
-    fun decryptObjectInputStreamLite(objectInputStream: ObjectInputStream, password: CharArray): Pair<String, ByteArray?> {
-
-        val map = getEncryptedHashMap(objectInputStream.readObject())
-
-        if (map != null) {
-
-            try {
-                val fn = map[APP_ENCRYPT_VAR0]
-                val iv = map[APP_ENCRYPT_VAR1]
-                val salt = map[APP_ENCRYPT_VAR2]
-                val encrypted = map[APP_ENCRYPT_VAR3]
-
-                if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encrypted is ByteArray) {
-
-                    //Decrypt
-                    return Pair(String(fn), decrypt(iv, salt, encrypted, password))
-                }
-            } catch (e: Exception){
-            }
-
-        }
-
-        return Pair("", null)
-
-    }
-    // todo: heavy decrypt function
-    fun decryptObjectInputStreamHeavy(objectInputStream: ObjectInputStream, password: CharArray): Pair<String, ByteArray?> {
-
-        val map = getEncryptedHashMap(objectInputStream.readObject())
-
-        if (map != null) {
-
-            try {
-                val fn = map[APP_ENCRYPT_VAR0]
-                val iv = map[APP_ENCRYPT_VAR1]
-                val salt = map[APP_ENCRYPT_VAR2]
-                val encryptedKey = map[APP_ENCRYPT_VAR3]
-                val encryptedData = map[APP_ENCRYPT_VAR4]
-
-                if (fn is ByteArray && iv is ByteArray && salt is ByteArray && encryptedData is ByteArray && encryptedKey is ByteArray) {
-
-                    // 1. decrypt key
-                    val decryptedKey = decrypt(iv, salt, encryptedKey, password)
-
-                    if (decryptedKey != null) {
-
-                        val key = String(decryptedKey, Charsets.UTF_8)
-                        val mapData = getEncryptedHashMap(encryptedData)
-
-                        // 2. decrypt data
-                        if (mapData != null) {
-                            val ivInner = mapData[APP_ENCRYPT_VAR1]
-                            val saltInner = mapData[APP_ENCRYPT_VAR2]
-                            val encryptedDataInner = mapData[APP_ENCRYPT_VAR3]
-
-                            if (ivInner is ByteArray && saltInner is ByteArray && encryptedDataInner is ByteArray) {
-                                return Pair(String(fn), decrypt(ivInner, saltInner, encryptedDataInner, key.toCharArray()))
-                            }
-                        }
-                    }
-
-                }
-            } catch (e: Exception){
-            }
-
-        }
-
-        return Pair("", null)
-
-    }
-
-    private fun encrypt(dataToEncrypt: ByteArray, password: CharArray): HashMap<String, ByteArray> {
-        val map = HashMap<String, ByteArray>()
-        try {
-            //Random salt for next step
-            val random = SecureRandom()
-            val salt = ByteArray(256)
-            random.nextBytes(salt)
-
-            val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
-
-            //Encrypt
-            val encrypted = cipher.doFinal(dataToEncrypt)
-
-            map[APP_ENCRYPT_VAR2] = salt
-            map[APP_ENCRYPT_VAR1] = cipher.iv
-            map[APP_ENCRYPT_VAR3] = encrypted
-        } catch (e: Exception) {
-            Log.e("MYAPP", "encryption exception", e)
-        }
-
-        return map
-
-    }
-
-    private fun decrypt(iv: ByteArray?, salt: ByteArray?, encrypted: ByteArray?, password: CharArray): ByteArray? {
-
-        var decrypted: ByteArray? = null
+        outFile.createNewFile()
 
         try {
-            val cipher = getCipher(Cipher.DECRYPT_MODE, password, salt, iv)
+            val fileOutputStream = FileOutputStream(outFile, true)
+            val cOut = CipherOutputStream(fileOutputStream, cipher)
 
-            //Decrypt
-            decrypted = cipher.doFinal(encrypted)
+            fileOutputStream.write(cipher.iv, 0, cipher.iv.size)
+            fileOutputStream.write(salt, 0, salt.size)
+
+            var buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            var count = input.read(buffer)
+
+            while (count> 0) {
+                cOut.write(buffer, 0, count)
+                count = input.read(buffer)
+            }
+            cOut.flush()
+            cOut.close()
+            fileOutputStream.close()
+            input.close()
+
+            return true
 
         } catch (e: Exception) {
-            Log.e("MYAPP", "decryption exception", e)
+
         }
 
-        return decrypted
+        return false
     }
 
-    private fun getCipher(mode: Int, password: CharArray, s: ByteArray?, i: ByteArray?) : Cipher {
+    // encrypt file to file
+    fun encryptFileToFile(sourceFilepath : String, targetFilepath : String, password : CharArray, overwite : Boolean = false) : Boolean{
+
+        val salt = this.generateRandomByte(SALT_LENGTH)
+        val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
+
+        val inFile = File(sourceFilepath)
+        val outFile = File(targetFilepath)
+
+        // is source file exist
+        if (!inFile.exists())
+            return false
+
+        // if not overwrite and target file already exist
+        if (!overwite && outFile.exists())
+            return false
+
+        if (outFile.exists() && overwite)
+            outFile.delete()
+        else
+            return false
+
+        outFile.createNewFile()
+
+        try {
+            val fileInputStream = FileInputStream(inFile)
+            val fileOutputStream = FileOutputStream(outFile, true)
+            val cOut = CipherOutputStream(fileOutputStream, cipher)
+
+            fileOutputStream.write(cipher.iv, 0, cipher.iv.size)
+            fileOutputStream.write(salt, 0, salt.size)
+
+            var buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            var count = fileInputStream.read(buffer)
+
+            while (count> 0) {
+                cOut.write(buffer, 0, count)
+                count = fileInputStream.read(buffer)
+            }
+            cOut.flush()
+            cOut.close()
+            fileOutputStream.close()
+            fileInputStream.close()
+
+            return true
+
+        } catch (e: Exception) {
+
+        }
+
+        return false
+    }
+
+
+    // decrypt input stream to file
+    fun decryptInputStreamToFile(input : InputStream, targetFilepath : String, password : CharArray, overwite : Boolean = false) : Boolean{
+
+        // is the input okay
+        if (input.available() < 1)
+            return false
+
+        val outFile = File(targetFilepath)
+
+        // if not overwrite and target file already exist
+        if (!overwite && outFile.exists())
+            return false
+
+        outFile.createNewFile()
+
+        try {
+            var iv : ByteArray = ByteArray(IV_LENGTH)
+            var salt : ByteArray = ByteArray(SALT_LENGTH)
+
+            input.read(iv, 0, IV_LENGTH)
+            input.read(salt, 0, SALT_LENGTH)
+
+            if (iv.size > 0 && salt.size > 0) {
+
+                val cipher = getCipher(Cipher.DECRYPT_MODE, password, salt, iv)
+                val fileOutputStream = FileOutputStream(outFile, false)
+                val cOut = CipherOutputStream(fileOutputStream, cipher)
+
+                var buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                var count = input.read(buffer)
+
+                while (count> 0) {
+                    cOut.write(buffer, 0, count)
+                    count = input.read(buffer)
+                }
+                cOut.flush()
+                cOut.close()
+                fileOutputStream.close()
+                input.close()
+
+                return true
+
+            }
+
+        } catch (e: Exception) {
+
+        }
+
+        return false
+    }
+
+    // decrypt file to file
+    fun decryptFileToFile(sourceFilepath : String, targetFilepath : String, password : CharArray, overwite : Boolean = false) : Boolean{
+
+        val inFile = File(sourceFilepath)
+        val outFile = File(targetFilepath)
+
+        // is source file exist
+        if (!inFile.exists())
+            return false
+
+        // if not overwrite and target file already exist
+        if (!overwite && outFile.exists())
+            return false
+
+        outFile.createNewFile()
+
+        try {
+            var iv : ByteArray = ByteArray(IV_LENGTH)
+            var salt : ByteArray = ByteArray(SALT_LENGTH)
+            val fileInputStream = FileInputStream(inFile)
+
+            fileInputStream.read(iv, 0, IV_LENGTH)
+            fileInputStream.read(salt, 0, SALT_LENGTH)
+
+            if (iv.size > 0 && salt.size > 0) {
+
+                val cipher = getCipher(Cipher.DECRYPT_MODE, password, salt, iv)
+                val fileOutputStream = FileOutputStream(outFile, false)
+                val cOut = CipherOutputStream(fileOutputStream, cipher)
+
+                var buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                var count = fileInputStream.read(buffer)
+
+                while (count> 0) {
+                    cOut.write(buffer, 0, count)
+                    count = fileInputStream.read(buffer)
+                }
+                cOut.flush()
+                cOut.close()
+                fileOutputStream.close()
+                fileInputStream.close()
+
+                return true
+
+            }
+
+        } catch (e: Exception) {
+
+        }
+
+        return false
+    }
+
+    // decrypt file to byte array
+    fun decryptFileToByteArray(sourceFilepath : String, password : CharArray) : ByteArray?{
+
+        val inFile = File(sourceFilepath)
+
+        // is source file exist
+        if (!inFile.exists())
+            return null
+
+        try {
+            var iv : ByteArray = ByteArray(IV_LENGTH)
+            var salt : ByteArray = ByteArray(SALT_LENGTH)
+            val fileInputStream = FileInputStream(inFile)
+
+            fileInputStream.read(iv, 0, IV_LENGTH)
+            fileInputStream.read(salt, 0, SALT_LENGTH)
+
+            if (iv.size > 0 && salt.size > 0) {
+
+                val cipher = getCipher(Cipher.DECRYPT_MODE, password, salt, iv)
+                val cIn = CipherInputStream(fileInputStream, cipher)
+
+                val result= cIn.readBytes()
+
+                cIn.close()
+                fileInputStream.close()
+
+                return result
+
+            }
+
+        } catch (e: Exception) {
+
+        }
+
+        return null
+    }
+
+
+    private fun getCipher(mode: Int, password: CharArray, s: ByteArray, i: ByteArray?) : Cipher {
 
         var salt = s
         var iv = i
 
         if (mode == Cipher.ENCRYPT_MODE) {
-            //Create initialization vector for AES
-            val ivRandom = SecureRandom() //not caching previous seeded instance of SecureRandom
-            iv = ByteArray(16)
-            ivRandom.nextBytes(iv)
+            // create a random iv if in encrypt mode
+            iv = this.generateRandomByte(IV_LENGTH)
         }
 
-        val pbKeySpec = PBEKeySpec(password, salt, KEY_HASH_ITERATION_COUNT, 256)
+        val pbKeySpec = PBEKeySpec(password, salt, KEY_HASH_ITERATION_COUNT, KEY_LENGTH)
         val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
         val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
         val keySpec = SecretKeySpec(keyBytes, "AES")
@@ -230,58 +346,4 @@ public class Encryption {
         return cipher
     }
 
-    private fun getEncryptedHashMap(data: Any): HashMap<String, ByteArray>? {
-        try {
-            when (data) {
-                is HashMap<*, *> -> {
-                    @Suppress("UNCHECKED_CAST")
-                    return data as? HashMap<String, ByteArray>
-                }
-            }
-        } catch (ex: java.lang.Exception) {
-            return null
-        }
-
-        return null
-    }
-
-    private fun getEncryptedHashMap(data: ByteArray): HashMap<String, ByteArray>? {
-        try {
-            val byteArrayInputStream = ByteArrayInputStream(data)
-            val objectInput: ObjectInput
-            objectInput = ObjectInputStream(byteArrayInputStream)
-            val map = objectInput.readObject()
-            objectInput.close()
-            byteArrayInputStream.close()
-
-            when (map) {
-                is HashMap<*, *> -> {
-                    @Suppress("UNCHECKED_CAST")
-                    return map as? HashMap<String, ByteArray>
-                }
-            }
-        } catch (ex: java.lang.Exception) {
-            return null
-        }
-
-        return null
-    }
-
-}
-
-private fun <K, V> java.util.HashMap<K, V>.toByteArray(): ByteArray {
-
-    val byteArrayOutputStream = ByteArrayOutputStream()
-    val objectOutputStream: ObjectOutputStream
-
-    objectOutputStream = ObjectOutputStream(byteArrayOutputStream)
-    objectOutputStream.writeObject(this)
-    objectOutputStream.flush()
-
-    val result = byteArrayOutputStream.toByteArray()
-
-    byteArrayOutputStream.close()
-    objectOutputStream.close()
-
-    return result
 }

@@ -88,10 +88,9 @@ class EncryptingActivity: BaseActivity() {
                     var encryptedSuccess = false
 
                     var fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
-                    var encryptedFilePath = encryptFileFromURI(EncryptingPassword.text.toString().toCharArray(), fileUri)
+                    var encryptedFilePath = FileManager.encryptFileFromUriToFolder(contentResolver, EncryptingPassword.text.toString().toCharArray(), fileUri)
 
-                    if (FileManager.isFileExist(encryptedFilePath)
-                        && FileManager.isEncryptedFile(File(encryptedFilePath)))
+                    if (FileManager.isFileExist(encryptedFilePath))
                         encryptedSuccess = true
 
                     launch(Dispatchers.Main) {
@@ -117,12 +116,6 @@ class EncryptingActivity: BaseActivity() {
 
             }
         }
-
-    }
-
-    private fun encryptFileFromURI(pwd: CharArray, uri: Uri): String {
-
-        return FileManager.encryptFileFromUriToFolder(contentResolver, pwd, uri)
 
     }
 

@@ -146,22 +146,9 @@ class MainActivity : BaseActivity() {
             toast(filename)
 
             if (filename.getFileExtension() == ENCRYPTED_FILE_EXT) {
-                // check if the shared file is a supported encrypted file
-                if (FileManager.isEncryptedFileUri(contentResolver, uri)) {
-
-                    // It is an encrypted file, so ask user if they want to save it in the library or decrypt it
-                    val importIntent = Intent(this, ImportingActivity::class.java)
-                    importIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
-                    startActivityForResult(importIntent, REQUEST_CODE_TO_IMPORTDECRYPT_FILE)
-
-                } else {
-
-                    showMessageDialog(this, R.string.error, R.string.imp_msg_invalid_file){
-                        finishAndRemoveTask()
-                    }
-
-                }
-
+                val importIntent = Intent(this, ImportingActivity::class.java)
+                importIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
+                startActivityForResult(importIntent, REQUEST_CODE_TO_IMPORTDECRYPT_FILE)
             } else {
                 // it's an ordinary file, show encrypting option and password input
                 val encryptingIntent = Intent(this, EncryptingActivity::class.java)
@@ -446,7 +433,7 @@ class MainActivity : BaseActivity() {
             GlobalScope.launch(Dispatchers.IO) {
 
                 //callback(password.toCharArray())
-                var decryptedFilePath = FileManager.decryptFileForSharing(passwordInput.text.toString().toCharArray(), file.path)
+                var decryptedFilePath = FileManager.decryptFileForSharing(file.path, passwordInput.text.toString().toCharArray())
 
 
                 launch(Dispatchers.Main) {

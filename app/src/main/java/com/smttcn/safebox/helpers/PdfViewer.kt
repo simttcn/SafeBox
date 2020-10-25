@@ -36,7 +36,7 @@ class PdfViewer : BaseViewer() {
 
     override fun view(password: CharArray) {
 
-        val decryptedFilePath = FileManager.decryptFile(_file.path, "", password, false)
+        val decryptedFilePath = FileManager.decryptFileForSharing(_file.path, password)
 
         GlobalScope.launch(Dispatchers.Main) {
 
