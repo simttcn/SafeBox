@@ -51,6 +51,9 @@ public class Encryption constructor() {
     val IV_LENGTH = 16
     val SALT_LENGTH = 256
     val KEY_LENGTH = 256
+    val SECRETKEYFACTORY_ALGORITHM = "PBKDF2WithHmacSHA1"
+    val CIPHER_TRANSFORMATION = "AES/CBC/PKCS7Padding"
+    //val CIPHER_TRANSFORMATION = "AES/GCM/NoPadding" // slower than CBC for local file encryption
 
     fun generateRandomByte(length : Int = 128) : ByteArray {
         val random = SecureRandom()
@@ -334,13 +337,13 @@ public class Encryption constructor() {
         }
 
         val pbKeySpec = PBEKeySpec(password, salt, KEY_HASH_ITERATION_COUNT, KEY_LENGTH)
-        val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+        val secretKeyFactory = SecretKeyFactory.getInstance(SECRETKEYFACTORY_ALGORITHM)
         val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
         val keySpec = SecretKeySpec(keyBytes, "AES")
 
         val ivSpec = IvParameterSpec(iv)
 
-        val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+        val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION)
         cipher.init(mode, keySpec, ivSpec)
 
         return cipher
