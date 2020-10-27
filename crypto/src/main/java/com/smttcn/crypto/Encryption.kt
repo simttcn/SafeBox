@@ -30,12 +30,8 @@
 
 package com.smttcn.crypto
 
-import android.app.Application
-import android.content.Context
-import android.util.Log
 import java.io.*
 import java.security.SecureRandom
-import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
 import javax.crypto.CipherOutputStream
@@ -44,40 +40,44 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.ByteArray
-import kotlin.collections.HashMap
 
 public class Encryption constructor() {
 
-    val IV_LENGTH = 16
-    val SALT_LENGTH = 256
-    val KEY_LENGTH = 256
+    val IV_LENGTH_BIT : Int = 128
+    val SALT_LENGTH_BIT : Int = 256
+    val KEY_LENGTH_BIT : Int = 256
+    val IV_LENGTH_BYTE : Int = IV_LENGTH_BIT / 8
+    val SALT_LENGTH_BYTE : Int = SALT_LENGTH_BIT / 8
+    val KEY_LENGTH_BYTE : Int = KEY_LENGTH_BIT / 8
+
     val SECRETKEYFACTORY_ALGORITHM = "PBKDF2WithHmacSHA1"
     val CIPHER_TRANSFORMATION = "AES/CBC/PKCS7Padding"
+    val KEY_HASH_ITERATION_COUNT = 10000
     //val CIPHER_TRANSFORMATION = "AES/GCM/NoPadding" // slower than CBC for local file encryption
 
-    fun generateRandomByte(length : Int = 128) : ByteArray {
+    fun generateRandomByte(length : Int = 16) : ByteArray {
         val random = SecureRandom()
         val data = ByteArray(length)
         random.nextBytes(data)
         return data
     }
 
-    fun generateSecretKey(length : Int = 128) : ByteArray {
+    fun generateSecretKey(length : Int = 16) : ByteArray {
         return generateRandomByte(length)
     }
 
-    fun generateSecretKeyAsString(length : Int = 128) : String {
+    fun generateSecretKeyAsString(length : Int = 16) : String {
         return generateRandomByte(length).toString()
     }
 
-    fun generateSecretKeyAsBase64CharArray(length : Int = 128) : CharArray {
+    fun generateSecretKeyAsBase64CharArray(length : Int = 16) : CharArray {
         return String(Base64.encode(generateRandomByte(length))).dropLast(2).toCharArray()
     }
 
     // encrypt byte array to byte array
     fun encryptByteArrayToTripleByteArray(data : ByteArray, password : CharArray) : Triple<ByteArray, ByteArray, ByteArray>?{
 
-        val salt = this.generateRandomByte(SALT_LENGTH)
+        val salt = this.generateRandomByte(SALT_LENGTH_BYTE)
         val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
 
         return Triple(cipher.iv, salt, cipher.doFinal(data))
@@ -86,7 +86,7 @@ public class Encryption constructor() {
     // encrypt input stream to file
     fun encryptInputStreamToFile(input : InputStream, targetFilepath : String, password : CharArray, overwite : Boolean = false) : Boolean{
 
-        val salt = this.generateRandomByte(SALT_LENGTH)
+        val salt = this.generateRandomByte(SALT_LENGTH_BYTE)
         val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
 
         // is the input okay
@@ -132,7 +132,7 @@ public class Encryption constructor() {
     // encrypt file to file
     fun encryptFileToFile(sourceFilepath : String, targetFilepath : String, password : CharArray, overwite : Boolean = false) : Boolean{
 
-        val salt = this.generateRandomByte(SALT_LENGTH)
+        val salt = this.generateRandomByte(SALT_LENGTH_BYTE)
         val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
 
         val inFile = File(sourceFilepath)
@@ -196,14 +196,19 @@ public class Encryption constructor() {
         if (!overwite && outFile.exists())
             return false
 
+        if (outFile.exists() && overwite)
+            outFile.delete()
+        else
+            return false
+
         outFile.createNewFile()
 
         try {
-            var iv : ByteArray = ByteArray(IV_LENGTH)
-            var salt : ByteArray = ByteArray(SALT_LENGTH)
+            var iv : ByteArray = ByteArray(IV_LENGTH_BYTE)
+            var salt : ByteArray = ByteArray(SALT_LENGTH_BYTE)
 
-            input.read(iv, 0, IV_LENGTH)
-            input.read(salt, 0, SALT_LENGTH)
+            input.read(iv, 0, IV_LENGTH_BYTE)
+            input.read(salt, 0, SALT_LENGTH_BYTE)
 
             if (iv.size > 0 && salt.size > 0) {
 
@@ -251,12 +256,12 @@ public class Encryption constructor() {
         outFile.createNewFile()
 
         try {
-            var iv : ByteArray = ByteArray(IV_LENGTH)
-            var salt : ByteArray = ByteArray(SALT_LENGTH)
+            var iv : ByteArray = ByteArray(IV_LENGTH_BYTE)
+            var salt : ByteArray = ByteArray(SALT_LENGTH_BYTE)
             val fileInputStream = FileInputStream(inFile)
 
-            fileInputStream.read(iv, 0, IV_LENGTH)
-            fileInputStream.read(salt, 0, SALT_LENGTH)
+            fileInputStream.read(iv, 0, IV_LENGTH_BYTE)
+            fileInputStream.read(salt, 0, SALT_LENGTH_BYTE)
 
             if (iv.size > 0 && salt.size > 0) {
 
@@ -297,12 +302,12 @@ public class Encryption constructor() {
             return null
 
         try {
-            var iv : ByteArray = ByteArray(IV_LENGTH)
-            var salt : ByteArray = ByteArray(SALT_LENGTH)
+            var iv : ByteArray = ByteArray(IV_LENGTH_BYTE)
+            var salt : ByteArray = ByteArray(SALT_LENGTH_BYTE)
             val fileInputStream = FileInputStream(inFile)
 
-            fileInputStream.read(iv, 0, IV_LENGTH)
-            fileInputStream.read(salt, 0, SALT_LENGTH)
+            fileInputStream.read(iv, 0, IV_LENGTH_BYTE)
+            fileInputStream.read(salt, 0, SALT_LENGTH_BYTE)
 
             if (iv.size > 0 && salt.size > 0) {
 
@@ -333,10 +338,10 @@ public class Encryption constructor() {
 
         if (mode == Cipher.ENCRYPT_MODE) {
             // create a random iv if in encrypt mode
-            iv = this.generateRandomByte(IV_LENGTH)
+            iv = this.generateRandomByte(IV_LENGTH_BYTE)
         }
 
-        val pbKeySpec = PBEKeySpec(password, salt, KEY_HASH_ITERATION_COUNT, KEY_LENGTH)
+        val pbKeySpec = PBEKeySpec(password, salt, KEY_HASH_ITERATION_COUNT, KEY_LENGTH_BIT)
         val secretKeyFactory = SecretKeyFactory.getInstance(SECRETKEYFACTORY_ALGORITHM)
         val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
         val keySpec = SecretKeySpec(keyBytes, "AES")
