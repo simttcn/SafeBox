@@ -37,6 +37,7 @@ import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.models.FileDirItem
+import com.smttcn.safebox.BuildConfig
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import com.smttcn.safebox.managers.ViewerManager
@@ -77,6 +78,8 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        MyApplication.baseConfig.lastVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE
 
 //        fab.setOnClickListener { view ->
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
