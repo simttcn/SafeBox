@@ -5,15 +5,16 @@
 
     <dimen name="fab_margin">16dp</dimen>
 
-    <dimen name="itemlist_thumbnail_height">36dp</dimen>
-    <dimen name="itemlist_thumbnail_width">36dp</dimen>
-    <dimen name="itemlist_textsize">16sp</dimen>
-    <dimen name="itemlist_filename_padding_start">4dp</dimen>
-    <dimen name="itemlist_filename_padding_end">4dp</dimen>
-    <dimen name="itemlist_filename_padding_top">1dp</dimen>
-    <dimen name="itemlist_filename_padding_bottom">1dp</dimen>
-    <dimen name="itemlist_padding_horizontal">4dp</dimen>
-    <dimen name="itemlist_padding_vertical">2dp</dimen>
+    <dimen name="itemlist_height">68dp</dimen>
+    <dimen name="itemlist_thumbnail_height">50dp</dimen>
+    <dimen name="itemlist_thumbnail_width">50dp</dimen>
+    <dimen name="itemlist_thumbnail_margin_top">10dp</dimen>
+    <dimen name="itemlist_thumbnail_margin_start">10dp</dimen>
+    <dimen name="itemlist_thumbnail_margin_end">70dp</dimen>
+    <dimen name="itemlist_filename_margin_top">13dp</dimen>
+    <dimen name="itemlist_filesize_margin_top">43dp</dimen>
+    <dimen name="itemlist_textsize">14sp</dimen>
+    <dimen name="itemlist_textsize_sub">10sp</dimen>
 
 
     <dimen name="popupmenu_width">30dp</dimen>

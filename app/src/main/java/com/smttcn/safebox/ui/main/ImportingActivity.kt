@@ -144,7 +144,7 @@ class ImportingActivity : BaseActivity() {
                 GlobalScope.launch(Dispatchers.IO) {
 
                     val inputStream = contentResolver.openInputStream(fileUri)
-                    val (filename, size) = FileManager.getFilenameAndSizeFromUri(contentResolver, fileUri)
+                    val (filename, _) = FileManager.getFilenameAndSizeFromUri(contentResolver, fileUri)
                     try {
                         if(inputStream != null) {
                             decryptedFilePath = FileManager.decryptInputStreamForSharing(inputStream, filename, password.text.toString().toCharArray())

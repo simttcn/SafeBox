@@ -7,9 +7,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.provider.Settings
 import android.text.Editable
-import android.text.InputType
 import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
@@ -18,10 +16,10 @@ import android.view.animation.AnimationUtils
 import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
@@ -29,9 +27,7 @@ import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
-import com.afollestad.materialdialogs.input.input
 import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
-import com.google.android.material.snackbar.Snackbar
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
@@ -49,10 +45,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.lang.Thread.sleep
 import java.util.*
 import kotlin.concurrent.schedule
-import kotlin.coroutines.CoroutineContext
 
 
 class MainActivity : BaseActivity() {
@@ -73,7 +67,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         MyApplication.mainActivityContext = this
         myContext = this
-        IsShareFromOtherApp = intent?.action == Intent.ACTION_SEND
+        IsShareFromOtherApp = (intent?.action == Intent.ACTION_SEND) || (intent?.action == Intent.ACTION_VIEW)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -99,7 +93,7 @@ class MainActivity : BaseActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
-        IsShareFromOtherApp = intent?.action == Intent.ACTION_SEND
+        IsShareFromOtherApp = (intent?.action == Intent.ACTION_SEND) || (intent?.action == Intent.ACTION_VIEW)
 
         if (IsShareFromOtherApp) {
             IsShareFromOtherApp = false
@@ -116,6 +110,10 @@ class MainActivity : BaseActivity() {
         recyclerViewAdapter = FileItemAdapter(myContext)
         recyclerView.adapter = recyclerViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(myContext)
+
+        // adding the divider to the recyclerview
+//        val decorator = DividerItemDecoration(applicationContext, LinearLayoutManager.VERTICAL)
+//        recyclerView.addItemDecoration(decorator)
 
         GlobalScope.launch(Dispatchers.IO) {
 
@@ -140,26 +138,29 @@ class MainActivity : BaseActivity() {
 
     private fun handleShareFromOtherApp(): Boolean {
         var result: Boolean = true
+        var uri: Uri
 
-        val uri = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri
-
-        if (uri != null) {
-            val (filename, _) = FileManager.getFilenameAndSizeFromUri(contentResolver, uri)
-
-            toast(filename)
-
-            if (filename.getFileExtension() == ENCRYPTED_FILE_EXT) {
-                val importIntent = Intent(this, ImportingActivity::class.java)
-                importIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
-                startActivityForResult(importIntent, REQUEST_CODE_TO_IMPORTDECRYPT_FILE)
-            } else {
-                // it's an ordinary file, show encrypting option and password input
-                val encryptingIntent = Intent(this, EncryptingActivity::class.java)
-                encryptingIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
-                startActivityForResult(encryptingIntent, REQUEST_CODE_TO_ENCRYPT_FILE)
-            }
-
+        if (intent?.action == Intent.ACTION_VIEW) {
+            uri = Uri.parse(intent.dataString)
+        } else {
+            uri = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as Uri
         }
+
+        val (filename, _) = FileManager.getFilenameAndSizeFromUri(contentResolver, uri)
+
+        toast(filename)
+
+        if (filename.getFileExtension() == ENCRYPTED_FILE_EXT) {
+            val importIntent = Intent(this, ImportingActivity::class.java)
+            importIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
+            startActivityForResult(importIntent, REQUEST_CODE_TO_IMPORTDECRYPT_FILE)
+        } else {
+            // it's an ordinary file, show encrypting option and password input
+            val encryptingIntent = Intent(this, EncryptingActivity::class.java)
+            encryptingIntent.putExtra(INTENT_SHARE_FILE_URI, uri)
+            startActivityForResult(encryptingIntent, REQUEST_CODE_TO_ENCRYPT_FILE)
+        }
+
 
         return result
     }

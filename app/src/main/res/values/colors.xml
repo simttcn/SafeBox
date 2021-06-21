@@ -2,6 +2,7 @@
 <resources>
     <color name="colorBlack">#000000</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="colorDivider">#BBBBBB</color>
 
     <color name="colorPrimaryLight">#1DBFAE</color>
     <color name="colorPrimary">#008577</color>

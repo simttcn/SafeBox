@@ -92,6 +92,10 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
         return filename.removeSuffix("." + ENCRYPTED_FILE_EXT)
     }
 
+    fun getFileSize(): Long {
+        return size
+    }
+
     fun getExt(): String {
         if (!isDirectory)
             return filename.getFileExtension()

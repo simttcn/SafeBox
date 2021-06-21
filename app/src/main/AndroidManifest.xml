@@ -29,20 +29,22 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="*/*" />
             </intent-filter>
-            <intent-filter
-                android:icon="@mipmap/ic_launcher"
-                android:label="@string/app_name"
-                android:priority="1">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="file"
-                    android:host="*"
-                    android:pathPattern=".*\\.enc"
-                    android:mimeType="*/*" />
-                <data android:scheme="content"
-                    android:pathPattern=".*\\.enc"
-                    android:mimeType="*/*" />
+                <data android:scheme="file"/>
+                <data android:scheme="content" />
+                <data android:host="*" />
+                <data android:mimeType="application/enc" />
+                <data android:pathPattern=".*\\.enc" />
+                <data android:pathPattern=".*\\..*\\.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.enc" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.enc" />
             </intent-filter>
         </activity>
         <activity

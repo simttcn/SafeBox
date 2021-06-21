@@ -41,15 +41,22 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.ByteArray
 
+// Todo: reading and writing new fields VER and PROP in file header
 public class Encryption constructor() {
 
-    val IV_LENGTH_BIT : Int = 128
-    val SALT_LENGTH_BIT : Int = 256
-    val KEY_LENGTH_BIT : Int = 256
+    val VER_LENGTH_BIT : Int = 16 // 2 bytes
+    val IV_LENGTH_BIT : Int = 128 // 16 bytes
+    val SALT_LENGTH_BIT : Int = 256 // 32 bytes
+    val PROP_LENGTH_BIT : Int = 4096 // 512 bytes
+
+    val VER_LENGTH_BYTE : Int = VER_LENGTH_BIT / 8
     val IV_LENGTH_BYTE : Int = IV_LENGTH_BIT / 8
     val SALT_LENGTH_BYTE : Int = SALT_LENGTH_BIT / 8
-    val KEY_LENGTH_BYTE : Int = KEY_LENGTH_BIT / 8
+    val PROP_LENGTH_BYTE : Int = PROP_LENGTH_BIT / 8
 
+    val KEY_LENGTH_BIT : Int = 256 // 32 bytes
+
+    val VER_NO = 1
     val SECRETKEYFACTORY_ALGORITHM = "PBKDF2WithHmacSHA1"
     val CIPHER_TRANSFORMATION = "AES/CBC/PKCS7Padding"
     val KEY_HASH_ITERATION_COUNT = 10000
@@ -88,6 +95,9 @@ public class Encryption constructor() {
 
         val salt = this.generateRandomByte(SALT_LENGTH_BYTE)
         val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
+        // Todo: set ver and prop here
+        val ver = ByteArray(VER_LENGTH_BYTE)
+        val prop = ByteArray(PROP_LENGTH_BYTE)
 
         // is the input okay
         if (input.available() < 1)
@@ -105,8 +115,10 @@ public class Encryption constructor() {
             val fileOutputStream = FileOutputStream(outFile, true)
             val cOut = CipherOutputStream(fileOutputStream, cipher)
 
+            fileOutputStream.write(ver, 0, ver.size)
             fileOutputStream.write(cipher.iv, 0, cipher.iv.size)
             fileOutputStream.write(salt, 0, salt.size)
+            fileOutputStream.write(prop, 0, prop.size)
 
             var buffer = ByteArray(DEFAULT_BUFFER_SIZE)
             var count = input.read(buffer)
@@ -134,6 +146,9 @@ public class Encryption constructor() {
 
         val salt = this.generateRandomByte(SALT_LENGTH_BYTE)
         val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
+        // Todo: set ver and prop here
+        val ver = ByteArray(VER_LENGTH_BYTE)
+        val prop = ByteArray(PROP_LENGTH_BYTE)
 
         val inFile = File(sourceFilepath)
         val outFile = File(targetFilepath)
@@ -158,8 +173,10 @@ public class Encryption constructor() {
             val fileOutputStream = FileOutputStream(outFile, true)
             val cOut = CipherOutputStream(fileOutputStream, cipher)
 
+            fileOutputStream.write(ver, 0, ver.size)
             fileOutputStream.write(cipher.iv, 0, cipher.iv.size)
             fileOutputStream.write(salt, 0, salt.size)
+            fileOutputStream.write(prop, 0, prop.size)
 
             var buffer = ByteArray(DEFAULT_BUFFER_SIZE)
             var count = fileInputStream.read(buffer)
@@ -192,23 +209,25 @@ public class Encryption constructor() {
 
         val outFile = File(targetFilepath)
 
-        // if not overwrite and target file already exist
-        if (!overwite && outFile.exists())
-            return false
-
-        if (outFile.exists() && overwite)
-            outFile.delete()
-        else
-            return false
+        if (outFile.exists()) {
+            if (overwite)
+                outFile.delete()
+            else
+                return false
+        }
 
         outFile.createNewFile()
 
         try {
+            var ver : ByteArray = ByteArray(VER_LENGTH_BYTE)
             var iv : ByteArray = ByteArray(IV_LENGTH_BYTE)
             var salt : ByteArray = ByteArray(SALT_LENGTH_BYTE)
+            var prop : ByteArray = ByteArray(PROP_LENGTH_BYTE)
 
+            input.read(ver, 0, VER_LENGTH_BYTE)
             input.read(iv, 0, IV_LENGTH_BYTE)
             input.read(salt, 0, SALT_LENGTH_BYTE)
+            input.read(prop, 0, PROP_LENGTH_BYTE)
 
             if (iv.size > 0 && salt.size > 0) {
 
@@ -256,12 +275,16 @@ public class Encryption constructor() {
         outFile.createNewFile()
 
         try {
+            var ver : ByteArray = ByteArray(VER_LENGTH_BYTE)
             var iv : ByteArray = ByteArray(IV_LENGTH_BYTE)
             var salt : ByteArray = ByteArray(SALT_LENGTH_BYTE)
+            var prop : ByteArray = ByteArray(PROP_LENGTH_BYTE)
             val fileInputStream = FileInputStream(inFile)
 
+            fileInputStream.read(ver, 0, VER_LENGTH_BYTE)
             fileInputStream.read(iv, 0, IV_LENGTH_BYTE)
             fileInputStream.read(salt, 0, SALT_LENGTH_BYTE)
+            fileInputStream.read(prop, 0, PROP_LENGTH_BYTE)
 
             if (iv.size > 0 && salt.size > 0) {
 
@@ -302,12 +325,16 @@ public class Encryption constructor() {
             return null
 
         try {
+            var ver : ByteArray = ByteArray(VER_LENGTH_BYTE)
             var iv : ByteArray = ByteArray(IV_LENGTH_BYTE)
             var salt : ByteArray = ByteArray(SALT_LENGTH_BYTE)
+            var prop : ByteArray = ByteArray(PROP_LENGTH_BYTE)
             val fileInputStream = FileInputStream(inFile)
 
+            fileInputStream.read(ver, 0, VER_LENGTH_BYTE)
             fileInputStream.read(iv, 0, IV_LENGTH_BYTE)
             fileInputStream.read(salt, 0, SALT_LENGTH_BYTE)
+            fileInputStream.read(prop, 0, PROP_LENGTH_BYTE)
 
             if (iv.size > 0 && salt.size > 0) {
 

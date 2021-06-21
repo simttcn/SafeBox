@@ -376,10 +376,12 @@ object FileManager {
 
     fun decryptInputStreamForSharing(inputStream: InputStream, filename : String, pwd: CharArray): String {
 
-        val targetFolder = getFolderInCacheFolder(TEMP_FILE_SHARE_FOLDER_NAME, true)!!.canonicalPath.withTrailingCharacter('/')
-        val targetFilepath = targetFolder + filename.removeEncryptedExtension()
+        val tempShareFolder: File? = getFolderInCacheFolder(TEMP_FILE_SHARE_FOLDER_NAME, true)
 
-        if (targetFolder != null) {
+        if (tempShareFolder != null) {
+
+            val targetFilepath = tempShareFolder.canonicalPath.withTrailingCharacter('/') + filename.removeEncryptedExtension()
+
             val result = Encryption().decryptInputStreamToFile(inputStream, targetFilepath.removeEncryptedExtension(), pwd, true)
 
             if (result == true) {

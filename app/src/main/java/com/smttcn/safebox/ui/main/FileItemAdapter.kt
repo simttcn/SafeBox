@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.smttcn.commons.extensions.formatSize
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
@@ -61,6 +62,8 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
                 itemView.item_thumbnail.setImageResource(R.drawable.ic_file_gray_24dp)
 
             itemView.item_name.text = item.getOriginalFilename() //item.filename
+
+            itemView.item_size.text = item.getFileSize().formatSize() //item.size
 
 //            if (item.isSelected) {
 //                itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundSelected))

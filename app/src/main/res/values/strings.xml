@@ -43,6 +43,7 @@
     <string name="decrypting_file">Decrypting file…</string>
     <string name="press_back_again_to_quit">Press back button again to quit this app.</string>
     <string name="operation_cancelled">Operation cancelled.</string>
+    <string name="no_app_to_share">No apps to share.</string>
 
     <!--  UI - login and password activity  -->
 <!--    <string name="new_app_password">New App Password</string>-->
