@@ -6,9 +6,9 @@ buildscript {
     }
     ext.versions = [
             'minSdk': 23,
-            'compileSdk': 29,
-            'targetSdk': 29,
-            'buildTools':'29.0.3',
+            'compileSdk': 30,
+            'targetSdk': 30,
+            'buildTools':'30.0.3',
 
             'gradle': '4.1.1',
 
@@ -17,7 +17,8 @@ buildscript {
             'material':'1.1.0',
             'lifecycle':'2.2.0',
             'appcompat':'1.1.0',
-            'recyclerview':'1.2.0-alpha04'
+            'recyclerview':'1.2.0-alpha04',
+            'swiperefreshlayout':'1.0.0'
     ]
     repositories {
         maven { url "https://dl.bintray.com/drummer-aidan/maven" }

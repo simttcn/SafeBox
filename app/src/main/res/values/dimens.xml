@@ -13,11 +13,14 @@
     <dimen name="itemlist_thumbnail_margin_end">70dp</dimen>
     <dimen name="itemlist_filename_margin_top">13dp</dimen>
     <dimen name="itemlist_filesize_margin_top">43dp</dimen>
+    <dimen name="itemlist_popupmenu_icon_padding_left">10dp</dimen>
+    <dimen name="itemlist_popupmenu_icon_padding_right">10dp</dimen>
     <dimen name="itemlist_textsize">14sp</dimen>
-    <dimen name="itemlist_textsize_sub">10sp</dimen>
+    <dimen name="itemlist_textsize_sub">12sp</dimen>
 
 
-    <dimen name="popupmenu_width">30dp</dimen>
+    <dimen name="popupmenu_icon_width">40dp</dimen>
+    <dimen name="popupmenu_textsize">14sp</dimen>
 
     <!-- Custom view -->
     <dimen name="customViewHeight">14sp</dimen>

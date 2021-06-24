@@ -16,6 +16,7 @@
     <color name="colorNavItemBackgroundUncheck">@color/colorPrimary</color>
     <color name="colorNavItemTextColorCheck">@color/colorPrimary</color>
     <color name="colorNavItemTextColorUncheck">@color/colorWhite</color>
+    <color name="colorPopupMenuBackground">#D8FFFA</color>
 
     <color name="colorItemBackgroundSelected">#6ADDD1</color>
     <color name="colorItemBackgroundNormal">@color/colorWhite</color>

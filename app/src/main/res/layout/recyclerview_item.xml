@@ -27,13 +27,14 @@
 
     <TextView
         android:id="@+id/item_name"
-        android:layout_gravity="top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="top"
         android:layout_marginStart="@dimen/itemlist_thumbnail_margin_end"
-        android:layout_marginEnd="@dimen/popupmenu_width"
         android:layout_marginTop="@dimen/itemlist_filename_margin_top"
+        android:layout_marginEnd="@dimen/popupmenu_icon_width"
         android:background="@android:color/transparent"
+        android:ellipsize="middle"
         android:singleLine="true"
         android:text="@string/itemlist_default_text"
         android:textSize="@dimen/itemlist_textsize" />
@@ -43,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/itemlist_thumbnail_margin_end"
-        android:layout_marginEnd="@dimen/popupmenu_width"
+        android:layout_marginEnd="@dimen/popupmenu_icon_width"
         android:layout_marginTop="@dimen/itemlist_filesize_margin_top"
         android:background="@android:color/transparent"
         android:singleLine="true"
@@ -55,6 +56,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"
+        android:paddingLeft="@dimen/itemlist_popupmenu_icon_padding_left"
+        android:paddingRight="@dimen/itemlist_popupmenu_icon_padding_left"
         android:background="@android:color/transparent"
         android:contentDescription="@string/menu_more"
         android:src="@drawable/ic_action_more_vert_gray_24dp" />
@@ -64,7 +67,7 @@
         android:layout_gravity="bottom"
         android:layout_height="1dp"
         android:layout_marginStart="@dimen/itemlist_thumbnail_margin_end"
-        android:layout_marginEnd="@dimen/popupmenu_width"
+        android:layout_marginEnd="@dimen/popupmenu_icon_width"
         android:background="@color/colorDivider" />
 
 </FrameLayout>

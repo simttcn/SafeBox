@@ -109,6 +109,7 @@ dependencies {
     // UI
     implementation "com.google.android.material:material:$versions.material"
     implementation "androidx.recyclerview:recyclerview:$versions.recyclerview"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$versions.swiperefreshlayout"
 
 
 //    // Room components

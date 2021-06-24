@@ -19,9 +19,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
@@ -55,6 +55,7 @@ class MainActivity : BaseActivity() {
     private val fileItemViewModel: FileItemViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: FileItemAdapter
+    private lateinit var pullToRefreshContainer: SwipeRefreshLayout
     private var IsShareFromOtherApp = false
     private lateinit var toolbarMenu: Menu
     private lateinit var myContext: Context
@@ -111,9 +112,26 @@ class MainActivity : BaseActivity() {
         recyclerView.adapter = recyclerViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(myContext)
 
-        // adding the divider to the recyclerview
-//        val decorator = DividerItemDecoration(applicationContext, LinearLayoutManager.VERTICAL)
-//        recyclerView.addItemDecoration(decorator)
+        // Setup refresh listener which triggers new data loading
+        pullToRefreshContainer = findViewById(R.id.swipeRefreshContainer)
+        pullToRefreshContainer.setOnRefreshListener {
+            GlobalScope.launch(Dispatchers.IO) {
+                fileItemViewModel.refresh()
+                launch(Dispatchers.Main) {
+                    pullToRefreshContainer.setRefreshing(false)
+                }
+            }
+
+        }
+
+        // Configure the refreshing colors
+        pullToRefreshContainer.setColorSchemeResources(
+            R.color.colorPrimary,
+            R.color.colorPrimary,
+            R.color.colorPrimary,
+            R.color.colorPrimary
+        );
+
 
         GlobalScope.launch(Dispatchers.IO) {
 
@@ -263,6 +281,9 @@ class MainActivity : BaseActivity() {
 
 
     private fun onRecyclerViewItemPopupMenuClicked(view: View, item: FileDirItem, position: Int) {
+        //init the wrapper with style
+        //val wrapper: Context = ContextThemeWrapper(myContext, R.style.BasePopupMenu)
+        //val popupMenu = PopupMenu(wrapper, view, Gravity.BOTTOM + Gravity.END)
         var popupMenu = PopupMenu(this, view, Gravity.BOTTOM + Gravity.END)
         popupMenu.menuInflater.inflate(R.menu.filediritem_popup_menu, popupMenu.menu)
 
@@ -310,13 +331,13 @@ class MainActivity : BaseActivity() {
 
         }
 
-        item.isOptionMenuActive = true
-        view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorItemBackgroundOptionMenuActive))
-
         popupMenu.setOnDismissListener {
             item.isOptionMenuActive = false
             view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorItemBackgroundNormal))
         }
+
+        item.isOptionMenuActive = true
+        view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorItemBackgroundOptionMenuActive))
 
         popupMenu.show()
 

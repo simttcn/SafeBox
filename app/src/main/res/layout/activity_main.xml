@@ -27,18 +27,29 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/itemListRecyclerView"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@android:color/white"
-        android:scrollbars="vertical"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appbar"
-        tools:listitem="@layout/recyclerview_item" />
+        app:layout_constraintTop_toBottomOf="@+id/appbar">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/itemListRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@android:color/white"
+            android:scrollbars="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appbar"
+            tools:listitem="@layout/recyclerview_item" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
