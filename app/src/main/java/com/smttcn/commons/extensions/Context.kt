@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.DrawableRes
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
@@ -59,8 +60,13 @@ private fun doToast(context: Context, message: String, length: Int) {
 }
 
 
-fun showMessageDialog(context: Context, title: String, message: String, callback: () -> Unit){
+fun showMessageDialog(context: Context, iconID: Int, title: String, message: String, callback: () -> Unit){
+
+    //val okText = "<font color='#1B1ED8'>" + context.getText(R.string.btn_ok) + "/font>"
+
     MaterialDialog(context).show {
+        if (iconID > 0) icon(iconID)
+        cornerRadius(5.0f)
         title(text = title)
         message(text = message)
         positiveButton(R.string.btn_ok)
@@ -72,8 +78,13 @@ fun showMessageDialog(context: Context, title: String, message: String, callback
 }
 
 
-fun showMessageDialog(context: Context, titleID: Int, messageID: Int, callback: () -> Unit){
+fun showMessageDialog(context: Context, iconID: Int, titleID: Int, messageID: Int, callback: () -> Unit){
+
+    //val okText = "<font color='#1B1ED8'>" + context.getText(R.string.btn_ok) + "/font>"
+
     MaterialDialog(context).show {
+        if (iconID > 0) icon(iconID)
+        cornerRadius(5.0f)
         title(titleID)
         message(messageID)
         positiveButton(R.string.btn_ok)

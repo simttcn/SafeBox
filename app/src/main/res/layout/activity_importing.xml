@@ -111,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/please_wait"
                 android:gravity="center_horizontal"
-                android:textSize="@dimen/dialog_alert_font_size"
+                android:textSize="@dimen/dialog_font_size"
                 android:textColor="@color/colorWhite"
                 />
 

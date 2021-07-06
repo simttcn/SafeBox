@@ -1,14 +1,19 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:popupAnimationStyle">@null</item>
-        <item name="android:fontFamily">@font/nunito_regular</item>
-        <item name="fontFamily">@font/nunito_regular</item> <!-- target android sdk versions < 26 and > 14 if theme other than AppCompat -->
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="elevation">0dp</item>
+        <item name="md_color_title">@color/colorText</item>
+        <item name="md_color_content">@color/colorText</item>
+        <item name="md_color_button_text">@color/colorText</item>
+        <item name="md_background_color">@color/colorWhite</item>
+<!--        <item name="md_divider_color">@color/yourDialogDividerColor</item>-->
 
     </style>
 
@@ -17,10 +22,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-
+    <style name="BasePopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textSize">@dimen/popupmenu_textsize</item>
+    </style>
 
 </resources>

@@ -125,6 +125,7 @@ class PasswordActivity : BaseActivity() {
                                         finish()
                                     } else {
                                         showMessageDialog(this,
+                                            R.drawable.ic_warning,
                                             R.string.dlg_title_change_app_password,
                                             R.string.dlg_msg_change_app_password_error)
                                         {
@@ -147,6 +148,7 @@ class PasswordActivity : BaseActivity() {
                         }
                     } else {
                         showMessageDialog(this,
+                            R.drawable.ic_warning,
                             R.string.dlg_title_change_app_password,
                             R.string.dlg_msg_change_app_password_incorrect)
                         {

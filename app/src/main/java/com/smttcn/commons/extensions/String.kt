@@ -103,7 +103,7 @@ fun String.isAudioMimeType() = isAudioExtension() || getMimeType().startsWith("a
 
 fun String.getCompressionFormat() = when (getFileExtension().lowerCase()) {
     "png" -> Bitmap.CompressFormat.PNG
-    "webp" -> Bitmap.CompressFormat.WEBP
+    //"webp" -> Bitmap.CompressFormat.WEBP
     else -> Bitmap.CompressFormat.JPEG
 }
 

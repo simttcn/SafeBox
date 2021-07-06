@@ -16,7 +16,7 @@
     <dimen name="itemlist_popupmenu_icon_padding_left">10dp</dimen>
     <dimen name="itemlist_popupmenu_icon_padding_right">10dp</dimen>
     <dimen name="itemlist_textsize">14sp</dimen>
-    <dimen name="itemlist_textsize_sub">12sp</dimen>
+    <dimen name="itemlist_textsize_sub">14sp</dimen>
 
 
     <dimen name="popupmenu_icon_width">40dp</dimen>
@@ -29,6 +29,8 @@
     <dimen name="progressSpinnerHeight">64sp</dimen>
 
     <!-- default activity -->
-    <dimen name="activity_font_size">16sp</dimen>
-    <dimen name="dialog_alert_font_size">16sp</dimen>
+    <dimen name="activity_font_size">14sp</dimen>
+    <dimen name="dialog_font_size">14sp</dimen>
+
 </resources>
+

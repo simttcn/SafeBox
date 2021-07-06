@@ -1,18 +1,9 @@
 package com.smttcn.safebox.helpers
 
 import android.app.Activity
-import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.EditText
 import android.widget.ImageView
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.WhichButton
-import com.afollestad.materialdialogs.actions.getActionButton
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.manager.ImageManager
@@ -57,6 +48,7 @@ class ImageViewer : BaseViewer() {
                 // fail to encrypt file
                 showMessageDialog(
                     _parentActivity,
+                    R.drawable.ic_warning,
                     R.string.error,
                     R.string.enc_enter_decrypting_password_error
                 ) {}
@@ -71,7 +63,7 @@ class ImageViewer : BaseViewer() {
     private fun loadImage(imageView: ImageView, imageByteArray: ByteArray) {
         val aniFade = AnimationUtils.loadAnimation(_parentActivity.applicationContext, R.anim.fadein)
         imageView.startAnimation(aniFade)
-        imageView.setImageDrawable(_parentActivity.getDrawableCompat(R.drawable.ic_image_gray_24dp))
+        imageView.setImageDrawable(_parentActivity.getDrawableCompat(R.drawable.ic_image))
 
         if (imageByteArray.size > 0) {
             imageView.setImageBitmap(ImageManager.toBitmap(imageByteArray))

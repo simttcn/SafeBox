@@ -329,8 +329,8 @@ class MaterialDialog(
    * corners.
    */
   fun cornerRadius(
-    literalDp: Float? = null,
-    @DimenRes res: Int? = null
+      literalDp: Float? = null,
+      @DimenRes res: Int? = null
   ): MaterialDialog = apply {
     assertOneSet("cornerRadius", literalDp, res)
     this.cornerRadius = if (res != null) {

@@ -3,8 +3,6 @@ package com.smttcn.safebox.ui.settings
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.InputType
 import androidx.preference.Preference
@@ -13,6 +11,7 @@ import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
+import com.smttcn.commons.extensions.showMessageDialog
 import com.smttcn.commons.helpers.*
 import com.smttcn.safebox.BuildConfig
 import com.smttcn.safebox.MyApplication
@@ -87,11 +86,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             enabledAppPassword!!.isChecked = true
                             changeAppPassword!!.isEnabled = true
 
-                            MaterialDialog(myContext).show {
-                                title(R.string.enter_app_password)
-                                message(R.string.enter_app_password_error)
-                                positiveButton(R.string.btn_ok)
-                            }
+                            showMessageDialog(
+                                myContext,
+                                R.drawable.ic_warning,
+                                R.string.dlg_title_error,
+                                R.string.enter_app_password_error
+                            ) {}
                         }
                     }
                 }
@@ -128,22 +128,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
             // Make sure the request was successful
             if (resultCode == Activity.RESULT_OK) {
                 // The user changed his/her app password
-                MaterialDialog(myContext).show {
-                    title(R.string.dlg_title_change_app_password)
-                    message(R.string.dlg_msg_change_app_password_success)
-                    positiveButton(R.string.btn_ok)
-                    cancelable(false)  // calls setCancelable on the underlying dialog
-                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-                }
+                showMessageDialog(
+                    myContext,
+                    R.drawable.ic_info,
+                    R.string.dlg_title_success,
+                    R.string.dlg_msg_change_app_password_success
+                ) {}
             } else if (resultCode == Activity.RESULT_CANCELED){
                 // User cancelled password change
-                MaterialDialog(myContext).show {
-                    title(R.string.dlg_title_change_app_password)
-                    message(R.string.dlg_msg_change_app_password_cancel)
-                    positiveButton(R.string.btn_ok)
-                    cancelable(false)  // calls setCancelable on the underlying dialog
-                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-                }
+                showMessageDialog(
+                    myContext,
+                    R.drawable.ic_info,
+                    R.string.dlg_title_change_app_password,
+                    R.string.dlg_msg_change_app_password_cancel
+                ) {}
             }
         } else if (requestCode == REQUEST_CODE_NEW_APP_PASSWORD) {
 
@@ -154,13 +152,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
                 // The user set a password, so automatically log user it
                 MyApplication.authenticated = true
-                MaterialDialog(myContext).show {
-                    title(R.string.dlg_title_new_app_password)
-                    message(R.string.dlg_msg_new_app_password_success)
-                    positiveButton(R.string.btn_ok)
-                    cancelable(false)  // calls setCancelable on the underlying dialog
-                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-                }
+                showMessageDialog(
+                    myContext,
+                    R.drawable.ic_info,
+                    R.string.dlg_title_new_app_password,
+                    R.string.dlg_msg_new_app_password_success
+                ) {}
 
             } else if (resultCode == Activity.RESULT_CANCELED){
 
@@ -169,13 +166,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 changeAppPassword!!.isEnabled = false
 
 //                // User cancelled password change
-//                MaterialDialog(myContext).show {
-//                    title(R.string.dlg_title_new_app_password)
-//                    message(R.string.dlg_msg_new_app_password_cancel)
-//                    positiveButton(R.string.btn_ok)
-//                    cancelable(false)  // calls setCancelable on the underlying dialog
-//                    cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-//                }
+//                showMessageDialog(
+//                    myContext,
+//                    R.drawable.ic_info,
+//                    R.string.dlg_title_new_app_password,
+//                    R.string.dlg_msg_new_app_password_cancel
+//                ) {}
             }
 
         }

@@ -37,7 +37,8 @@
         android:ellipsize="middle"
         android:singleLine="true"
         android:text="@string/itemlist_default_text"
-        android:textSize="@dimen/itemlist_textsize" />
+        android:textSize="@dimen/itemlist_textsize"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/item_size"
@@ -60,7 +61,7 @@
         android:paddingRight="@dimen/itemlist_popupmenu_icon_padding_left"
         android:background="@android:color/transparent"
         android:contentDescription="@string/menu_more"
-        android:src="@drawable/ic_action_more_vert_gray_24dp" />
+        android:src="@drawable/ic_action_more_vert" />
 
     <View
         android:layout_width="match_parent"

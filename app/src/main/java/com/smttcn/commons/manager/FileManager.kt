@@ -296,7 +296,7 @@ object FileManager {
 
         if (inputStream != null) {
 
-            if (Encryption().encryptInputStreamToFile(inputStream, encryptedFilePath, password))
+            if (Encryption(ENCRYPTION_VER).encryptInputStreamToFile(inputStream, encryptedFilePath, password))
                 return encryptedFilePath
         }
 
@@ -315,7 +315,7 @@ object FileManager {
             try {
                 val tempFilepath = MyApplication.applicationContext.cacheDir.canonicalPath.withTrailingCharacter('/') + "tmp_" + sourceFile.name.removeEncryptedExtension()
 
-                val enc = Encryption()
+                val enc = Encryption(ENCRYPTION_VER)
                 if (enc.decryptFileToFile(filePath, tempFilepath, oldPwd)) {
                     // decrypted, so encrypt with new password
                     val result = enc.encryptFileToFile(tempFilepath, filePath, newPwd, true)
@@ -344,7 +344,7 @@ object FileManager {
     fun decryptFileToByteArray(file: File, password: CharArray): ByteArray? {
         if (file.isDirectory) return null
 
-        return Encryption().decryptFileToByteArray(file.canonicalPath, password)
+        return Encryption(ENCRYPTION_VER).decryptFileToByteArray(file.canonicalPath, password)
     }
 
 
@@ -360,7 +360,7 @@ object FileManager {
         targetFilepath = targetFolder + sourceFilePath.getFilenameFromPath().removeEncryptedExtension()
 
         if (targetFilepath.length > 0) {
-            val result = Encryption().decryptInputStreamToFile(FileInputStream(sourceFilePath), targetFilepath.removeEncryptedExtension(), pwd, true)
+            val result = Encryption(ENCRYPTION_VER).decryptInputStreamToFile(FileInputStream(sourceFilePath), targetFilepath.removeEncryptedExtension(), pwd, true)
 
             if (result == true) {
 
@@ -382,7 +382,7 @@ object FileManager {
 
             val targetFilepath = tempShareFolder.canonicalPath.withTrailingCharacter('/') + filename.removeEncryptedExtension()
 
-            val result = Encryption().decryptInputStreamToFile(inputStream, targetFilepath.removeEncryptedExtension(), pwd, true)
+            val result = Encryption(ENCRYPTION_VER).decryptInputStreamToFile(inputStream, targetFilepath.removeEncryptedExtension(), pwd, true)
 
             if (result == true) {
 

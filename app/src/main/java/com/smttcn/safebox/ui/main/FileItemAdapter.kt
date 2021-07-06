@@ -4,9 +4,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
@@ -17,11 +17,15 @@ import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
 import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
-class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adapter<FileItemAdapter.FileItemViewHolder>() {
+
+class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adapter<FileItemAdapter.FileItemViewHolder>(), Filterable {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private lateinit var fileItems: MutableList<FileDirItem> // Cached copy of FileDirItem
+    private lateinit var fileItemsFiltered: MutableList<FileDirItem> // Cached copy of filtered FileDirItem
     private val currentContext = context
     private var currSelectedItemIndex = -1
     private var prevSelectedItemIndex = -1
@@ -49,7 +53,7 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
                 //notifyItemChanged(currSelectedItemIndex)
 
                 // invoke the onItemClick method in MainActivity
-                onItemClick?.invoke(it, fileItems[currSelectedItemIndex], prevSelectedItemIndex, currSelectedItemIndex)
+                onItemClick?.invoke(it, fileItemsFiltered[currSelectedItemIndex], prevSelectedItemIndex, currSelectedItemIndex)
 
             }
         }
@@ -59,7 +63,7 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
             if (thumbnail != null)
                 itemView.item_thumbnail.setImageDrawable(thumbnail)
             else
-                itemView.item_thumbnail.setImageResource(R.drawable.ic_file_gray_24dp)
+                itemView.item_thumbnail.setImageResource(R.drawable.ic_file)
 
             itemView.item_name.text = item.getOriginalFilename() //item.filename
 
@@ -77,7 +81,7 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
     }
 
     override fun getItemCount(): Int {
-        return fileItems.size
+        return fileItemsFiltered.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileItemViewHolder {
@@ -86,7 +90,7 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: FileItemViewHolder, position: Int) {
-        val currentItem = fileItems.get(position)
+        val currentItem = fileItemsFiltered.get(position)
 
         holder.itemView.popup_menu.setOnClickListener {
 
@@ -96,9 +100,45 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
         holder.bindItem(currentItem)
     }
 
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val charString = constraint?.toString() ?: ""
+                if (charString.isEmpty()) {
+
+                    fileItemsFiltered = fileItems
+
+                } else {
+
+                    val filteredList = ArrayList<FileDirItem>()
+                    fileItems
+                        .filter {
+                            (it.getOriginalFilename().toLowerCase(Locale.getDefault()).contains(charString.toLowerCase(Locale.getDefault())))
+                        }
+                        .forEach { filteredList.add(it) }
+                    fileItemsFiltered = filteredList
+
+
+                }
+                return FilterResults().apply { values = fileItemsFiltered }
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+
+                @Suppress("UNCHECKED_CAST")
+                fileItemsFiltered = if (results?.values == null)
+                    ArrayList()
+                else
+                    results.values as MutableList<FileDirItem>
+
+                notifyDataSetChanged()
+            }
+        }
+    }
+
     fun getSelectedItem(): FileDirItem? {
 
-        for (item in fileItems) {
+        for (item in fileItemsFiltered) {
             if (item.isSelected)
                 return item
         }
@@ -108,7 +148,7 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
     fun getSelectedItemCount(): Int {
         var count = 0
 
-        for (item in fileItems) {
+        for (item in fileItemsFiltered) {
             if (item.isSelected) count++
         }
 
@@ -117,21 +157,25 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
 
     internal fun setFileItems(items: MutableList<FileDirItem>) {
         this.fileItems = items
+        this.fileItemsFiltered = items
         notifyDataSetChanged()
     }
 
     internal fun deleteFileItem(position: Int) {
 
-        var item = fileItems[position]
+        var item = fileItemsFiltered[position]
 
         // ask for the decrypting password for this file
         var dialog = MaterialDialog(currentContext).show {
+            icon(R.drawable.ic_warning)
             title(R.string.dlg_title_delete_item)
+            cornerRadius(5.0f)
             customView(R.layout.delete_file_view)
             positiveButton(R.string.btn_delete) {
 
                 if (FileManager.deleteFile(File(item.path))) {
-                    fileItems.removeAt(position)
+                    fileItemsFiltered.remove(item)
+                    fileItems.remove(item)
                     notifyDataSetChanged()
                 }
 

@@ -3,6 +3,7 @@ package com.smttcn.commons.helpers
 import android.os.Build
 import android.os.Looper
 
+const val ENCRYPTION_VER = 1
 const val PACKAGE_NAME = "com.smttcn.safebox"
 const val APP_NAME = "app_name"
 const val APP_AUTHORITY = "com.smttcn.safebox.fileprovider"

@@ -42,7 +42,7 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.ByteArray
 
 // Todo: reading and writing new fields VER and PROP in file header
-public class Encryption constructor() {
+public class Encryption constructor(ver: Int) {
 
     val VER_LENGTH_BIT : Int = 16 // 2 bytes
     val IV_LENGTH_BIT : Int = 128 // 16 bytes
@@ -56,7 +56,7 @@ public class Encryption constructor() {
 
     val KEY_LENGTH_BIT : Int = 256 // 32 bytes
 
-    val VER_NO = 1
+    val VER_NO = ver
     val SECRETKEYFACTORY_ALGORITHM = "PBKDF2WithHmacSHA1"
     val CIPHER_TRANSFORMATION = "AES/CBC/PKCS7Padding"
     val KEY_HASH_ITERATION_COUNT = 10000

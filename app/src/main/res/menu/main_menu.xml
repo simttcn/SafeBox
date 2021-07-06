@@ -4,35 +4,44 @@
     tools:context="com.smttcn.myapplication.MainActivity">
 
     <item
+        android:id="@+id/menu_search"
+        android:orderInCategory="10"
+        android:icon="@drawable/ic_search"
+        android:title="@string/menu_refresh"
+        android:visible="true"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/menu_refresh"
         android:orderInCategory="90"
         android:title="@string/menu_refresh"
-        android:icon="@drawable/icon_refresh_light"
+        android:icon="@drawable/ic_refresh"
         android:visible="true"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="100"
         android:title="@string/menu_settings"
-        android:icon="@drawable/ic_settings_white_24dp"
+        android:icon="@drawable/ic_settings"
         android:visible="true"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_visible"
         android:orderInCategory="110"
-        android:title="@string/menu_refresh"
-        android:icon="@drawable/ic_visible_white_24dp"
-        android:visible="false"
-        app:showAsAction="always" />
+        android:title="@string/menu_test"
+        android:icon="@drawable/ic_visibility"
+        android:visible="true"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_debug_console"
         android:orderInCategory="120"
         android:title="@string/debug_console"
-        android:icon="@drawable/ic_debug_white_24dp"
-        android:visible="false"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_debug"
+        android:visible="true"
+        app:showAsAction="never" />
 
 </menu>

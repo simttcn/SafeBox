@@ -14,6 +14,7 @@
     <string name="title_activity_debugconsole">Debug Console</string>
 
     <!--  Menu  -->
+    <string name="menu_test">Test</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_more">More…</string>
@@ -44,6 +45,7 @@
     <string name="press_back_again_to_quit">Press back button again to quit this app.</string>
     <string name="operation_cancelled">Operation cancelled.</string>
     <string name="no_app_to_share">No apps to share.</string>
+    <string name="encrypt_new_item">Encrypt new item...</string>
 
     <!--  UI - login and password activity  -->
 <!--    <string name="new_app_password">New App Password</string>-->
@@ -63,7 +65,7 @@
 
     <!--  UI - recyclerview item delete dialog  -->
     <string name="dlg_title_delete_item">Delete Item</string>
-    <string name="dlg_msg_delete_item">Do you really want to permanently delete the following item?\n\n Deleted file are NOT recoverable.</string>
+    <string name="dlg_msg_delete_item">Do you really want to permanently delete the following item?\n\nWARNING:\nDeleted item are NOT recoverable.</string>
 
     <!--  UI - share item menu  -->
     <string name="enc_enter_password">Enter Password</string>

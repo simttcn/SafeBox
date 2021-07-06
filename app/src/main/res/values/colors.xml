@@ -4,19 +4,23 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorDivider">#BBBBBB</color>
 
-    <color name="colorPrimaryLight">#1DBFAE</color>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#014A40</color>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#E3E3E3</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorBackground">@color/colorWhite</color>
-    <color name="colorText">#202020</color>
-    <color name="colorWarning">#FF0000</color>
+    <color name="colorText">#0D0D0D</color>
+    <color name="colorInfo">#0000FF</color>
+    <color name="colorWarning">#FF9800</color>
     <color name="colorError">#FF0000</color>
     <color name="colorNavItemBackgroundCheck">@color/colorWhite</color>
     <color name="colorNavItemBackgroundUncheck">@color/colorPrimary</color>
     <color name="colorNavItemTextColorCheck">@color/colorPrimary</color>
     <color name="colorNavItemTextColorUncheck">@color/colorWhite</color>
     <color name="colorPopupMenuBackground">#D8FFFA</color>
+    <color name="colorToolbarIcon">#727272</color>
+    <color name="colorSwipeRefreshColor1">#ECECEC</color>
+    <color name="colorSwipeRefreshColor2">#BFBFBF</color>
+    <color name="colorSwipeRefreshColor3">#727272</color>
 
     <color name="colorItemBackgroundSelected">#6ADDD1</color>
     <color name="colorItemBackgroundNormal">@color/colorWhite</color>

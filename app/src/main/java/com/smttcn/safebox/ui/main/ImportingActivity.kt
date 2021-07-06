@@ -1,14 +1,12 @@
 package com.smttcn.safebox.ui.main
 
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.Editable
-import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
@@ -16,23 +14,15 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import androidx.core.content.FileProvider
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.input.getInputField
-import com.afollestad.materialdialogs.input.input
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import com.smttcn.commons.manager.FileManager
-import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
 import kotlinx.android.synthetic.main.activity_importing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileInputStream
-import java.io.ObjectInputStream
 import java.lang.Exception
 
 class ImportingActivity : BaseActivity() {
@@ -163,6 +153,7 @@ class ImportingActivity : BaseActivity() {
                             // fail to encrypt file
                             showMessageDialog(
                                 myContext,
+                                R.drawable.ic_warning,
                                 R.string.error,
                                 R.string.enc_enter_decrypting_password_error
                             ) {

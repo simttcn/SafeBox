@@ -13,12 +13,9 @@ import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.animation.AnimationUtils
-import android.widget.EditText
-import android.widget.PopupMenu
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -51,24 +48,24 @@ import kotlin.concurrent.schedule
 
 class MainActivity : BaseActivity() {
 
-    private val FILE_PASSWORD_SEPERATOR = "=::::="
+    //private val FILE_PASSWORD_SEPARATOR = "=::::="
     private val fileItemViewModel: FileItemViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: FileItemAdapter
     private lateinit var pullToRefreshContainer: SwipeRefreshLayout
-    private var IsShareFromOtherApp = false
+    private var isShareFromOtherApp = false
     private lateinit var toolbarMenu: Menu
     private lateinit var myContext: Context
 
-    var BackButtonPressedOnce = false
-    var LastPressedBackTime = System.currentTimeMillis()
+    private var backButtonPressedOnce = false
+    private var lastPressedBackTime = System.currentTimeMillis()
 
 
     // todo: Investigate "The application may be doing too much work on its main thread"
     override fun onCreate(savedInstanceState: Bundle?) {
         MyApplication.mainActivityContext = this
         myContext = this
-        IsShareFromOtherApp = (intent?.action == Intent.ACTION_SEND) || (intent?.action == Intent.ACTION_VIEW)
+        isShareFromOtherApp = (intent?.action == Intent.ACTION_SEND) || (intent?.action == Intent.ACTION_VIEW)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -81,8 +78,8 @@ class MainActivity : BaseActivity() {
 //                .setAction("Action", null).show()
 //        }
 
-        if (IsShareFromOtherApp) {
-            IsShareFromOtherApp = false
+        if (isShareFromOtherApp) {
+            isShareFromOtherApp = false
             handleShareFromOtherApp()
         }
 
@@ -94,10 +91,10 @@ class MainActivity : BaseActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
-        IsShareFromOtherApp = (intent?.action == Intent.ACTION_SEND) || (intent?.action == Intent.ACTION_VIEW)
+        isShareFromOtherApp = (intent?.action == Intent.ACTION_SEND) || (intent?.action == Intent.ACTION_VIEW)
 
-        if (IsShareFromOtherApp) {
-            IsShareFromOtherApp = false
+        if (isShareFromOtherApp) {
+            isShareFromOtherApp = false
             handleShareFromOtherApp()
         }
     }
@@ -107,30 +104,28 @@ class MainActivity : BaseActivity() {
 
         showProgressBar(true)
 
-        recyclerView = findViewById<RecyclerView>(R.id.itemListRecyclerView)
+        // setting recyclerview adapter
+        recyclerView = findViewById(R.id.itemListRecyclerView)
         recyclerViewAdapter = FileItemAdapter(myContext)
         recyclerView.adapter = recyclerViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(myContext)
 
         // Setup refresh listener which triggers new data loading
         pullToRefreshContainer = findViewById(R.id.swipeRefreshContainer)
+        // todo: setColor no effect
+        pullToRefreshContainer.setColorSchemeColors(R.array.swipeRefreshColors)
         pullToRefreshContainer.setOnRefreshListener {
             GlobalScope.launch(Dispatchers.IO) {
                 fileItemViewModel.refresh()
                 launch(Dispatchers.Main) {
-                    pullToRefreshContainer.setRefreshing(false)
+                    pullToRefreshContainer.isRefreshing = false
                 }
             }
 
         }
 
         // Configure the refreshing colors
-        pullToRefreshContainer.setColorSchemeResources(
-            R.color.colorPrimary,
-            R.color.colorPrimary,
-            R.color.colorPrimary,
-            R.color.colorPrimary
-        );
+        pullToRefreshContainer.setColorSchemeColors(R.array.swipeRefreshColors)
 
 
         GlobalScope.launch(Dispatchers.IO) {
@@ -144,7 +139,7 @@ class MainActivity : BaseActivity() {
             }
 
             launch(Dispatchers.Main) {
-                fileItemViewModel.allFileItems.observe(this@MainActivity, Observer { item ->
+                fileItemViewModel.allFileItems.observe(this@MainActivity, { item ->
                     // Update the cached copy of the fileItems in the adapter.
                     item?.let { recyclerViewAdapter.setFileItems(it as MutableList<FileDirItem>) }
                 })
@@ -155,13 +150,11 @@ class MainActivity : BaseActivity() {
 
 
     private fun handleShareFromOtherApp(): Boolean {
-        var result: Boolean = true
-        var uri: Uri
 
-        if (intent?.action == Intent.ACTION_VIEW) {
-            uri = Uri.parse(intent.dataString)
+        val uri: Uri = if (intent?.action == Intent.ACTION_VIEW) {
+            Uri.parse(intent.dataString)
         } else {
-            uri = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as Uri
+            intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as Uri
         }
 
         val (filename, _) = FileManager.getFilenameAndSizeFromUri(contentResolver, uri)
@@ -180,16 +173,16 @@ class MainActivity : BaseActivity() {
         }
 
 
-        return result
+        return true
     }
 
 
     override fun onBackPressed() {
-        val millisecondsSinceLastPressedBack = System.currentTimeMillis() - LastPressedBackTime
-        if (!BackButtonPressedOnce || millisecondsSinceLastPressedBack > INTERVAL_BACK_BUTTON_QUIT_IN_MS) {
+        val millisecondsSinceLastPressedBack = System.currentTimeMillis() - lastPressedBackTime
+        if (!backButtonPressedOnce || millisecondsSinceLastPressedBack > INTERVAL_BACK_BUTTON_QUIT_IN_MS) {
             toast(R.string.press_back_again_to_quit, Toast.LENGTH_LONG)
-            BackButtonPressedOnce = true
-            LastPressedBackTime = System.currentTimeMillis()
+            backButtonPressedOnce = true
+            lastPressedBackTime = System.currentTimeMillis()
             return
         } else {
             //showProgressBar(true)
@@ -198,19 +191,28 @@ class MainActivity : BaseActivity() {
         super.onBackPressed()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         toolbarMenu = menu
 
         if (MyApplication.isDebug) { // show debug menu item when in debug mode
-            toolbarMenu.findItem(R.id.menu_visible).setVisible(true)
-            toolbarMenu.findItem(R.id.menu_debug_console).setVisible(true)
+            toolbarMenu.findItem(R.id.menu_visible).isVisible = true
+            toolbarMenu.findItem(R.id.menu_debug_console).isVisible = true
         }
+
+        val search = menu.findItem(R.id.menu_search)
+        val searchView = search.actionView as SearchView
+        searchView.queryHint = "Search"
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+            override fun onQueryTextChange(newText: String?): Boolean {
+                recyclerViewAdapter.filter.filter(newText)
+                return true
+            }
+        })
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -264,11 +266,11 @@ class MainActivity : BaseActivity() {
         //toast(item.filename + " clicked")
 
         // update toolbar icon status
-        if (recyclerViewAdapter.getSelectedItemCount() > 0) {
+        //if (recyclerViewAdapter.getSelectedItemCount() > 0) {
             // item selected
-        } else {
+        //} else {
             // no item selected
-        }
+        //}
 
 //        val targetfile = item.path
 //        if (targetfile.length > 0) {
@@ -282,9 +284,9 @@ class MainActivity : BaseActivity() {
 
     private fun onRecyclerViewItemPopupMenuClicked(view: View, item: FileDirItem, position: Int) {
         //init the wrapper with style
-        //val wrapper: Context = ContextThemeWrapper(myContext, R.style.BasePopupMenu)
-        //val popupMenu = PopupMenu(wrapper, view, Gravity.BOTTOM + Gravity.END)
-        var popupMenu = PopupMenu(this, view, Gravity.BOTTOM + Gravity.END)
+        val wrapper: Context = ContextThemeWrapper(myContext, R.style.BasePopupMenu)
+        val popupMenu = PopupMenu(wrapper, view, Gravity.BOTTOM + Gravity.END)
+        //var popupMenu = PopupMenu(this, view, Gravity.BOTTOM + Gravity.END)
         popupMenu.menuInflater.inflate(R.menu.filediritem_popup_menu, popupMenu.menu)
 
         // color the last menu item "Delete" as red colour
@@ -308,7 +310,7 @@ class MainActivity : BaseActivity() {
                 R.id.popupmenu_share_encrypt -> {
                     // copy the file to be shared to the designated share folder
                     val shareFilePath = FileManager.copyFileToTempShareFolder(item.path)
-                    if (shareFilePath.length > 0) {
+                    if (shareFilePath.isNotEmpty()) {
                         sendShareItent(myContext, shareFilePath)
                     }
                     true
@@ -323,7 +325,7 @@ class MainActivity : BaseActivity() {
                 }
                 R.id.popupmenu_delete_item -> {
                     recyclerViewAdapter.deleteFileItem(position)
-                    //showMessageDialog(this, R.id.popupmenu_delete_item.toString(), item.filename){}
+                    //showMessageDialog(this, R.drawable.ic_alert, R.id.popupmenu_delete_item.toString(), item.filename){}
                     true
                 }
                 else -> false
@@ -344,7 +346,7 @@ class MainActivity : BaseActivity() {
     }
 
 
-    // let people view the contetnt of supported file
+    // let people view the content of supported file
     private fun viewItem(item: FileDirItem, view: View) {
 
         // get the appropriate viewer through the viewer manager
@@ -375,8 +377,8 @@ class MainActivity : BaseActivity() {
 
         val passwordInput: EditText = dialog.getCustomView().findViewById(R.id.password)
         val progressBarContainer: View = dialog.getCustomView().findViewById(R.id.progressBarContainer)
-        var btnOk = dialog.getActionButton(WhichButton.POSITIVE)
-        var btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
+        val btnOk = dialog.getActionButton(WhichButton.POSITIVE)
+        val btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
 
         progressBarContainer.visibility = View.GONE
         btnCancel.isEnabled = true
@@ -432,8 +434,8 @@ class MainActivity : BaseActivity() {
 
         val passwordInput: EditText = dialog.getCustomView().findViewById(R.id.password)
         val progressBarContainer: View = dialog.getCustomView().findViewById(R.id.progressBarContainer)
-        var btnOk = dialog.getActionButton(WhichButton.POSITIVE)
-        var btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
+        val btnOk = dialog.getActionButton(WhichButton.POSITIVE)
+        val btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
 
         progressBarContainer.visibility = View.GONE
         btnCancel.isEnabled = true
@@ -458,7 +460,7 @@ class MainActivity : BaseActivity() {
             GlobalScope.launch(Dispatchers.IO) {
 
                 //callback(password.toCharArray())
-                var decryptedFilePath = FileManager.decryptFileForSharing(file.path, passwordInput.text.toString().toCharArray())
+                val decryptedFilePath = FileManager.decryptFileForSharing(file.path, passwordInput.text.toString().toCharArray())
 
 
                 launch(Dispatchers.Main) {
@@ -466,12 +468,13 @@ class MainActivity : BaseActivity() {
                     dialog.dismiss()
 
                     if (FileManager.isFileExist(decryptedFilePath)) {
-                        // succesfully decrypted file
+                        // successfully decrypted file
                         sendShareItent(myContext, decryptedFilePath)
                     } else {
                         // fail to encrypt file
                         showMessageDialog(
                             this@MainActivity,
+                            R.drawable.ic_warning,
                             R.string.error,
                             R.string.enc_enter_decrypting_password_error
                         ) {}
@@ -505,8 +508,8 @@ class MainActivity : BaseActivity() {
             dialog.getCustomView().findViewById(R.id.confirm_password)
         val dialogProgressBarContainer: View =
             dialog.getCustomView().findViewById(R.id.dialogProgressBarContainer)
-        var btnOk = dialog.getActionButton(WhichButton.POSITIVE)
-        var btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
+        val btnOk = dialog.getActionButton(WhichButton.POSITIVE)
+        val btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
 
         dialogProgressBarContainer.visibility = View.GONE
         btnCancel.isEnabled = true
@@ -566,12 +569,14 @@ class MainActivity : BaseActivity() {
                     if (success)
                         showMessageDialog(
                             this@MainActivity,
+                            R.drawable.ic_info,
                             R.string.dlg_title_success,
                             R.string.dlg_msg_change_encrypting_password_success
                         ) {}
                     else
                         showMessageDialog(
                             this@MainActivity,
+                            R.drawable.ic_error,
                             R.string.dlg_title_error,
                             R.string.dlg_msg_change_encrypting_password_failed
                         ) {}
@@ -629,82 +634,97 @@ class MainActivity : BaseActivity() {
         // Check which request we're responding to
         if (requestCode == REQUEST_CODE_TO_ENCRYPT_FILE) {
 
-            if (resultCode == Activity.RESULT_OK) {
+            when (resultCode) {
+                Activity.RESULT_OK -> {
 
-                // file encrypted
-                var filename = ""
-                if (resultData != null) {
-                    filename = "\n\n" + resultData.getStringExtra(INTENT_ENCRYPTED_FILENAME)
+                    // file encrypted
+                    var filename = ""
+                    if (resultData != null) {
+                        filename = "\n\n" + resultData.getStringExtra(INTENT_ENCRYPTED_FILENAME)
+                    }
+
+                    showMessageDialog(
+                        this,
+                        R.drawable.ic_info,
+                        getString(R.string.enc_title_encrypting_file),
+                        getString(R.string.enc_msg_encrypting_success) + filename
+                    ) {
+                        refreshFileItemList()
+                    }
+
                 }
+                INTENT_RESULT_FAILED -> {
+                    // failed to encrypt file
+                    showMessageDialog(
+                        this,
+                        R.drawable.ic_error,
+                        R.string.enc_title_encrypting_file,
+                        R.string.enc_msg_encrypting_failed
+                    ) {}
 
-                showMessageDialog(
-                    this,
-                    getString(R.string.enc_title_encrypting_file),
-                    getString(R.string.enc_msg_encrypting_success) + filename
-                ) {
-                    refreshFileItemList()
                 }
+                Activity.RESULT_CANCELED -> {
+                    // User cancelled encrypting file
+                    showMessageDialog(
+                        this,
+                        R.drawable.ic_warning,
+                        R.string.enc_title_encrypting_file,
+                        R.string.enc_msg_encrypting_cancelled
+                    ) {}
 
-            } else if (resultCode == INTENT_RESULT_FAILED) {
-                // failed to encrypt file
-                showMessageDialog(
-                    this,
-                    R.string.enc_title_encrypting_file,
-                    R.string.enc_msg_encrypting_failed
-                ) {}
-
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                // User cancelled encrypting file
-                showMessageDialog(
-                    this,
-                    R.string.enc_title_encrypting_file,
-                    R.string.enc_msg_encrypting_cancelled
-                ) {}
-
+                }
             }
 
         } else if (requestCode == REQUEST_CODE_TO_IMPORTDECRYPT_FILE) {
 
-            if (resultCode == INTENT_RESULT_IMPORTED) {
-                // file imported
-                var filename = ""
-                if (resultData != null) {
-                    filename = "\n\n" + resultData.getStringExtra(INTENT_IMPORTED_FILENAME)
+            when (resultCode) {
+                INTENT_RESULT_IMPORTED -> {
+                    // file imported
+                    var filename = ""
+                    if (resultData != null) {
+                        filename = "\n\n" + resultData.getStringExtra(INTENT_IMPORTED_FILENAME)
+                    }
+
+                    showMessageDialog(
+                        this,
+                        R.drawable.ic_info,
+                        getString(R.string.imp_title_import_decrypt),
+                        getString(R.string.imp_msg_import_success) + filename
+                    ) {
+                        refreshFileItemList()
+                    }
+
                 }
-
-                showMessageDialog(
-                    this,
-                    getString(R.string.imp_title_import_decrypt),
-                    getString(R.string.imp_msg_import_success) + filename
-                ) {
-                    refreshFileItemList()
-                }
-
-            } else if (resultCode == INTENT_RESULT_DECRYPTED) {
-                // successfully decrypted and shared the file
-                // so nothing to do here and quit
-                finishAndRemoveTask()
-
-            } else if (resultCode == INTENT_RESULT_FAILED) {
-                // import/decrypt operation failed
-                showMessageDialog(
-                    this,
-                    R.string.imp_title_import_decrypt,
-                    R.string.imp_msg_import_failed
-                ) {
+                INTENT_RESULT_DECRYPTED -> {
+                    // successfully decrypted and shared the file
+                    // so nothing to do here and quit
                     finishAndRemoveTask()
-                }
 
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                // User cancelled import/decrypt operation
-                showMessageDialog(
-                    this,
-                    R.string.imp_title_import_decrypt,
-                    R.string.operation_cancelled
-                ) {
-                    finishAndRemoveTask()
                 }
+                INTENT_RESULT_FAILED -> {
+                    // import/decrypt operation failed
+                    showMessageDialog(
+                        this,
+                        R.drawable.ic_error,
+                        R.string.imp_title_import_decrypt,
+                        R.string.imp_msg_import_failed
+                    ) {
+                        finishAndRemoveTask()
+                    }
 
+                }
+                Activity.RESULT_CANCELED -> {
+                    // User cancelled import/decrypt operation
+                    showMessageDialog(
+                        this,
+                        R.drawable.ic_warning,
+                        R.string.imp_title_import_decrypt,
+                        R.string.operation_cancelled
+                    ) {
+                        finishAndRemoveTask()
+                    }
+
+                }
             }
 
         }
