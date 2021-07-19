@@ -140,9 +140,15 @@ class PasswordActivity : BaseActivity() {
 
                             } else {
                                 // incorrect app password
-                                showChangePasswordDialog(R.string.dlg_msg_change_app_password_incorrect) {
+                                showMessageDialog(
+                                    this,
+                                    R.drawable.ic_warning,
+                                    R.string.dlg_title_change_app_password,
+                                    R.string.dlg_msg_change_app_password_incorrect
+                                ) {
                                     CurrentPassword.selectAll()
                                     showKeyboard(CurrentPassword)
+
                                 }
                             }
                         }
@@ -166,18 +172,18 @@ class PasswordActivity : BaseActivity() {
         }
     }
 
-    private fun showChangePasswordDialog(stringID: Int, callback: () -> Unit){
-        MaterialDialog(this).show {
-            title(R.string.dlg_title_change_app_password)
-            message(stringID)
-            positiveButton(R.string.btn_ok)
-            cancelable(false)  // calls setCancelable on the underlying dialog
-            cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
-        }.positiveButton {
-            callback()
-        }
-    }
-
+//    private fun showChangePasswordDialog(stringID: Int, callback: () -> Unit){
+//        MaterialDialog(this).show {
+//            title(R.string.dlg_title_change_app_password)
+//            message(stringID)
+//            positiveButton(R.string.btn_ok)
+//            cancelable(false)  // calls setCancelable on the underlying dialog
+//            cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+//        }.positiveButton {
+//            callback()
+//        }
+//    }
+//
     private fun toEnableConfirmButton(newPassword: String, confirmPassword: String) {
         val confirmButton = findViewById<Button>(R.id.confirm)
         confirmButton.isEnabled = isNewPasswordConfinedToPolicy(newPassword, confirmPassword)

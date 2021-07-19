@@ -87,7 +87,6 @@ dependencies {
     // local copy library
     implementation project(path: ':crypto')
     implementation project(path: ':imageviewer')
-    implementation project(path: ':materialdialogs')
     implementation project(path: ':pdfview-library')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -132,6 +131,15 @@ dependencies {
 
     // preference
     implementation 'androidx.preference:preference:1.1.1'
+
+    // Afollestad Material Dialogs
+    implementation "com.afollestad.material-dialogs:core:$versions.afollestadmaterialdialogs"
+    implementation "com.afollestad.material-dialogs:input:$versions.afollestadmaterialdialogs"
+    implementation "com.afollestad.material-dialogs:files:$versions.afollestadmaterialdialogs"
+    implementation "com.afollestad.material-dialogs:color:$versions.afollestadmaterialdialogs"
+    implementation "com.afollestad.material-dialogs:datetime:$versions.afollestadmaterialdialogs"
+    implementation "com.afollestad.material-dialogs:bottomsheets:$versions.afollestadmaterialdialogs"
+    implementation "com.afollestad.material-dialogs:lifecycle:$versions.afollestadmaterialdialogs"
 
     // Testing
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"

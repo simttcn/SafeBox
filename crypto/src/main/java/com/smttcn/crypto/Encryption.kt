@@ -30,7 +30,9 @@
 
 package com.smttcn.crypto
 
+import android.telephony.mbms.MbmsErrors
 import java.io.*
+import java.nio.ByteBuffer
 import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
@@ -41,10 +43,10 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.ByteArray
 
-// Todo: reading and writing new fields VER and PROP in file header
+// Todo: reading and writing new fields PROP in file header
 public class Encryption constructor(ver: Int) {
-
-    val VER_LENGTH_BIT : Int = 16 // 2 bytes
+//Todo: check for support file version
+    val VER_LENGTH_BIT : Int = 32 // 4 bytes
     val IV_LENGTH_BIT : Int = 128 // 16 bytes
     val SALT_LENGTH_BIT : Int = 256 // 32 bytes
     val PROP_LENGTH_BIT : Int = 4096 // 512 bytes
@@ -67,6 +69,21 @@ public class Encryption constructor(ver: Int) {
         val data = ByteArray(length)
         random.nextBytes(data)
         return data
+    }
+
+    fun getVerByteArray() : ByteArray {
+        val bb = ByteBuffer.allocate(VER_LENGTH_BYTE)
+        bb.clear()
+        bb.putInt(VER_NO)
+        return bb.array()
+    }
+
+    fun getVerFromByteArray(bytes: ByteArray): Int {
+        var result = 0
+        for (i in bytes.indices) {
+            result = result or (bytes[i].toInt() shl 32 * i)
+        }
+        return result
     }
 
     fun generateSecretKey(length : Int = 16) : ByteArray {
@@ -95,8 +112,7 @@ public class Encryption constructor(ver: Int) {
 
         val salt = this.generateRandomByte(SALT_LENGTH_BYTE)
         val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
-        // Todo: set ver and prop here
-        val ver = ByteArray(VER_LENGTH_BYTE)
+        // Todo: set prop here
         val prop = ByteArray(PROP_LENGTH_BYTE)
 
         // is the input okay
@@ -115,7 +131,7 @@ public class Encryption constructor(ver: Int) {
             val fileOutputStream = FileOutputStream(outFile, true)
             val cOut = CipherOutputStream(fileOutputStream, cipher)
 
-            fileOutputStream.write(ver, 0, ver.size)
+            fileOutputStream.write(getVerByteArray(), 0, getVerByteArray().size)
             fileOutputStream.write(cipher.iv, 0, cipher.iv.size)
             fileOutputStream.write(salt, 0, salt.size)
             fileOutputStream.write(prop, 0, prop.size)
@@ -146,8 +162,7 @@ public class Encryption constructor(ver: Int) {
 
         val salt = this.generateRandomByte(SALT_LENGTH_BYTE)
         val cipher = getCipher(Cipher.ENCRYPT_MODE, password, salt, null)
-        // Todo: set ver and prop here
-        val ver = ByteArray(VER_LENGTH_BYTE)
+        // Todo: set prop here
         val prop = ByteArray(PROP_LENGTH_BYTE)
 
         val inFile = File(sourceFilepath)
@@ -173,7 +188,7 @@ public class Encryption constructor(ver: Int) {
             val fileOutputStream = FileOutputStream(outFile, true)
             val cOut = CipherOutputStream(fileOutputStream, cipher)
 
-            fileOutputStream.write(ver, 0, ver.size)
+            fileOutputStream.write(getVerByteArray(), 0, getVerByteArray().size)
             fileOutputStream.write(cipher.iv, 0, cipher.iv.size)
             fileOutputStream.write(salt, 0, salt.size)
             fileOutputStream.write(prop, 0, prop.size)
@@ -228,6 +243,8 @@ public class Encryption constructor(ver: Int) {
             input.read(iv, 0, IV_LENGTH_BYTE)
             input.read(salt, 0, SALT_LENGTH_BYTE)
             input.read(prop, 0, PROP_LENGTH_BYTE)
+
+            val ver_no : Int = getVerFromByteArray(ver)
 
             if (iv.size > 0 && salt.size > 0) {
 
@@ -286,6 +303,8 @@ public class Encryption constructor(ver: Int) {
             fileInputStream.read(salt, 0, SALT_LENGTH_BYTE)
             fileInputStream.read(prop, 0, PROP_LENGTH_BYTE)
 
+            val ver_no : Int = getVerFromByteArray(ver)
+
             if (iv.size > 0 && salt.size > 0) {
 
                 val cipher = getCipher(Cipher.DECRYPT_MODE, password, salt, iv)
@@ -335,6 +354,8 @@ public class Encryption constructor(ver: Int) {
             fileInputStream.read(iv, 0, IV_LENGTH_BYTE)
             fileInputStream.read(salt, 0, SALT_LENGTH_BYTE)
             fileInputStream.read(prop, 0, PROP_LENGTH_BYTE)
+
+            val ver_no : Int = getVerFromByteArray(ver)
 
             if (iv.size > 0 && salt.size > 0) {
 
