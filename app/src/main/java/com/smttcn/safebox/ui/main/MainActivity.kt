@@ -13,6 +13,7 @@ import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -323,6 +324,10 @@ class MainActivity : BaseActivity() {
                     changeEncryptingPassword(item)
                     true
                 }
+                R.id.popupmenu_rename_item -> {
+                    renameItem(item, position)
+                    true
+                }
                 R.id.popupmenu_delete_item -> {
                     recyclerViewAdapter.deleteFileItem(position)
                     //showMessageDialog(this, R.drawable.ic_alert, R.id.popupmenu_delete_item.toString(), item.filename){}
@@ -368,7 +373,7 @@ class MainActivity : BaseActivity() {
         // ask for the decrypting password for this file
         val dialog = MaterialDialog(this).show {
             title(R.string.enc_enter_password)
-            customView(R.layout.enter_password_view, scrollable = true, horizontalPadding = true)
+            customView(R.layout.dialog_enter_password_view, scrollable = true, horizontalPadding = true)
             positiveButton(R.string.btn_ok)
             negativeButton(R.string.btn_cancel)
             cancelable(false)  // calls setCancelable on the underlying dialog
@@ -425,7 +430,7 @@ class MainActivity : BaseActivity() {
         // ask for the decrypting password for this file
         val dialog = MaterialDialog(this).show {
             title(R.string.enc_enter_password)
-            customView(R.layout.enter_password_view, scrollable = true, horizontalPadding = true)
+            customView(R.layout.dialog_enter_password_view, scrollable = true, horizontalPadding = true)
             positiveButton(R.string.btn_ok)
             negativeButton(R.string.btn_cancel)
             cancelable(false)  // calls setCancelable on the underlying dialog
@@ -493,7 +498,7 @@ class MainActivity : BaseActivity() {
         // ask for the original password for this file
         val dialog = MaterialDialog(this).show {
             title(R.string.dlg_title_change_encrypting_password)
-            customView(R.layout.change_password_view, scrollable = true, horizontalPadding = true)
+            customView(R.layout.dialog_change_password_view, scrollable = true, horizontalPadding = true)
             positiveButton(R.string.btn_ok)
             negativeButton(android.R.string.cancel)
             cancelable(false)  // calls setCancelable on the underlying dialog
@@ -588,6 +593,59 @@ class MainActivity : BaseActivity() {
 
     }
 
+
+    private fun renameItem(item: FileDirItem, position: Int) {
+        val dialog = MaterialDialog(this).show {
+            title(R.string.dlg_title_rename_item)
+            customView(R.layout.dialog_new_filename_view, scrollable = true, horizontalPadding = true)
+            positiveButton(R.string.btn_rename)
+            negativeButton(R.string.btn_cancel)
+            cancelable(false)  // calls setCancelable on the underlying dialog
+            cancelOnTouchOutside(false)  // calls setCanceledOnTouchOutside on the underlying dialog
+        }
+
+        val filenameInput: EditText = dialog.getCustomView().findViewById(R.id.new_filename)
+        val progressBarContainer: View = dialog.getCustomView().findViewById(R.id.progressBarContainer)
+        val btnOk = dialog.getActionButton(WhichButton.POSITIVE)
+        val btnCancel = dialog.getActionButton(WhichButton.NEGATIVE)
+
+        val extLength : Int = item.getOriginalFilename().getFileExtension().length + 1
+
+        filenameInput.setText(item.getOriginalFilename())
+        filenameInput.setSelection(0, item.getOriginalFilename().length - extLength)
+
+
+        progressBarContainer.visibility = View.GONE
+        btnCancel.isEnabled = true
+        btnOk.isEnabled = true
+        showKeyboard(filenameInput)
+
+        filenameInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                btnOk.isEnabled = (filenameInput.text.length > 0)
+            }
+
+        })
+
+        btnOk.setOnClickListener {
+            // display a progress activity when decrypting file.
+            btnOk.isEnabled = false
+            btnCancel.isEnabled = false
+            progressBarContainer.visibility = View.VISIBLE
+
+            val newFilename = filenameInput.text.toString()
+
+            if (recyclerViewAdapter.renameFileItem(position, newFilename)) {
+                refreshFileItemList()
+            }
+
+            dialog.dismiss()
+
+        }
+
+    }
 
     private fun refreshFileItemList() {
         showProgressBar(true)

@@ -4,14 +4,20 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
-import com.smttcn.commons.extensions.formatSize
+import com.smttcn.commons.extensions.*
+import com.smttcn.commons.helpers.ENCRYPTED_FILE_EXT
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
@@ -165,12 +171,11 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
 
         var item = fileItemsFiltered[position]
 
-        // ask for the decrypting password for this file
         var dialog = MaterialDialog(currentContext).show {
             icon(R.drawable.ic_warning)
             title(R.string.dlg_title_delete_item)
             cornerRadius(5.0f)
-            customView(R.layout.delete_file_view)
+            customView(R.layout.dialog_delete_file_view)
             positiveButton(R.string.btn_delete) {
 
                 if (FileManager.deleteFile(File(item.path))) {
@@ -187,6 +192,17 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
 
         val filename: TextView = dialog.getCustomView().findViewById(R.id.filename)
         filename.text = item.getOriginalFilename()
+
+    }
+
+    internal fun renameFileItem(position: Int, newFilename: String) : Boolean {
+
+        var item = fileItemsFiltered[position]
+
+        val fromFilePath = item.path
+        val toFilePath = item.path.getPathOnly().appendFilename(newFilename).appendExtension(ENCRYPTED_FILE_EXT)
+
+        return FileManager.renameFile(fromFilePath, toFilePath)
 
     }
 

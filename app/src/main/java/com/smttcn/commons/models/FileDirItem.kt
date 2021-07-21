@@ -66,8 +66,8 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
                 }
                 sorting and SORT_BY_FOLDERNAME != 0 -> result = when {
                     // sort by folder/fullPathWithFilename name
-                    getParentPath() == other.getParentPath() -> 0
-                    getParentPath() > other.getParentPath() -> 1
+                    getPathOnly() == other.getPathOnly() -> 0
+                    getPathOnly() > other.getPathOnly() -> 1
                     else -> -1
 
                 }
@@ -109,7 +109,7 @@ open class FileDirItem(_file: File) : Comparable<FileDirItem> {
 
     fun getDirectChildrenCount(countHiddenItems: Boolean) = File(path).getDirectChildrenCount(countHiddenItems)
 
-    fun getParentPath() = path.getParentPath()
+    fun getPathOnly() = path.getPathOnly()
 
     fun deepcopy(): FileDirItem {
         val JSON = Gson().toJson(this)

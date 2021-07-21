@@ -23,7 +23,7 @@
             android:paddingBottom="40dp"
             android:textSize="@dimen/activity_font_size"
             android:text="@string/dlg_msg_delete_item"
-            android:textColor="@color/colorWarning" />
+            android:textColor="@color/colorRed" />
 
         <TextView
             android:id="@+id/filename"

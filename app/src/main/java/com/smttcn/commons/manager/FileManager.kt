@@ -203,6 +203,20 @@ object FileManager {
     }
 
 
+    fun renameFile(fromFilePath: String, toFilePath : String): Boolean {
+        try {
+            val oldFile = File(fromFilePath)
+            val newFile = File(toFilePath)
+            if (oldFile.renameTo(newFile))
+                return true
+            else
+                return false
+        } catch (e: Exception) {
+            return false
+        }
+    }
+
+
     fun deleteFile(file: File?): Boolean {
         if (file != null && file.isFile) {
             return file.delete()
@@ -290,7 +304,7 @@ object FileManager {
         else
             encryptedFilePath = FileManager.toFullPathInDocumentRoot(filename)
 
-        encryptedFilePath = encryptedFilePath.addExtension(ENCRYPTED_FILE_EXT)
+        encryptedFilePath = encryptedFilePath.appendExtension(ENCRYPTED_FILE_EXT)
 
         encryptedFilePath = renameDuplicatedFilePath(encryptedFilePath)
 

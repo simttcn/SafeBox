@@ -16,9 +16,11 @@ fun String.lowerCase() = this.toLowerCase(Locale.ENGLISH)
 
 fun String.upperCase() = this.toUpperCase(Locale.ENGLISH)
 
-fun String.addExtension(ext: String) = this + "." + ext
-
 fun String.appendPath(path: String) = this.removeSuffix("/") + "/" + path
+
+fun String.appendFilename(filename: String) = this.removeSuffix("/") + "/" + filename
+
+fun String.appendExtension(ext: String) = this + "." + ext
 
 fun String.removeTrailingCharacter(character: Char): String {
     if (endsWith(character, ignoreCase = false)) {
@@ -117,7 +119,7 @@ fun String.getGenericMimeType(): String {
     return "$type/*"
 }
 
-fun String.getParentPath() = removeSuffix("/${getFilenameFromPath()}")
+fun String.getPathOnly() = removeSuffix("/${getFilenameFromPath()}")
 
 fun String.substringTo(cnt: Int): String {
     return if (isEmpty()) {
