@@ -38,15 +38,15 @@ android {
 
     signingConfigs {
         release {
-            keyAlias "keyAliasSafeBox"
-            keyPassword "kdeLJFm392Ec2AA2"
-            storePassword "DM6skJXncZ9P2Ld8"
+            keyAlias keystoreProperties["keyAlias"].toString()
+            keyPassword keystoreProperties["keyPassword"].toString()
+            storePassword keystoreProperties["storePassword"].toString()
             storeFile file('../keystore.jks')
         }
         debug {
-            keyAlias "keyAliasSafeBox"
-            keyPassword "kdeLJFm392Ec2AA2"
-            storePassword "DM6skJXncZ9P2Ld8"
+            keyAlias keystoreProperties["keyAlias"].toString()
+            keyPassword keystoreProperties["keyPassword"].toString()
+            storePassword keystoreProperties["storePassword"].toString()
             storeFile file('../keystore.jks')
         }
     }
@@ -72,7 +72,8 @@ android {
 
     packagingOptions {
         // to exclude the atomic functions module from the package and prevent warnings.
-        exclude 'META-INF/atomicfu.kotlin_module'
+        //exclude 'META-INF/atomicfu.kotlin_module'
+        exclude 'DebugProbesKt.bin'
     }
 }
 
@@ -135,10 +136,10 @@ dependencies {
     // Afollestad Material Dialogs
     implementation "com.afollestad.material-dialogs:core:$versions.afollestadmaterialdialogs"
     implementation "com.afollestad.material-dialogs:input:$versions.afollestadmaterialdialogs"
-    implementation "com.afollestad.material-dialogs:files:$versions.afollestadmaterialdialogs"
-    implementation "com.afollestad.material-dialogs:color:$versions.afollestadmaterialdialogs"
-    implementation "com.afollestad.material-dialogs:datetime:$versions.afollestadmaterialdialogs"
-    implementation "com.afollestad.material-dialogs:bottomsheets:$versions.afollestadmaterialdialogs"
+    //implementation "com.afollestad.material-dialogs:files:$versions.afollestadmaterialdialogs"
+    //implementation "com.afollestad.material-dialogs:color:$versions.afollestadmaterialdialogs"
+    //implementation "com.afollestad.material-dialogs:datetime:$versions.afollestadmaterialdialogs"
+    //implementation "com.afollestad.material-dialogs:bottomsheets:$versions.afollestadmaterialdialogs"
     implementation "com.afollestad.material-dialogs:lifecycle:$versions.afollestadmaterialdialogs"
 
     // Testing

@@ -113,7 +113,6 @@ class MainActivity : BaseActivity() {
 
         // Setup refresh listener which triggers new data loading
         pullToRefreshContainer = findViewById(R.id.swipeRefreshContainer)
-        // todo: setColor no effect
         pullToRefreshContainer.setColorSchemeColors(R.array.swipeRefreshColors)
         pullToRefreshContainer.setOnRefreshListener {
             GlobalScope.launch(Dispatchers.IO) {
@@ -200,6 +199,9 @@ class MainActivity : BaseActivity() {
         if (MyApplication.isDebug) { // show debug menu item when in debug mode
             toolbarMenu.findItem(R.id.menu_visible).isVisible = true
             toolbarMenu.findItem(R.id.menu_debug_console).isVisible = true
+        } else {
+            toolbarMenu.findItem(R.id.menu_visible).isVisible = false
+            toolbarMenu.findItem(R.id.menu_debug_console).isVisible = false
         }
 
         val search = menu.findItem(R.id.menu_search)
