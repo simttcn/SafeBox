@@ -52,7 +52,7 @@
 <!--    <string name="new_app_password">New App Password</string>-->
     <string name="enter_app_password">Enter App Password</string>
     <string name="enter_app_password_error">password incorrect, please try again.</string>
-    <string name="enter_your_app_password">Enter password</string>
+    <string name="enter_your_app_password">Enter app password</string>
     <string name="enter_existing_app_password">Enter existing app password</string>
     <string name="enter_new_app_password">enter new app password</string>
     <string name="confirm_new_app_password">confirm new app password</string>
