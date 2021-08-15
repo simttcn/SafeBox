@@ -13,12 +13,12 @@ import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.animation.AnimationUtils
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
@@ -127,6 +127,18 @@ class MainActivity : BaseActivity() {
         // Configure the refreshing colors
         pullToRefreshContainer.setColorSchemeColors(R.array.swipeRefreshColors)
 
+        // RecyclerViewAdapter on change listener
+        recyclerViewAdapter.registerAdapterDataObserver(object : AdapterDataObserver() {
+            override fun onChanged() {
+                if (recyclerViewAdapter.itemCount > 0) {
+                    itemListRecyclerView.visibility = View.VISIBLE
+                    emptyFolderLayout.visibility = View.GONE
+                } else {
+                    itemListRecyclerView.visibility = View.GONE
+                    emptyFolderLayout.visibility = View.VISIBLE
+                }
+            }
+        })
 
         GlobalScope.launch(Dispatchers.IO) {
 
@@ -141,7 +153,7 @@ class MainActivity : BaseActivity() {
             launch(Dispatchers.Main) {
                 fileItemViewModel.allFileItems.observe(this@MainActivity, { item ->
                     // Update the cached copy of the fileItems in the adapter.
-                    item?.let { recyclerViewAdapter.setFileItems(it as MutableList<FileDirItem>) }
+                    item?.let { recyclerViewAdapter.setFileItems(it as MutableList<FileDirItem>)}
                 })
                 showProgressBar(false)
             }
@@ -670,15 +682,12 @@ class MainActivity : BaseActivity() {
             val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadein_fast)
             mainActivityProgressBarContainer.startAnimation(aniFade)
             mainActivityProgressBarContainer.visibility = View.VISIBLE
-            itemListRecyclerView.visibility = View.GONE
 
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
             GlobalScope.launch(Dispatchers.Main){
                 delay(750)
-
-                itemListRecyclerView.visibility = View.VISIBLE
 
                 val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadeout_fast)
                 mainActivityProgressBarContainer.startAnimation(aniFade)

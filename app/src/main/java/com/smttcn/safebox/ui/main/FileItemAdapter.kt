@@ -86,6 +86,11 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
 
     }
 
+    init {
+        fileItems = mutableListOf()
+        fileItemsFiltered = mutableListOf()
+    }
+
     override fun getItemCount(): Int {
         return fileItemsFiltered.size
     }

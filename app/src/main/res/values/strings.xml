@@ -112,6 +112,8 @@
     <string name="itemlist_thumbnail">Thumbnail</string>
     <string name="itemlist_image">Image</string>
     <string name="itemlist_default_text">item name</string>
+    <string name="itemlist_nothing_here">There is nothing here!</string>
+    <string name="itemlist_empty_folder">Empty Folder.</string>
 
     <!-- Dialog Title -->
     <string name="dlg_title_success">Success</string>
