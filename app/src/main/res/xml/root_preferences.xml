@@ -33,7 +33,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/info_header"
+    <PreferenceCategory app:title="@string/about_header"
         app:iconSpaceReserved="false">
 
         <Preference
@@ -41,7 +41,7 @@
             android:enabled="true"
             android:key="appinfo"
             android:title="@string/app_name"
-            android:summary="@string/pref_aoo_build_no" />
+            android:summary="@string/pref_app_build_no" />
 
     </PreferenceCategory>
     <!--

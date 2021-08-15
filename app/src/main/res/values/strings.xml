@@ -323,14 +323,16 @@
     <string name="security_header">Security</string>
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
-    <string name="info_header">Information</string>
+    <string name="about_header">About</string>
+
 
     <!-- Security Preferences -->
     <string name="enable_app_password">Enable App Password</string>
     <string name="change_app_password">Change App Password</string>
 
-    <!-- Preference Information -->
-    <string name="pref_aoo_build_no">Version</string>
+    <!-- Preference About -->
+    <string name="pref_app_build_no">Version</string>
+    <string name="pref_app_copyright">Copyright Sim 2021</string>
 
     <string name="title_activity_image_view">ImageViewActivity</string>
     <string name="dummy_button">Dummy Button</string>

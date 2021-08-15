@@ -35,7 +35,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         var appInfo: Preference? = findPreference("appinfo")
         var buildText = if (BuildConfig.DEBUG) " Debug" else ""
         var versionText = " " + BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE
-        appInfo?.summary = getString(R.string.pref_aoo_build_no) + versionText + buildText
+        appInfo?.summary = getString(R.string.pref_app_build_no) + versionText + buildText + "\n" + getString(R.string.pref_app_copyright)
 
         enabledAppPassword = findPreference("enableapppassword")
         changeAppPassword = findPreference("changeapppassword")

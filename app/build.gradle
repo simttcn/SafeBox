@@ -11,14 +11,18 @@ android {
     compileSdkVersion versions.compileSdk
     //buildToolsVersion versions.buildTools
 
+    def toIncreaseBuildNo = false
     def versionPropsFile = file('version.properties')
 
     if (versionPropsFile.canRead()) {
         Properties versionProps = new Properties()
         versionProps.load(new FileInputStream(versionPropsFile))
-        def code = versionProps['VERSION_CODE'].toInteger() // + 1
-        versionProps['VERSION_CODE'] = code.toString()
-        versionProps.store(versionPropsFile.newWriter(), null)
+        def code = versionProps['VERSION_CODE'].toInteger()
+        if (toIncreaseBuildNo) {
+            code = code + 1
+            versionProps['VERSION_CODE'] = code.toString()
+            versionProps.store(versionPropsFile.newWriter(), null)
+        }
 
         defaultConfig {
             applicationId "com.smttcn.safebox"
