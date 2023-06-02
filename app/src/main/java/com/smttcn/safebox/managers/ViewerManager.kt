@@ -11,6 +11,7 @@ import com.smttcn.commons.extensions.withLeadingCharacter
 import com.smttcn.commons.helpers.PdfExtensions
 import com.smttcn.commons.helpers.photoExtensions
 import com.smttcn.commons.models.FileDirItem
+import com.smttcn.safebox.databinding.RecyclerviewItemBinding
 import com.smttcn.safebox.helpers.BaseViewer
 import com.smttcn.safebox.helpers.ImageViewer
 import kotlin.reflect.KClass
@@ -47,7 +48,7 @@ object ViewerManager{
     }
 
 
-    fun getHelper(activity: Activity, view: View, file: FileDirItem): BaseViewer? {
+    fun getHelper(activity: Activity, view: View, binding: RecyclerviewItemBinding, file: FileDirItem): BaseViewer? {
 
         var helper: BaseViewer? = null
         val fileExt = file.getOriginalFilename().getFileExtension()
@@ -56,7 +57,7 @@ object ViewerManager{
             if (item.value.contains(fileExt.withLeadingCharacter('.'))) {
 
                 helper = Class.forName(item.key).newInstance() as BaseViewer
-                helper.initialize(activity, view, file)
+                helper.initialize(activity, view, binding, file)
 
             }
         }

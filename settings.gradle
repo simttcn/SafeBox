@@ -1,2 +1,24 @@
+pluginManagement {
+    repositories {
+        google()
+//        jcenter()
+        //maven { url "https://dl.bintray.com/drummer-aidan/maven" }
+//        maven { url "https://dl.bintray.com/drummer-aidan/maven" }
+//        maven { url 'https://maven.google.com' } // for Room
+        //maven { url "https://s3.amazonaws.com/repo.commonsware.com" } // for com.commonsware.misc:support.db.tests.x:0.4.5
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+//        jcenter()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url "https://dl.bintray.com/drummer-aidan/maven" }
+    }
+}
 include ':app', ':crypto', ':imageviewer', ':pdfview-library'
 rootProject.name='SafeBox'

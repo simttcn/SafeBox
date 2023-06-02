@@ -32,7 +32,7 @@ class DebugconsoleActivity : BaseActivity() {
 
     }
 
-    fun initActivityUI() {
+    private fun initActivityUI() {
         supportActionBar?.title = getString(R.string.title_activity_debugconsole)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }

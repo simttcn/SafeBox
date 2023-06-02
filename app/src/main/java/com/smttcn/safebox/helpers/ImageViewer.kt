@@ -9,8 +9,9 @@ import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.manager.ImageManager
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
+import com.smttcn.safebox.databinding.RecyclerviewItemBinding
 import com.stfalcon.imageviewer.StfalconImageViewer
-import kotlinx.android.synthetic.main.recyclerview_item.view.*
+//import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -19,9 +20,10 @@ import java.io.File
 class ImageViewer : BaseViewer() {
 
 
-    override fun initialize(activity: Activity, view: View, fileDirItem: FileDirItem) {
+    override fun initialize(activity: Activity, view: View, binding: RecyclerviewItemBinding, fileDirItem: FileDirItem) {
         _parentActivity = activity
         _view = view
+        _binding = binding
         _file = fileDirItem
     }
 
@@ -40,7 +42,7 @@ class ImageViewer : BaseViewer() {
                     imagePaths,
                     ::loadImage
                 )
-                    .withTransitionFrom(_view.item_background)
+                    .withTransitionFrom(_binding.itemBackground)
                     .show()
 
             } else {
@@ -65,7 +67,7 @@ class ImageViewer : BaseViewer() {
         imageView.startAnimation(aniFade)
         imageView.setImageDrawable(_parentActivity.getDrawableCompat(R.drawable.ic_image))
 
-        if (imageByteArray.size > 0) {
+        if (imageByteArray.isNotEmpty()) {
             imageView.setImageBitmap(ImageManager.toBitmap(imageByteArray))
         }
 

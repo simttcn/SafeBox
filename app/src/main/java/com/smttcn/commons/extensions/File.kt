@@ -90,7 +90,7 @@ fun File.doesThisOrParentHaveNoMedia(): Boolean {
 
 fun File.getFileTypeDrawableId(): Int {
     //val ext = "." + FileManager.getFileExtensionFromEncryptedFile(this)
-    val ext = "." + this.name.removeEncryptedExtension().getFileExtension().toLowerCase(Locale.getDefault())
+    val ext = "." + this.name.removeEncryptedExtension().getFileExtension().lowercase(Locale.getDefault())
 
     if (photoExtensions.contains(ext)) return R.drawable.fileicon_image_50
     if (videoExtensions.contains(ext)) return R.drawable.fileicon_video_50

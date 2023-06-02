@@ -10,7 +10,6 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
-import android.widget.EditText
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.getFilenameFromPath
@@ -18,18 +17,21 @@ import com.smttcn.commons.extensions.removeEncryptedExtension
 import com.smttcn.commons.extensions.showKeyboard
 import com.smttcn.commons.helpers.*
 import com.smttcn.safebox.R
-import kotlinx.android.synthetic.main.activity_encrypting.*
+import com.smttcn.safebox.databinding.ActivityEncryptingBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.File
 
 class EncryptingActivity: BaseActivity() {
 
+    private lateinit var binding: ActivityEncryptingBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityEncryptingBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        initActivity()
         initActivityUI()
 
         showProgressBar(false)
@@ -41,33 +43,29 @@ class EncryptingActivity: BaseActivity() {
         finish()
     }
 
-    private fun initActivity() {
-        setContentView(R.layout.activity_encrypting)
-    }
-
     private fun initActivityUI() {
-        val EncryptingPassword = findViewById<EditText>(R.id.encrypting_password)
-        val ConfirmPassword = findViewById<EditText>(R.id.confirm_password)
-        val btnOk = findViewById<Button>(R.id.ok)
-        val btnCancel = findViewById<Button>(R.id.cancel)
+        val encryptingPassword = binding.encryptingPassword
+        val confirmPassword = binding.confirmPassword
+        val btnOk = binding.ok
+        val btnCancel = binding.cancel
 
-        showKeyboard(EncryptingPassword)
+        showKeyboard(encryptingPassword)
 
 
-        EncryptingPassword.addTextChangedListener(object: TextWatcher {
+        encryptingPassword.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                toEnableOkButton(s.toString(), ConfirmPassword.text.toString())
+                toEnableOkButton(s.toString(), confirmPassword.text.toString())
             }
 
         })
 
-        ConfirmPassword.addTextChangedListener(object: TextWatcher {
+        confirmPassword.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                toEnableOkButton(EncryptingPassword.text.toString(), s.toString())
+                toEnableOkButton(encryptingPassword.text.toString(), s.toString())
             }
 
         })
@@ -79,7 +77,7 @@ class EncryptingActivity: BaseActivity() {
         }
 
         btnOk.setOnClickListener {
-            if (isEncryptingPasswordValid(EncryptingPassword.text.toString(), ConfirmPassword.text.toString())){
+            if (isEncryptingPasswordValid(encryptingPassword.text.toString(), confirmPassword.text.toString())){
 
                 showProgressBar(true)
 
@@ -88,7 +86,7 @@ class EncryptingActivity: BaseActivity() {
                     var encryptedSuccess = false
 
                     var fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
-                    var encryptedFilePath = FileManager.encryptFileFromUriToFolder(contentResolver, EncryptingPassword.text.toString().toCharArray(), fileUri)
+                    var encryptedFilePath = FileManager.encryptFileFromUriToFolder(contentResolver, encryptingPassword.text.toString().toCharArray(), fileUri)
 
                     if (FileManager.isFileExist(encryptedFilePath))
                         encryptedSuccess = true
@@ -136,11 +134,11 @@ class EncryptingActivity: BaseActivity() {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
-            encryptingActivityProgressBarContainer.visibility = View.VISIBLE
+            binding.encryptingActivityProgressBarContainer.visibility = View.VISIBLE
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
-            encryptingActivityProgressBarContainer.visibility = View.GONE
+            binding.encryptingActivityProgressBarContainer.visibility = View.GONE
         }
     }
 

@@ -5,15 +5,12 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
-import com.pdfview.PDFView
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.getFilenameFromPath
 import com.smttcn.commons.helpers.INTENT_VIEW_FILE_PATH
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.safebox.R
-import kotlinx.android.synthetic.main.activity_view_pdf.*
-import com.smttcn.commons.extensions.lowerCase
-import kotlinx.android.synthetic.main.activity_main.*
+import com.smttcn.safebox.databinding.ActivityViewPdfBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -21,12 +18,15 @@ import kotlinx.coroutines.launch
 
 class PdfViewActivity : BaseActivity() {
 
-    lateinit var myContext: Context
-    var filePath: String = ""
+    private lateinit var myContext: Context
+    private var filePath: String = ""
+
+    private lateinit var bindingPdf: ActivityViewPdfBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        bindingPdf = ActivityViewPdfBinding.inflate(layoutInflater)
 
         initActivity()
         initActivityUI()
@@ -37,15 +37,15 @@ class PdfViewActivity : BaseActivity() {
     private fun initActivity() {
         myContext = this
         filePath = intent.getStringExtra(INTENT_VIEW_FILE_PATH)!!
-        setContentView(R.layout.activity_view_pdf)
+        setContentView(bindingPdf.root)
     }
 
 
     private fun initActivityUI() {
 
-        if (filePath.length > 0) {
+        if (filePath.isNotEmpty()) {
 
-            var viewer = pdfView.fromFile(filePath)
+            val viewer = bindingPdf.pdfView.fromFile(filePath)
 
             supportActionBar?.title = filePath.getFilenameFromPath()
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -95,9 +95,9 @@ class PdfViewActivity : BaseActivity() {
             )
 
             val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadein_fast)
-            pdfViewActivityProgressBarContainer.startAnimation(aniFade)
-            pdfViewActivityProgressBarContainer.visibility = View.VISIBLE
-            pdfView.visibility = View.GONE
+            bindingPdf.pdfViewActivityProgressBarContainer.startAnimation(aniFade)
+            bindingPdf.pdfViewActivityProgressBarContainer.visibility = View.VISIBLE
+            bindingPdf.pdfView.visibility = View.GONE
 
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
@@ -105,11 +105,11 @@ class PdfViewActivity : BaseActivity() {
             GlobalScope.launch(Dispatchers.Main){
                 delay(750)
 
-                pdfView.visibility = View.VISIBLE
+                bindingPdf.pdfView.visibility = View.VISIBLE
 
                 val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadeout_fast)
-                pdfViewActivityProgressBarContainer.startAnimation(aniFade)
-                pdfViewActivityProgressBarContainer.visibility = View.INVISIBLE
+                bindingPdf.pdfViewActivityProgressBarContainer.startAnimation(aniFade)
+                bindingPdf.pdfViewActivityProgressBarContainer.visibility = View.INVISIBLE
             }
         }
 

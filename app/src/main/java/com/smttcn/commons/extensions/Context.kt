@@ -11,13 +11,11 @@ import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
-import android.os.Parcelable
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.DrawableRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
@@ -156,7 +154,7 @@ fun Context.hideKeyboard(view: View) {
 }
 
 
-fun sendShareItent(context: Context, filepath: String) {
+fun sendShareIntent(context: Context, filepath: String) {
 
     if (filepath.isNotEmpty()) {
 

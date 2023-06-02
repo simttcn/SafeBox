@@ -1,12 +1,17 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+//apply plugin: 'com.android.library'
+//apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion versions.compileSdk
+    compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion versions.minSdk //19
-        targetSdkVersion versions.targetSdk
+        minSdkVersion 26
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
     }
@@ -22,12 +27,8 @@ android {
 }
 
 dependencies {
-    api "androidx.appcompat:appcompat:$versions.appcompat"
+    api "androidx.appcompat:appcompat:1.1.0"
     api 'androidx.transition:transition:1.2.0'
-    implementation 'com.github.chrisbanes:PhotoView:2.2.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
-}
-
-repositories {
-    maven { url "https://jitpack.io" }
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.20"
 }

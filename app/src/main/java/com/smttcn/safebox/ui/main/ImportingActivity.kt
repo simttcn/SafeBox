@@ -19,7 +19,7 @@ import com.smttcn.commons.extensions.*
 import com.smttcn.commons.helpers.*
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.safebox.R
-import kotlinx.android.synthetic.main.activity_importing.*
+import com.smttcn.safebox.databinding.ActivityImportingBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -28,12 +28,14 @@ import java.lang.Exception
 class ImportingActivity : BaseActivity() {
 
     lateinit var myContext: Context
+    private lateinit var binding: ActivityImportingBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        binding = ActivityImportingBinding.inflate(layoutInflater)
 
-        initActivity()
+        initActivity(binding.root)
         initActivityUI()
 
         showProgressBar(false)
@@ -47,9 +49,9 @@ class ImportingActivity : BaseActivity() {
     }
 
 
-    private fun initActivity() {
+    private fun initActivity(view: View) {
         myContext = this
-        setContentView(R.layout.activity_importing)
+        setContentView(view)
     }
 
 
@@ -102,7 +104,7 @@ class ImportingActivity : BaseActivity() {
 
         btnOk.setOnClickListener {
 
-            var fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
+            val fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
 
             if (optionSave.isChecked) {
 
@@ -146,7 +148,7 @@ class ImportingActivity : BaseActivity() {
                         showProgressBar(false)
                         if (FileManager.isFileExist(decryptedFilePath)) {
                             // succesfully decrypted file
-                            sendShareItent(myContext, decryptedFilePath)
+                            sendShareIntent(myContext, decryptedFilePath)
                             setResult(INTENT_RESULT_DECRYPTED)
                             finish()
                         } else {
@@ -181,12 +183,12 @@ class ImportingActivity : BaseActivity() {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
             )
 
-            importingActivityProgressBarContainer.visibility = View.VISIBLE
+            binding.importingActivityProgressBarContainer.visibility = View.VISIBLE
             //itemListRecyclerView.visibility = View.GONE
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
-            importingActivityProgressBarContainer.visibility = View.GONE
+            binding.importingActivityProgressBarContainer.visibility = View.GONE
             //itemListRecyclerView.visibility = View.VISIBLE
         }
     }

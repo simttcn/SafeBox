@@ -13,6 +13,7 @@ import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.manager.ImageManager
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
+import com.smttcn.safebox.databinding.RecyclerviewItemBinding
 import com.smttcn.safebox.ui.main.PdfViewActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -21,9 +22,10 @@ import kotlinx.coroutines.launch
 class PdfViewer : BaseViewer() {
 
 
-    override fun initialize(activity: Activity, view: View, fileDirItem: FileDirItem) {
+    override fun initialize(activity: Activity, view: View, binding: RecyclerviewItemBinding, fileDirItem: FileDirItem) {
         _parentActivity = activity
         _view = view
+        _binding = binding
         _file = fileDirItem
     }
 
@@ -34,7 +36,7 @@ class PdfViewer : BaseViewer() {
 
         GlobalScope.launch(Dispatchers.Main) {
 
-            if (decryptedFilePath.length > 0) {
+            if (decryptedFilePath.isNotEmpty()) {
 
                 val viewerIntent = Intent(_parentActivity, PdfViewActivity::class.java)
                 viewerIntent.putExtra(INTENT_VIEW_FILE_PATH, decryptedFilePath)
@@ -63,7 +65,7 @@ class PdfViewer : BaseViewer() {
         imageView.startAnimation(aniFade)
         imageView.setImageDrawable(_parentActivity.getDrawableCompat(R.drawable.ic_image))
 
-        if (imageByteArray.size > 0) {
+        if (imageByteArray.isNotEmpty()) {
             imageView.setImageBitmap(ImageManager.toBitmap(imageByteArray))
         }
 

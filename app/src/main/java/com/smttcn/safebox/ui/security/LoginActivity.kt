@@ -14,7 +14,7 @@ import com.smttcn.commons.helpers.Authenticator
 import com.smttcn.commons.helpers.MIN_PASSWORD_LENGTH
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
-import kotlinx.android.synthetic.main.activity_login.*
+import com.smttcn.safebox.databinding.ActivityLoginBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -22,12 +22,15 @@ import kotlinx.coroutines.launch
 
 class LoginActivity : BaseActivity() {
 
+    private lateinit var binding: ActivityLoginBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
 
         authenticationExempted = true
 
-        setContentView(R.layout.activity_login)
+        setContentView(binding.root)
         initializeUI()
 
         showProgressBar(false)
@@ -40,40 +43,40 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun initializeUI() {
-        val Password = findViewById<EditText>(R.id.password)
-        val LoginButton = findViewById<Button>(R.id.login)
+        val password = findViewById<EditText>(R.id.password)
+        val loginButton = findViewById<Button>(R.id.login)
 
-        Password.text.clear()
+        password.text.clear()
 
-        showKeyboard(Password)
+        showKeyboard(password)
 
-        Password.addTextChangedListener(object: TextWatcher {
+        password.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                LoginButton.isEnabled = s.toString().length >= MIN_PASSWORD_LENGTH
+                loginButton.isEnabled = s.toString().length >= MIN_PASSWORD_LENGTH
             }
 
         })
 
-        LoginButton.setOnClickListener {
+        loginButton.setOnClickListener {
             // perform authenticaiton here
             val authenticator: Authenticator = Authenticator()
 
-            if (Password.length() >= MIN_PASSWORD_LENGTH) {
-                authenticator.authenticateAppPassword((Password.text.toString())) {
+            if (password.length() >= MIN_PASSWORD_LENGTH) {
+                authenticator.authenticateAppPassword((password.text.toString())) {
                     //showProgressBar(false)
-                    Password.text.clear()
-                    if (it == true) {
+                    password.text.clear()
+                    if (it) {
                         // Login successfully
                         MyApplication.authenticated = true
                         // finish and return
                         finish()
                     } else {
                         MyApplication.lockApp()
-                        val Message = findViewById<TextView>(R.id.message)
-                        Message.text = getString(R.string.enter_app_password_error)
-                        Message.visibility = View.VISIBLE
+                        val message = findViewById<TextView>(R.id.message)
+                        message.text = getString(R.string.enter_app_password_error)
+                        message.visibility = View.VISIBLE
                     }
                 }
             }
@@ -91,11 +94,11 @@ class LoginActivity : BaseActivity() {
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                 )
 
-                loginActivityProgressBarContainer.visibility = View.VISIBLE
+                binding.loginActivityProgressBarContainer.visibility = View.VISIBLE
             } else {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
-                loginActivityProgressBarContainer.visibility = View.GONE
+                binding.loginActivityProgressBarContainer.visibility = View.GONE
             }
 
         }

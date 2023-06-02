@@ -12,15 +12,15 @@ import java.text.Normalizer
 import java.util.*
 import java.util.regex.Pattern
 
-fun String.lowerCase() = this.toLowerCase(Locale.ENGLISH)
+fun String.lowerCase() = this.lowercase(Locale.ENGLISH)
 
-fun String.upperCase() = this.toUpperCase(Locale.ENGLISH)
+fun String.upperCase() = this.uppercase(Locale.ENGLISH)
 
 fun String.appendPath(path: String) = this.removeSuffix("/") + "/" + path
 
 fun String.appendFilename(filename: String) = this.removeSuffix("/") + "/" + filename
 
-fun String.appendExtension(ext: String) = this + "." + ext
+fun String.appendExtension(ext: String) = "$this.$ext"
 
 fun String.removeTrailingCharacter(character: Char): String {
     if (endsWith(character, ignoreCase = false)) {

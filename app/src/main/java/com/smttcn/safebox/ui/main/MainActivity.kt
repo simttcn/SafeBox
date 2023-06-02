@@ -34,11 +34,12 @@ import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.BuildConfig
 import com.smttcn.safebox.MyApplication
 import com.smttcn.safebox.R
+import com.smttcn.safebox.databinding.ActivityMainBinding
+import com.smttcn.safebox.databinding.RecyclerviewItemBinding
 import com.smttcn.safebox.managers.ViewerManager
 import com.smttcn.safebox.ui.debug.DebugconsoleActivity
 import com.smttcn.safebox.ui.settings.SettingsActivity
 import com.smttcn.safebox.viewmodel.FileItemViewModel
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -61,6 +62,7 @@ class MainActivity : BaseActivity() {
     private var backButtonPressedOnce = false
     private var lastPressedBackTime = System.currentTimeMillis()
 
+    private lateinit var binding: ActivityMainBinding
 
     // todo: Investigate "The application may be doing too much work on its main thread"
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,8 +71,10 @@ class MainActivity : BaseActivity() {
         isShareFromOtherApp = (intent?.action == Intent.ACTION_SEND) || (intent?.action == Intent.ACTION_VIEW)
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+        setSupportActionBar(binding.toolbar)
 
         MyApplication.baseConfig.lastVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE
 
@@ -106,13 +110,13 @@ class MainActivity : BaseActivity() {
         showProgressBar(true)
 
         // setting recyclerview adapter
-        recyclerView = findViewById(R.id.itemListRecyclerView)
+        recyclerView = binding.itemListRecyclerView
         recyclerViewAdapter = FileItemAdapter(myContext)
         recyclerView.adapter = recyclerViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(myContext)
 
         // Setup refresh listener which triggers new data loading
-        pullToRefreshContainer = findViewById(R.id.swipeRefreshContainer)
+        pullToRefreshContainer = binding.swipeRefreshContainer
         pullToRefreshContainer.setColorSchemeColors(R.array.swipeRefreshColors)
         pullToRefreshContainer.setOnRefreshListener {
             GlobalScope.launch(Dispatchers.IO) {
@@ -131,11 +135,11 @@ class MainActivity : BaseActivity() {
         recyclerViewAdapter.registerAdapterDataObserver(object : AdapterDataObserver() {
             override fun onChanged() {
                 if (recyclerViewAdapter.itemCount > 0) {
-                    itemListRecyclerView.visibility = View.VISIBLE
-                    emptyFolderLayout.visibility = View.GONE
+                    binding.itemListRecyclerView.visibility = View.VISIBLE
+                    binding.emptyFolderLayout.visibility = View.GONE
                 } else {
-                    itemListRecyclerView.visibility = View.GONE
-                    emptyFolderLayout.visibility = View.VISIBLE
+                    binding.itemListRecyclerView.visibility = View.GONE
+                    binding.emptyFolderLayout.visibility = View.VISIBLE
                 }
             }
         })
@@ -146,8 +150,8 @@ class MainActivity : BaseActivity() {
                 onRecyclerViewItemClicked(view, item, prevIdx, currIdx)
             }
 
-            recyclerViewAdapter.onItemPopupMenuClick = { view, item, position ->
-                onRecyclerViewItemPopupMenuClicked(view, item, position)
+            recyclerViewAdapter.onItemPopupMenuClick = { view, binding, item, position ->
+                onRecyclerViewItemPopupMenuClicked(view, binding, item, position)
             }
 
             launch(Dispatchers.Main) {
@@ -189,6 +193,7 @@ class MainActivity : BaseActivity() {
     }
 
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         val millisecondsSinceLastPressedBack = System.currentTimeMillis() - lastPressedBackTime
         if (!backButtonPressedOnce || millisecondsSinceLastPressedBack > INTERVAL_BACK_BUTTON_QUIT_IN_MS) {
@@ -297,7 +302,7 @@ class MainActivity : BaseActivity() {
     }
 
 
-    private fun onRecyclerViewItemPopupMenuClicked(view: View, item: FileDirItem, position: Int) {
+    private fun onRecyclerViewItemPopupMenuClicked(view: View, binding: RecyclerviewItemBinding, item: FileDirItem, position: Int) {
         //init the wrapper with style
         val wrapper: Context = ContextThemeWrapper(myContext, R.style.BasePopupMenu)
         val popupMenu = PopupMenu(wrapper, view, Gravity.BOTTOM + Gravity.END)
@@ -319,14 +324,14 @@ class MainActivity : BaseActivity() {
         popupMenu.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.popupmenu_view -> {
-                    viewItem(item, view)
+                    viewItem(item, view, binding)
                     true
                 }
                 R.id.popupmenu_share_encrypt -> {
                     // copy the file to be shared to the designated share folder
                     val shareFilePath = FileManager.copyFileToTempShareFolder(item.path)
                     if (shareFilePath.isNotEmpty()) {
-                        sendShareItent(myContext, shareFilePath)
+                        sendShareIntent(myContext, shareFilePath)
                     }
                     true
                 }
@@ -366,10 +371,10 @@ class MainActivity : BaseActivity() {
 
 
     // let people view the content of supported file
-    private fun viewItem(item: FileDirItem, view: View) {
+    private fun viewItem(item: FileDirItem, view: View, binding: RecyclerviewItemBinding) {
 
         // get the appropriate viewer through the viewer manager
-        val helper = ViewerManager.getHelper(this, view, item)
+        val helper = ViewerManager.getHelper(this, view, binding, item)
 
         if (helper != null) { // helper not null
 
@@ -488,7 +493,7 @@ class MainActivity : BaseActivity() {
 
                     if (FileManager.isFileExist(decryptedFilePath)) {
                         // successfully decrypted file
-                        sendShareItent(myContext, decryptedFilePath)
+                        sendShareIntent(myContext, decryptedFilePath)
                     } else {
                         // fail to encrypt file
                         showMessageDialog(
@@ -680,8 +685,8 @@ class MainActivity : BaseActivity() {
             )
 
             val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadein_fast)
-            mainActivityProgressBarContainer.startAnimation(aniFade)
-            mainActivityProgressBarContainer.visibility = View.VISIBLE
+            binding.mainActivityProgressBarContainer.startAnimation(aniFade)
+            binding.mainActivityProgressBarContainer.visibility = View.VISIBLE
 
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
@@ -690,8 +695,8 @@ class MainActivity : BaseActivity() {
                 delay(750)
 
                 val aniFade = AnimationUtils.loadAnimation(applicationContext, R.anim.fadeout_fast)
-                mainActivityProgressBarContainer.startAnimation(aniFade)
-                mainActivityProgressBarContainer.visibility = View.INVISIBLE
+                binding.mainActivityProgressBarContainer.startAnimation(aniFade)
+                binding.mainActivityProgressBarContainer.visibility = View.INVISIBLE
             }
         }
 

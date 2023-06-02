@@ -4,16 +4,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getSystemService
+import com.smttcn.safebox.databinding.RecyclerviewItemBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.WhichButton
-import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.smttcn.commons.extensions.*
@@ -21,7 +17,6 @@ import com.smttcn.commons.helpers.ENCRYPTED_FILE_EXT
 import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.models.FileDirItem
 import com.smttcn.safebox.R
-import kotlinx.android.synthetic.main.recyclerview_item.view.*
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -30,18 +25,19 @@ import kotlin.collections.ArrayList
 class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adapter<FileItemAdapter.FileItemViewHolder>(), Filterable {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private lateinit var fileItems: MutableList<FileDirItem> // Cached copy of FileDirItem
-    private lateinit var fileItemsFiltered: MutableList<FileDirItem> // Cached copy of filtered FileDirItem
+    private var fileItems: MutableList<FileDirItem> // Cached copy of FileDirItem
+    private var fileItemsFiltered: MutableList<FileDirItem> // Cached copy of filtered FileDirItem
     private val currentContext = context
     private var currSelectedItemIndex = -1
     private var prevSelectedItemIndex = -1
 
     var onItemClick: ((View, FileDirItem, Int, Int) -> Unit)? = null // to point to the onItemClick method in MainActivity
-    var onItemPopupMenuClick: ((View, FileDirItem, Int) -> Unit)? = null // to point to the onItemClick method in MainActivity
+    var onItemPopupMenuClick: ((View, RecyclerviewItemBinding, FileDirItem, Int) -> Unit)? = null // to point to the onItemClick method in MainActivity
 
-    inner class FileItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class FileItemViewHolder(val binding: RecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         init {
+
             itemView.setOnClickListener{
 
                 prevSelectedItemIndex = currSelectedItemIndex
@@ -65,15 +61,15 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
         }
 
         fun bindItem(item: FileDirItem) {
-            var thumbnail = item.getThumbnailDrawable()
+            val thumbnail = item.getThumbnailDrawable()
             if (thumbnail != null)
-                itemView.item_thumbnail.setImageDrawable(thumbnail)
+                binding.itemThumbnail.setImageDrawable(thumbnail)
             else
-                itemView.item_thumbnail.setImageResource(R.drawable.ic_file)
+                binding.itemThumbnail.setImageResource(R.drawable.ic_file)
 
-            itemView.item_name.text = item.getOriginalFilename() //item.filename
+            binding.itemName.text = item.getOriginalFilename() //item.filename
 
-            itemView.item_size.text = item.getFileSize().formatSize() //item.size
+            binding.itemName.text = item.getFileSize().formatSize() //item.size
 
 //            if (item.isSelected) {
 //                itemView.setBackgroundColor(ContextCompat.getColor(currentContext, R.color.colorItemBackgroundSelected))
@@ -96,16 +92,17 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileItemViewHolder {
-        var holder = FileItemViewHolder(inflater.inflate(R.layout.recyclerview_item, parent, false))
-        return holder
+        val binding = RecyclerviewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        return FileItemViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: FileItemViewHolder, position: Int) {
-        val currentItem = fileItemsFiltered.get(position)
+        val currentItem = fileItemsFiltered[position]
 
-        holder.itemView.popup_menu.setOnClickListener {
+        holder.binding.popupMenu.setOnClickListener {
 
-            onItemPopupMenuClick?.invoke(holder.itemView, currentItem, position)
+            onItemPopupMenuClick?.invoke(holder.itemView, holder.binding, currentItem, position)
 
         }
         holder.bindItem(currentItem)
@@ -124,7 +121,7 @@ class FileItemAdapter internal constructor(context: Context) : RecyclerView.Adap
                     val filteredList = ArrayList<FileDirItem>()
                     fileItems
                         .filter {
-                            (it.getOriginalFilename().toLowerCase(Locale.getDefault()).contains(charString.toLowerCase(Locale.getDefault())))
+                            (it.getOriginalFilename().lowercase(Locale.getDefault()).contains(charString.lowercase(Locale.getDefault())))
                         }
                         .forEach { filteredList.add(it) }
                     fileItemsFiltered = filteredList
