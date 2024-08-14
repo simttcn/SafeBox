@@ -24,9 +24,9 @@ object Base64 {
     init {
         Arrays.fill(decode, -1)
         for (i in encode.indices) {
-            decode[encode[i].toInt()] = i
+            decode[encode[i].code] = i
         }
-        decode[pad.toInt()] = 0
+        decode[pad.code] = 0
     }
 
     /**
@@ -88,7 +88,7 @@ object Base64 {
 
         while (di < blocks) {
             val n =
-                table[src[si++].toInt()] shl 18 or (table[src[si++].toInt()] shl 12) or (table[src[si++].toInt()] shl 6) or table[src[si++].toInt()]
+                table[src[si++].code] shl 18 or (table[src[si++].code] shl 12) or (table[src[si++].code] shl 6) or table[src[si++].code]
             dst[di++] = (n shr 16).toByte()
             dst[di++] = (n shr 8).toByte()
             dst[di++] = n.toByte()
@@ -98,21 +98,21 @@ object Base64 {
             var n = 0
             when (len - si) {
                 4 -> {
-                    n = n or table[src[si + 3].toInt()]
-                    n = n or (table[src[si + 2].toInt()] shl 6)
-                    n = n or (table[src[si + 1].toInt()] shl 12)
-                    n = n or (table[src[si].toInt()] shl 18)
+                    n = n or table[src[si + 3].code]
+                    n = n or (table[src[si + 2].code] shl 6)
+                    n = n or (table[src[si + 1].code] shl 12)
+                    n = n or (table[src[si].code] shl 18)
                 }
                 3 -> {
-                    n = n or (table[src[si + 2].toInt()] shl 6)
-                    n = n or (table[src[si + 1].toInt()] shl 12)
-                    n = n or (table[src[si].toInt()] shl 18)
+                    n = n or (table[src[si + 2].code] shl 6)
+                    n = n or (table[src[si + 1].code] shl 12)
+                    n = n or (table[src[si].code] shl 18)
                 }
                 2 -> {
-                    n = n or (table[src[si + 1].toInt()] shl 12)
-                    n = n or (table[src[si].toInt()] shl 18)
+                    n = n or (table[src[si + 1].code] shl 12)
+                    n = n or (table[src[si].code] shl 18)
                 }
-                1 -> n = n or (table[src[si].toInt()] shl 18)
+                1 -> n = n or (table[src[si].code] shl 18)
             }
             var r = 16
             while (di < bytes) {
@@ -142,7 +142,7 @@ object Base64 {
         val blocks = len / 3 * 3
         var chars = (len - 1) / 3 + 1 shl 2
         val tail = len - blocks
-        if (pad.toInt() == 0 && tail > 0) chars -= 3 - tail
+        if (pad.code == 0 && tail > 0) chars -= 3 - tail
 
         val dst = CharArray(chars)
         var si = 0
@@ -166,7 +166,7 @@ object Base64 {
             dst[di++] = table[n.ushr(6) and 0x3f]
             if (tail == 2) dst[di++] = table[n and 0x3f]
 
-            if (pad.toInt() != 0) {
+            if (pad.code != 0) {
                 if (tail == 1) dst[di++] = pad
                 dst[di] = pad
             }

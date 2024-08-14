@@ -3,6 +3,7 @@ package com.smttcn.safebox.ui.main
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.Editable
@@ -10,12 +11,12 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
-import com.smttcn.commons.manager.FileManager
 import com.smttcn.commons.activities.BaseActivity
 import com.smttcn.commons.extensions.getFilenameFromPath
 import com.smttcn.commons.extensions.removeEncryptedExtension
 import com.smttcn.commons.extensions.showKeyboard
 import com.smttcn.commons.helpers.*
+import com.smttcn.commons.manager.FileManager
 import com.smttcn.safebox.R
 import com.smttcn.safebox.databinding.ActivityEncryptingBinding
 import kotlinx.coroutines.Dispatchers
@@ -85,8 +86,13 @@ class EncryptingActivity: BaseActivity() {
 
                     var encryptedSuccess = false
 
-                    var fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
-                    var encryptedFilePath = FileManager.encryptFileFromUriToFolder(contentResolver, encryptingPassword.text.toString().toCharArray(), fileUri)
+                    val fileUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        intent.getParcelableExtra(INTENT_SHARE_FILE_URI, Uri::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
+                    }
+                    val encryptedFilePath = FileManager.encryptFileFromUriToFolder(contentResolver, encryptingPassword.text.toString().toCharArray(), fileUri!!)
 
                     if (FileManager.isFileExist(encryptedFilePath))
                         encryptedSuccess = true
@@ -96,8 +102,8 @@ class EncryptingActivity: BaseActivity() {
                         showProgressBar(false)
 
                         if (encryptedSuccess) {
-                            // succesfully encrypted file
-                            var resultIntent = Intent()
+                            // successfully encrypted file
+                            val resultIntent = Intent()
                             resultIntent.putExtra(INTENT_ENCRYPTED_FILENAME, encryptedFilePath.getFilenameFromPath().removeEncryptedExtension())
                             setResult(Activity.RESULT_OK, resultIntent)
                             finish()
@@ -128,7 +134,7 @@ class EncryptingActivity: BaseActivity() {
                 && encryptingPassword.equals(confirmPassword, false))
     }
 
-    fun showProgressBar(show: Boolean) {
+    private fun showProgressBar(show: Boolean) {
         if (show) {
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,

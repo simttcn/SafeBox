@@ -1,5 +1,6 @@
 package com.stfalcon.imageviewer.common.pager
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.SparseArray
@@ -63,7 +64,12 @@ internal abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHol
     override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
         if (state != null && state is Bundle) {
             state.classLoader = loader
-            val sparseArray: SparseArray<Parcelable>? = state.getSparseParcelableArray(STATE)
+            val sparseArray: SparseArray<Parcelable>? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                state.getSparseParcelableArray(STATE, Parcelable::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                state.getSparseParcelableArray(STATE)
+            }
             savedStates = sparseArray ?: SparseArray()
         }
         super.restoreState(state, loader)
@@ -139,7 +145,12 @@ internal abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHol
 
         private fun getStateFromParcelable(state: Parcelable?): SparseArray<Parcelable>? {
             if (state != null && state is Bundle && state.containsKey(STATE)) {
-                return state.getSparseParcelableArray<Parcelable>(STATE)
+                return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    state.getSparseParcelableArray(STATE, Parcelable::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    state.getSparseParcelableArray(STATE)
+                }
             }
             return null
         }

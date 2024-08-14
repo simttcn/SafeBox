@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.Editable
@@ -14,6 +15,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -75,6 +77,19 @@ class MainActivity : BaseActivity() {
         val view = binding.root
         setContentView(view)
         setSupportActionBar(binding.toolbar)
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val millisecondsSinceLastPressedBack = System.currentTimeMillis() - lastPressedBackTime
+                if (!backButtonPressedOnce || millisecondsSinceLastPressedBack > INTERVAL_BACK_BUTTON_QUIT_IN_MS) {
+                    toast(R.string.press_back_again_to_quit, Toast.LENGTH_LONG)
+                    backButtonPressedOnce = true
+                    lastPressedBackTime = System.currentTimeMillis()
+                } else {
+                    finishAndRemoveTask()
+                }
+            }
+        })
 
         MyApplication.baseConfig.lastVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE
 
@@ -170,7 +185,13 @@ class MainActivity : BaseActivity() {
         val uri: Uri = if (intent?.action == Intent.ACTION_VIEW) {
             Uri.parse(intent.dataString)
         } else {
-            intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as Uri
+            val fileUri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+            }
+            fileUri!!
         }
 
         val (filename, _) = FileManager.getFilenameAndSizeFromUri(contentResolver, uri)
@@ -193,20 +214,20 @@ class MainActivity : BaseActivity() {
     }
 
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        val millisecondsSinceLastPressedBack = System.currentTimeMillis() - lastPressedBackTime
-        if (!backButtonPressedOnce || millisecondsSinceLastPressedBack > INTERVAL_BACK_BUTTON_QUIT_IN_MS) {
-            toast(R.string.press_back_again_to_quit, Toast.LENGTH_LONG)
-            backButtonPressedOnce = true
-            lastPressedBackTime = System.currentTimeMillis()
-            return
-        } else {
-            //showProgressBar(true)
-            finishAndRemoveTask()
-        }
-        super.onBackPressed()
-    }
+//    @Deprecated("Deprecated in Java")
+//    override fun onBackPressed() {
+//        val millisecondsSinceLastPressedBack = System.currentTimeMillis() - lastPressedBackTime
+//        if (!backButtonPressedOnce || millisecondsSinceLastPressedBack > INTERVAL_BACK_BUTTON_QUIT_IN_MS) {
+//            toast(R.string.press_back_again_to_quit, Toast.LENGTH_LONG)
+//            backButtonPressedOnce = true
+//            lastPressedBackTime = System.currentTimeMillis()
+//            return
+//        } else {
+//            //showProgressBar(true)
+//            finishAndRemoveTask()
+//        }
+//        super.onBackPressed()
+//    }
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

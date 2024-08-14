@@ -56,7 +56,7 @@ object ViewerManager{
         for (item in viewerMap.entries) {
             if (item.value.contains(fileExt.withLeadingCharacter('.'))) {
 
-                helper = Class.forName(item.key).newInstance() as BaseViewer
+                helper = Class.forName(item.key).getDeclaredConstructor().newInstance() as BaseViewer
                 helper.initialize(activity, view, binding, file)
 
             }

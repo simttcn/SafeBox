@@ -244,7 +244,7 @@ public class Encryption constructor(ver: Int) {
             input.read(salt, 0, SALT_LENGTH_BYTE)
             input.read(prop, 0, PROP_LENGTH_BYTE)
 
-            val ver_no : Int = getVerFromByteArray(ver)
+            //val ver_no : Int = getVerFromByteArray(ver)
 
             if (iv.size > 0 && salt.size > 0) {
 
@@ -303,7 +303,7 @@ public class Encryption constructor(ver: Int) {
             fileInputStream.read(salt, 0, SALT_LENGTH_BYTE)
             fileInputStream.read(prop, 0, PROP_LENGTH_BYTE)
 
-            val ver_no : Int = getVerFromByteArray(ver)
+            //val ver_no : Int = getVerFromByteArray(ver)
 
             if (iv.size > 0 && salt.size > 0) {
 
@@ -355,7 +355,7 @@ public class Encryption constructor(ver: Int) {
             fileInputStream.read(salt, 0, SALT_LENGTH_BYTE)
             fileInputStream.read(prop, 0, PROP_LENGTH_BYTE)
 
-            val ver_no : Int = getVerFromByteArray(ver)
+            //val ver_no : Int = getVerFromByteArray(ver)
 
             if (iv.size > 0 && salt.size > 0) {
 

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.Editable
@@ -104,7 +105,12 @@ class ImportingActivity : BaseActivity() {
 
         btnOk.setOnClickListener {
 
-            val fileUri = intent.getParcelableExtra<Parcelable>(INTENT_SHARE_FILE_URI) as Uri
+            val fileUri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(INTENT_SHARE_FILE_URI, Uri::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra<Uri>(INTENT_SHARE_FILE_URI)
+            }
 
             if (optionSave.isChecked) {
 
@@ -112,7 +118,7 @@ class ImportingActivity : BaseActivity() {
 
                 GlobalScope.launch(Dispatchers.IO) {
 
-                    var filename = FileManager.copyFileFromUriToFolder(contentResolver, fileUri)
+                    var filename = FileManager.copyFileFromUriToFolder(contentResolver, fileUri!!)
 
                     var resultIntent = Intent()
                     resultIntent.putExtra(INTENT_IMPORTED_FILENAME, filename.getFilenameFromPath().removeEncryptedExtension())
@@ -135,7 +141,7 @@ class ImportingActivity : BaseActivity() {
 
                 GlobalScope.launch(Dispatchers.IO) {
 
-                    val inputStream = contentResolver.openInputStream(fileUri)
+                    val inputStream = contentResolver.openInputStream(fileUri!!)
                     val (filename, _) = FileManager.getFilenameAndSizeFromUri(contentResolver, fileUri)
                     try {
                         if(inputStream != null) {

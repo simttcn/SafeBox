@@ -1,14 +1,14 @@
 plugins {
-    id 'com.android.application' version '7.3.1' apply false
-    id 'com.android.library' version '7.3.1' apply false
+    id 'com.android.application' version '8.5.1' apply false
+    id 'com.android.library' version '8.5.1' apply false
     id 'org.jetbrains.kotlin.android' version '1.7.0' apply false
     //id 'com.google.dagger.hilt.android' version '2.44.2' apply false
 }
 
 allprojects {
-    buildDir = "C:/build/${rootProject.name}/${project.name}"
+    layout.buildDirectory.set(new File("C:/build/${rootProject.name}/${project.name}"))
 }
 
 task clean(type: Delete) {
-    delete rootProject.buildDir
+    delete rootProject.layout.buildDirectory.get().asFile
 }

@@ -7,28 +7,19 @@ plugins {
 //apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 26
-        targetSdkVersion 33
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 34
     }
+    namespace 'com.stfalcon.imageviewer'
 
-    buildTypes {
-        debug {
-            debuggable = true
-        }
-        release {
-            debuggable = false
-        }
-    }
 }
 
 dependencies {
     api "androidx.appcompat:appcompat:1.1.0"
     api 'androidx.transition:transition:1.2.0'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.20"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.0"
 }
